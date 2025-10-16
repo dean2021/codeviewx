@@ -138,6 +138,104 @@ def ripgrep_search(pattern: str, path: str = ".",
         return f"搜索错误: {error_msg}"
 
 
+def write_real_file(file_path: str, content: str) -> str:
+    """
+    写入真实文件系统中的文件
+    
+    Args:
+        file_path: 文件的绝对路径或相对路径
+        content: 文件内容
+    
+    Returns:
+        操作结果，成功或错误信息
+    
+    Examples:
+        - write_real_file(".wiki/README.md", "# 文档")
+        - write_real_file("/path/to/file.txt", "内容")
+    """
+    try:
+        # 确保目录存在
+        directory = os.path.dirname(file_path)
+        if directory and not os.path.exists(directory):
+            os.makedirs(directory, exist_ok=True)
+        
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+        
+        return f"✅ 成功写入文件: {file_path} ({len(content)} 字符)"
+    
+    except PermissionError:
+        return f"❌ 错误: 没有权限写入文件 '{file_path}'"
+    except Exception as e:
+        return f"❌ 错误: {str(e)}"
+
+
+def read_real_file(file_path: str) -> str:
+    """
+    读取真实文件系统中的文件内容
+    
+    Args:
+        file_path: 文件的绝对路径或相对路径
+    
+    Returns:
+        文件内容，如果出错则返回错误信息
+    
+    Examples:
+        - read_real_file("/Users/deanlu/Desktop/projects/codeviewx/main.py")
+        - read_real_file("README.md")
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            # 如果文件太大，只返回前10000个字符
+            if len(content) > 10000:
+                return content[:10000] + f"\n\n... (文件太大，已截断，总共 {len(content)} 字符)"
+            return content
+    except FileNotFoundError:
+        return f"❌ 错误: 文件 '{file_path}' 不存在"
+    except PermissionError:
+        return f"❌ 错误: 没有权限读取文件 '{file_path}'"
+    except Exception as e:
+        return f"❌ 错误: {str(e)}"
+
+
+def list_real_directory(directory: str = ".") -> str:
+    """
+    列出真实文件系统中目录的内容
+    
+    Args:
+        directory: 目录路径，默认为当前目录
+    
+    Returns:
+        目录内容列表，如果出错则返回错误信息
+    
+    Examples:
+        - list_real_directory("/Users/deanlu/Desktop/projects/codeviewx")
+        - list_real_directory(".")
+    """
+    try:
+        items = os.listdir(directory)
+        # 分类显示
+        dirs = [f"📁 {item}/" for item in items if os.path.isdir(os.path.join(directory, item))]
+        files = [f"📄 {item}" for item in items if os.path.isfile(os.path.join(directory, item))]
+        
+        result = f"目录: {os.path.abspath(directory)}\n"
+        result += f"共 {len(dirs)} 个目录, {len(files)} 个文件\n\n"
+        
+        if dirs:
+            result += "目录:\n" + "\n".join(sorted(dirs)) + "\n\n"
+        if files:
+            result += "文件:\n" + "\n".join(sorted(files))
+        
+        return result if result else "目录为空"
+    except FileNotFoundError:
+        return f"❌ 错误: 目录 '{directory}' 不存在"
+    except PermissionError:
+        return f"❌ 错误: 没有权限访问目录 '{directory}'"
+    except Exception as e:
+        return f"❌ 错误: {str(e)}"
+
+
 def load_prompt(name):
     """加载 AI 文档生成的系统提示词"""
     with open(f"prompt/{name}.md", "r") as f:
@@ -153,8 +251,11 @@ print("✓ 已加载系统提示词")
 
 # 创建工具列表
 tools = [
-    execute_command,    # 执行系统命令
-    ripgrep_search,     # 快速文本搜索
+    execute_command,      # 执行系统命令（通用）
+    ripgrep_search,       # 快速文本搜索
+    write_real_file,      # 写入真实文件 ⭐ 直接保存到文件系统
+    read_real_file,       # 读取真实文件
+    list_real_directory,  # 列出真实目录
 ]
 
 agent = create_deep_agent(
