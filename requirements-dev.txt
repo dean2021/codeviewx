@@ -1,0 +1,12 @@
+# 开发和测试依赖
+pytest>=7.0.0
+pytest-cov>=4.0.0
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.0.0
+isort>=5.0.0
+
+# 构建和发布工具
+build>=0.10.0
+twine>=4.0.0
+

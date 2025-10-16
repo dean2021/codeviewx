@@ -1,0 +1,23 @@
+# 包含项目元数据文件
+include README.md
+include LICENSE
+include requirements.txt
+include pyproject.toml
+
+# 包含提示词文件
+recursive-include codeviewx/prompts *.md
+
+# 包含文档
+recursive-include docs *.md
+
+# 排除不必要的文件
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+recursive-exclude * .DS_Store
+recursive-exclude * *.swp
+recursive-exclude * .gitignore
+
+# 排除旧的目录结构
+exclude tools/*
+exclude prompt/*
+

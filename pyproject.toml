@@ -1,0 +1,112 @@
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "codeviewx"
+version = "0.1.0"
+description = "AI 驱动的代码文档生成器，基于 DeepAgents 和 LangChain"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "CodeViewX Team"}
+]
+keywords = [
+    "documentation", 
+    "ai", 
+    "code-analysis", 
+    "deepagents", 
+    "langchain",
+    "code-documentation",
+    "document-generation"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Documentation",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Environment :: Console",
+]
+
+dependencies = [
+    "langchain>=0.3.27",
+    "langchain-anthropic>=0.3.22",
+    "langchain-core>=0.3.79",
+    "langchain-text-splitters>=0.3.11",
+    "langgraph>=0.6.10",
+    "langgraph-checkpoint>=2.1.2",
+    "langgraph-prebuilt>=0.6.4",
+    "langgraph-sdk>=0.2.9",
+    "langsmith>=0.4.34",
+    "deepagents>=0.0.5",
+    "ripgrepy>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "flake8>=6.0",
+    "mypy>=1.0",
+    "isort>=5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/codeviewx"
+Documentation = "https://github.com/yourusername/codeviewx/tree/main/docs"
+Repository = "https://github.com/yourusername/codeviewx"
+"Bug Tracker" = "https://github.com/yourusername/codeviewx/issues"
+
+[project.scripts]
+codeviewx = "codeviewx.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["codeviewx*"]
+exclude = ["tests*", "docs*", "examples*", "tools", "prompt"]
+
+[tool.setuptools.package-data]
+codeviewx = ["prompts/*.md"]
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311']
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v"
+
