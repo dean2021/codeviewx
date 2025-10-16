@@ -68,7 +68,7 @@ export OPENAI_API_KEY='your-api-key-here'
 ### 命令行使用
 
 ```bash
-# 分析当前目录，输出到 .wiki/
+# 分析当前目录，输出到 .wiki/（默认显示简洁进度）
 codeviewx
 
 # 分析指定项目
@@ -77,12 +77,52 @@ codeviewx -w /path/to/project
 # 自定义输出目录
 codeviewx -o docs
 
-# 显示详细日志
+# 显示详细日志（开发调试用）
 codeviewx --verbose
 
 # 完整配置
 codeviewx -w /path/to/project -o docs --verbose
 ```
+
+**进度提示说明：**
+- **标准模式**：显示简洁清爽的进度信息，智能跟踪执行状态
+  ```
+  📋 任务规划:  （仅在首次创建和重要里程碑时显示）
+     ⏳ 分析项目结构和技术栈
+     ⏳ 识别核心模块和入口文件
+     ⏳ 生成 README.md 文档
+     ⏳ 生成项目概览文档
+  
+  💭 AI: 我将首先分析项目结构...
+  🔍 分析项目结构...
+     📁 列表: ✓ 8 项 | codeviewx, tests, examples ... (+5)
+     📖 读取: ✓ 42 行 | [tool.poetry] name = "codeviewx"...
+     📖 读取: ✓ 156 行 | # CodeViewX 🚀 AI驱动...
+     📁 列表: ✓ 5 项 | __init__.py, core.py, cli.py ... (+2)
+     🔎 搜索: ✓ 127 处匹配 | from deepagents import Agent...
+     📖 读取: ✓ 441 行 | import os import sys logging...
+  
+  📋 任务规划:  （有实质性进展时更新，完成数 +2）
+     ✅ 分析项目结构和技术栈
+     ✅ 识别核心模块和入口文件
+     🔄 生成 README.md 文档
+     ⏳ 生成项目概览文档
+  
+  📄 正在生成文档 (1): README.md
+  📄 正在生成文档 (2): 01-overview.md
+  ✅ 文档生成完成! 共生成 6 个文档文件
+  ```
+  - ✅ **简洁一行式显示**（前25步）：
+    - 📖 读取：`✓ 行数 | 内容预览...`
+    - 📁 列表：`✓ 项数 | 前3项 ... (+N)`
+    - 🔎 搜索：`✓ 匹配数 | 首个匹配...`
+    - ⚙️ 命令：`✓ 输出摘要...`
+  - ✅ 显示所有 TODO 任务（完整内容）
+  - ✅ 智能显示：首次 + 重要进展 + 完成时
+  - ✅ AI 思考和规划
+  - ✅ 自动隐藏 HTTP 日志
+  
+- **Verbose 模式**：显示完整的执行日志，包括每个工具调用详情
 
 查看帮助信息：
 
