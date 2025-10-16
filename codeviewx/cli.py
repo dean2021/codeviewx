@@ -20,10 +20,15 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例:
-  codeviewx                           # 分析当前目录
+  codeviewx                           # 分析当前目录（自动检测语言）
   codeviewx -w /path/to/project       # 分析指定项目
   codeviewx -o docs                   # 输出到 docs 目录
+  codeviewx -l English                # 使用英文生成文档
+  codeviewx -l Chinese -o docs        # 使用中文，输出到 docs
   codeviewx -w . -o .wiki --verbose   # 完整配置 + 详细日志
+  
+支持的语言:
+  Chinese, English, Japanese, Korean, French, German, Spanish, Russian
   
 环境变量:
   OPENAI_API_KEY     OpenAI API 密钥（如使用 OpenAI 模型）
@@ -52,6 +57,14 @@ def main():
     )
     
     parser.add_argument(
+        "-l", "--language",
+        dest="doc_language",
+        default=None,
+        choices=['Chinese', 'English', 'Japanese', 'Korean', 'French', 'German', 'Spanish', 'Russian'],
+        help="文档语言（默认：自动检测系统语言）"
+    )
+    
+    parser.add_argument(
         "--recursion-limit",
         type=int,
         default=1000,
@@ -73,6 +86,7 @@ def main():
         generate_docs(
             working_directory=args.working_directory,
             output_directory=args.output_directory,
+            doc_language=args.doc_language,
             recursion_limit=args.recursion_limit,
             verbose=args.verbose
         )

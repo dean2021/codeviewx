@@ -3,6 +3,8 @@ CodeViewX 核心功能模块
 """
 
 import os
+import sys
+import locale
 import logging
 from datetime import datetime
 from pathlib import Path
@@ -18,6 +20,48 @@ from .tools import (
     read_real_file,
     list_real_directory,
 )
+
+
+def detect_system_language() -> str:
+    """
+    检测系统语言
+    
+    Returns:
+        语言代码字符串，如 'zh-CN', 'en-US', 'ja-JP' 等
+    
+    Examples:
+        >>> detect_system_language()
+        'zh-CN'  # 在中文系统上
+    """
+    try:
+        # 尝试获取系统语言设置
+        lang, encoding = locale.getdefaultlocale()
+        
+        if lang:
+            # 规范化语言代码
+            if lang.startswith('zh'):
+                return 'Chinese'  # 中文
+            elif lang.startswith('ja'):
+                return 'Japanese'  # 日语
+            elif lang.startswith('ko'):
+                return 'Korean'  # 韩语
+            elif lang.startswith('fr'):
+                return 'French'  # 法语
+            elif lang.startswith('de'):
+                return 'German'  # 德语
+            elif lang.startswith('es'):
+                return 'Spanish'  # 西班牙语
+            elif lang.startswith('ru'):
+                return 'Russian'  # 俄语
+            else:
+                return 'English'  # 默认英文
+        
+        # 如果无法检测，返回英文
+        return 'English'
+        
+    except Exception:
+        # 发生异常时默认返回英文
+        return 'English'
 
 
 def load_prompt(name: str, **kwargs) -> str:
@@ -86,6 +130,7 @@ def load_prompt(name: str, **kwargs) -> str:
 def generate_docs(
     working_directory: Optional[str] = None,
     output_directory: str = ".wiki",
+    doc_language: Optional[str] = None,
     recursion_limit: int = 1000,
     verbose: bool = False
 ) -> None:
@@ -95,21 +140,24 @@ def generate_docs(
     Args:
         working_directory: 项目工作目录（默认：当前目录）
         output_directory: 文档输出目录（默认：.wiki）
+        doc_language: 文档语言（默认：自动检测系统语言）
+                     支持：'Chinese', 'English', 'Japanese', 等
         recursion_limit: Agent 递归限制（默认：1000）
         verbose: 是否显示详细日志（默认：False）
     
     Examples:
-        # 分析当前目录
+        # 分析当前目录，自动检测语言
         generate_docs()
         
-        # 分析指定项目
+        # 分析指定项目，使用英文
         generate_docs(
             working_directory="/path/to/project",
-            output_directory="docs"
+            output_directory="docs",
+            doc_language="English"
         )
         
-        # 显示详细日志
-        generate_docs(verbose=True)
+        # 使用中文生成文档
+        generate_docs(doc_language="Chinese", verbose=True)
     """
     # 配置日志
     log_level = logging.DEBUG if verbose else logging.INFO
@@ -127,19 +175,28 @@ def generate_docs(
     if working_directory is None:
         working_directory = os.getcwd()
     
+    # 检测或使用指定的文档语言
+    if doc_language is None:
+        doc_language = detect_system_language()
+        language_source = "自动检测"
+    else:
+        language_source = "用户指定"
+    
     print("=" * 80)
     print(f"🚀 启动 CodeViewX 文档生成器 - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 80)
     print(f"📂 工作目录: {working_directory}")
     print(f"📝 输出目录: {output_directory}")
+    print(f"🌍 文档语言: {doc_language} ({language_source})")
     
     # 加载提示词
     prompt = load_prompt(
         "DocumentEngineer",
         working_directory=working_directory,
-        output_directory=output_directory
+        output_directory=output_directory,
+        doc_language=doc_language
     )
-    print("✓ 已加载系统提示词（已注入工作目录和输出目录）")
+    print("✓ 已加载系统提示词（已注入工作目录、输出目录和文档语言）")
     
     # 创建工具列表
     tools = [

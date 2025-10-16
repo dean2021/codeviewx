@@ -16,16 +16,19 @@ def test_load_prompt_with_variables():
     prompt = load_prompt(
         "DocumentEngineer",
         working_directory="/test/path",
-        output_directory=".wiki"
+        output_directory=".wiki",
+        doc_language="English"
     )
     
     # 检查变量是否被替换
     assert "/test/path" in prompt
     assert ".wiki" in prompt
+    assert "English" in prompt
     
     # 检查占位符是否被完全替换
     assert "{working_directory}" not in prompt
     assert "{output_directory}" not in prompt
+    assert "{doc_language}" not in prompt
     
     # 检查提示词不为空
     assert len(prompt) > 0
@@ -60,12 +63,14 @@ def test_load_prompt_multiple_variables():
     prompt = load_prompt(
         "DocumentEngineer",
         working_directory="/my/project",
-        output_directory="docs"
+        output_directory="docs",
+        doc_language="Chinese"
     )
     
     # 检查所有变量都被正确替换
     assert "/my/project" in prompt
     assert "docs" in prompt
+    assert "Chinese" in prompt
     
     # 统计出现次数（应该多次出现）
     assert prompt.count("/my/project") > 5
@@ -77,13 +82,15 @@ def test_prompt_content_structure():
     prompt = load_prompt(
         "DocumentEngineer",
         working_directory="/test",
-        output_directory=".wiki"
+        output_directory=".wiki",
+        doc_language="Chinese"
     )
     
     # 检查是否包含关键章节
     assert "角色与使命" in prompt or "角色" in prompt
     assert "工具" in prompt or "Tools" in prompt
     assert "文档" in prompt or "Documentation" in prompt
+    assert "Chinese" in prompt
 
 
 if __name__ == "__main__":
