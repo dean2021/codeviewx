@@ -86,11 +86,18 @@ if __name__ == "__main__":
 
     # 获取当前工作目录
     working_directory = os.getcwd()
-    print(f"📂 工作目录: {working_directory}")
+    output_directory = ".wiki"  # 文档输出目录
     
-    # 加载系统提示词并注入工作目录
-    prompt = load_prompt("DocumentEngineer", working_directory=working_directory)
-    print("✓ 已加载系统提示词（已注入工作目录）")
+    print(f"📂 工作目录: {working_directory}")
+    print(f"📝 输出目录: {output_directory}")
+    
+    # 加载系统提示词并注入工作目录和输出目录
+    prompt = load_prompt(
+        "DocumentEngineer", 
+        working_directory=working_directory,
+        output_directory=output_directory
+    )
+    print("✓ 已加载系统提示词（已注入工作目录和输出目录）")
 
     # 创建工具列表
     tools = [
