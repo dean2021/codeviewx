@@ -45,7 +45,8 @@ print("\n📝 开始分析项目并生成文档...\n")
 step_count = 0
 for chunk in agent.stream(
     {"messages": [{"role": "user", "content": "当前工作目录为:/Users/deanlu/Desktop/projects/codeviewx,请生成一份该项目的深度技术文档"}]},
-    stream_mode="values"  # 使用 values 模式
+    stream_mode="values",  # 使用 values 模式
+    config={"recursion_limit": 1000}  # 增加递归限制到1000步
 ):
     if "messages" in chunk:
         step_count += 1

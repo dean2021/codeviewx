@@ -10,6 +10,61 @@
 5.  配置文件（如 `.env.example`, `config/`, `application.yml`）。
 6.  测试文件（如 `tests/`, `__tests__/`, `*_test.go`, `*.spec.ts`）以了解测试策略。
 
+## 需要忽略的文件和目录
+在分析项目时，**必须忽略**以下文件和目录，它们与项目的核心功能无关：
+
+### 版本控制和配置
+- `.git/` - Git 版本控制目录
+- `.gitignore` - Git 忽略文件配置
+- `.gitattributes` - Git 属性配置
+- `.svn/` - SVN 版本控制目录
+- `.hg/` - Mercurial 版本控制目录
+
+### 虚拟环境和依赖
+- `.venv/` - Python 虚拟环境
+- `venv/` - Python 虚拟环境
+- `env/` - Python 虚拟环境
+- `node_modules/` - Node.js 依赖包
+- `vendor/` - Go/PHP 依赖包
+- `.bundle/` - Ruby 依赖包
+- `__pycache__/` - Python 字节码缓存
+- `*.pyc` - Python 编译文件
+- `.pytest_cache/` - pytest 缓存
+- `.mypy_cache/` - mypy 缓存
+
+### IDE 和编辑器配置
+- `.vscode/` - VSCode 配置
+- `.idea/` - JetBrains IDE 配置
+- `.vs/` - Visual Studio 配置
+- `*.swp`, `*.swo` - Vim 临时文件
+- `.DS_Store` - macOS 系统文件
+- `Thumbs.db` - Windows 缩略图文件
+
+### 构建产物和临时文件
+- `dist/` - 构建输出目录
+- `build/` - 构建输出目录
+- `out/` - 构建输出目录
+- `target/` - Maven/Rust 构建目录
+- `.cache/` - 缓存目录
+- `tmp/` - 临时文件目录
+- `temp/` - 临时文件目录
+- `*.log` - 日志文件
+- `.next/` - Next.js 构建缓存
+- `.nuxt/` - Nuxt.js 构建缓存
+
+### 测试覆盖率和报告
+- `coverage/` - 测试覆盖率报告
+- `.coverage` - Python 覆盖率数据
+- `htmlcov/` - HTML 覆盖率报告
+- `.nyc_output/` - NYC 覆盖率输出
+
+### 其他
+- `.env` - 环境变量文件（可能包含敏感信息）
+- `.env.local` - 本地环境变量
+- `*.lock` - 锁文件（如 package-lock.json, poetry.lock）可以扫描但不需要深入分析
+
+**注意**: 如果用户明确要求分析某些通常被忽略的文件（如 `.gitignore` 来了解项目规范），则应该分析。
+
 ## 异常情况处理策略
 - **无 README 或文档**: 完全依靠代码分析，在文档中标注"项目缺少现有文档"。
 - **项目过大**: 优先分析入口文件、核心业务逻辑和主要模块，明确说明分析范围。
