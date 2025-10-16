@@ -3,10 +3,13 @@
 
 # 项目信息
 - **工作目录**: `{working_directory}`
-- **文档输出目录**: `.wiki/`
+- **文档输出目录**: `{output_directory}`
 - **分析任务**: 深度技术文档生成
 
-**重要**: 所有文件路径操作都基于工作目录 `{working_directory}`，文档应保存到 `.wiki/` 子目录。
+**重要**: 
+- 所有源代码文件路径操作都基于工作目录 `{working_directory}`
+- 所有生成的文档必须保存到 `{output_directory}` 目录
+- 使用 `write_real_file` 工具时，文档路径应为：`{output_directory}/文档名.md`
 
 # 输入规范
 你将全面分析当前项目（位于 `{working_directory}`）。你必须优先读取并解析以下文件以建立项目上下文：
@@ -185,14 +188,14 @@
    ```
 
 #### 阶段B: 文档生成（直接写入真实文件系统）⭐
-使用 `write_real_file` 直接生成文档到 `.wiki/` 目录：
+使用 `write_real_file` 直接生成文档到输出目录：
 ```
-write_real_file(".wiki/README.md", "# 文档内容...")
-write_real_file(".wiki/01-overview.md", "# 项目概览...")
+write_real_file("{output_directory}/README.md", "# 文档内容...")
+write_real_file("{output_directory}/01-overview.md", "# 项目概览...")
 ```
 
 **特性**:
-- ✅ 支持子目录路径（`.wiki/README.md`）
+- ✅ 支持子目录路径（如 `{output_directory}/README.md`）
 - ✅ 自动创建不存在的目录
 - ✅ 直接写入真实文件系统
 - ✅ 用户可以立即看到生成的文件
@@ -211,12 +214,12 @@ write_real_file(".wiki/01-overview.md", "# 项目概览...")
 
 使用 `write_real_file` 工具直接写入真实文件系统：
 ```
-write_real_file(".wiki/README.md", "# 文档内容")
-write_real_file(".wiki/01-overview.md", "# 概览")
+write_real_file("{output_directory}/README.md", "# 文档内容")
+write_real_file("{output_directory}/01-overview.md", "# 概览")
 ```
 
 **特性**：
-- ✅ 支持子目录路径（`.wiki/README.md`）
+- ✅ 支持子目录路径（如 `{output_directory}/README.md`）
 - ✅ 自动创建目录结构
 - ✅ 用户可以立即在文件系统中看到文件
 - ✅ 实时文档生成进度可见
@@ -225,10 +228,10 @@ write_real_file(".wiki/01-overview.md", "# 概览")
 
 1. **逐个生成文档文件** ⭐
    - **一次只生成一个完整的文档文件**
-   - 使用 `write_real_file(".wiki/README.md", content)`
+   - 使用 `write_real_file("{output_directory}/README.md", content)`
    - 生成顺序：README → 01-overview → 02-quickstart → 其他文档
    - 每生成一个文件后，更新对应的 todo 状态
-   - `write_real_file` 会自动创建 `.wiki/` 目录，无需手动创建
+   - `write_real_file` 会自动创建输出目录，无需手动创建
 
 2. **为什么要逐个生成？**
    - ✅ 用户可以实时看到生成进度
@@ -275,41 +278,41 @@ write_real_file(".wiki/01-overview.md", "# 概览")
 ```
 使用 write_real_file 直接写入文件系统！
 
-步骤16-20: 生成 .wiki/README.md ⭐
-  - 使用 write_real_file(".wiki/README.md", content)
+步骤16-20: 生成 README.md ⭐
+  - 使用 write_real_file("{output_directory}/README.md", content)
   - 包含文档结构表格、快速导航、元信息
-  - 自动创建 .wiki 目录
+  - 自动创建输出目录
   - 更新对应的 todo 状态
 
-步骤21-25: 生成 .wiki/01-overview.md
-  - 使用 write_real_file(".wiki/01-overview.md", content)
+步骤21-25: 生成 01-overview.md
+  - 使用 write_real_file("{output_directory}/01-overview.md", content)
   - 包含项目介绍、技术栈、目录结构、核心特性
   - 更新对应的 todo 状态
 
-步骤26-30: 生成 .wiki/02-quickstart.md
-  - 使用 write_real_file(".wiki/02-quickstart.md", content)
+步骤26-30: 生成 02-quickstart.md
+  - 使用 write_real_file("{output_directory}/02-quickstart.md", content)
   - 包含环境要求、安装步骤、运行命令、基础示例
   - 更新对应的 todo 状态
 
-步骤31-35: 生成 .wiki/03-architecture.md（如适用）
-  - 使用 write_real_file(".wiki/03-architecture.md", content)
+步骤31-35: 生成 03-architecture.md（如适用）
+  - 使用 write_real_file("{output_directory}/03-architecture.md", content)
   - 包含架构图、模块说明、设计模式
   - 更新对应的 todo 状态
 
-步骤36-42: 生成 .wiki/04-core-mechanisms.md
-  - 使用 write_real_file(".wiki/04-core-mechanisms.md", content)
+步骤36-42: 生成 04-core-mechanisms.md
+  - 使用 write_real_file("{output_directory}/04-core-mechanisms.md", content)
   - 这是最重要的文档，要详细分析1-3个核心流程
   - 包含时序图、数据流图、详细步骤说明
   - 更新对应的 todo 状态
 
 步骤43-50: 生成其他必需的文档
-  - 根据项目类型生成 .wiki/07-development-guide.md 等
-  - 可能需要 .wiki/09-security.md、.wiki/10-performance.md 等
+  - 根据项目类型生成其他必需文档（如 07-development-guide.md）
+  - 可能需要 09-security.md、10-performance.md 等
   - 每生成一个文件，更新一次 todo 状态
 
 重要说明：
 - ✅ 使用 write_real_file 直接写入真实文件系统
-- ✅ 支持子目录路径（.wiki/README.md）
+- ✅ 文档路径格式：{output_directory}/文档名.md
 - ✅ 自动创建目录结构
 - ✅ 用户可以立即看到生成的文件
 ```
@@ -404,7 +407,7 @@ write_real_file(".wiki/01-overview.md", "# 概览")
 
 ### 标准文件结构
 ```
-.wiki/
+{output_directory}/
 ├── README.md                    # 文档索引和导航（必需）
 ├── 01-overview.md              # 项目概览（必需）
 ├── 02-quickstart.md            # 快速入门（推荐）
@@ -543,8 +546,8 @@ write_real_file(".wiki/01-overview.md", "# 概览")
 ```
 
 **说明**: 
-- 文档使用 `write_real_file` 直接保存到 `.wiki/` 目录
-- 代码引用使用相对路径，假设文档在 `.wiki/` 目录下
+- 文档使用 `write_real_file` 直接保存到 `{output_directory}` 目录
+- 代码引用使用相对路径，假设文档在输出目录下
 - 引用源代码时使用项目根目录的相对路径（如 `./main.py`, `./src/server.py`）
 
 ## 文档内容模板参考
@@ -749,9 +752,10 @@ flowchart LR
 7.  **文档组织方式** - 多文件结构:
     - 使用 `write_real_file` 直接生成文档到真实文件系统
     - **采用多文件结构**，每个主题一个独立的 Markdown 文件
-    - 文件路径示例：`.wiki/README.md`, `.wiki/01-overview.md`, `.wiki/02-quickstart.md`
+    - 文件路径格式：`{output_directory}/文档名.md`
+    - 文件路径示例：`{output_directory}/README.md`, `{output_directory}/01-overview.md`
     - 不要把所有内容塞进一个大文档，这样会导致内容不够深入
-    - `write_real_file` 会自动创建 `.wiki/` 目录，无需手动创建
+    - `write_real_file` 会自动创建输出目录，无需手动创建
 
 ## 质量自检清单
 在完成文档前，你必须进行以下自检：
