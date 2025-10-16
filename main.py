@@ -63,7 +63,7 @@ for chunk in agent.stream(
         if hasattr(last_message, 'tool_calls') and last_message.tool_calls:
             print(f"\n🔧 调用了 {len(last_message.tool_calls)} 个工具:")
             for tool_call in last_message.tool_calls:
-                print(f"   - {tool_call.get('name', 'unknown')}: {str(tool_call.get('args', {}))[:100]}...")
+                print(f"   - {tool_call.get('name', 'unknown')}: {str(tool_call.get('args', {}))}")
 
 print("\n" + "=" * 80)
 print("✅ 文档生成完成!")
