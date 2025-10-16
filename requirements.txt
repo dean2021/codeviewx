@@ -8,3 +8,4 @@ langgraph-prebuilt==0.6.4
 langgraph-sdk==0.2.9
 langsmith==0.4.34
 deepagents==0.0.5
+ripgrepy==2.0.0

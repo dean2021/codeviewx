@@ -1,11 +1,13 @@
 # 标准库导入
 import os  # 用于访问环境变量
 import logging  # 日志记录
+import subprocess  # 执行系统命令
 from datetime import datetime
 
 # 第三方库导入
 from typing import Literal  # 用于类型提示，限制参数的可选值
 from deepagents import create_deep_agent  # 创建深度代理的工具
+from ripgrepy import Ripgrepy  # ripgrep Python 接口
 
 # 配置日志输出
 logging.basicConfig(
@@ -17,6 +19,123 @@ logging.basicConfig(
 # 启用 LangChain 相关的详细日志
 logging.getLogger("langchain").setLevel(logging.DEBUG)
 logging.getLogger("langgraph").setLevel(logging.DEBUG)
+
+
+def execute_command(command: str, working_dir: str = None) -> str:
+    """
+    执行系统命令并返回输出结果
+    
+    Args:
+        command: 要执行的命令（如 'ls -la', 'cat file.txt', 'find . -name "*.py"'）
+        working_dir: 命令执行的工作目录，默认为当前目录
+    
+    Returns:
+        命令的输出结果（stdout），如果出错则返回错误信息
+    
+    Examples:
+        - execute_command("ls -la /Users/deanlu/Desktop/projects/codeviewx")
+        - execute_command("cat README.md", "/Users/deanlu/Desktop/projects/codeviewx")
+        - execute_command("find . -name '*.py' -type f")
+    """
+    try:
+        # 如果没有指定工作目录，使用当前目录
+        cwd = working_dir if working_dir else os.getcwd()
+        
+        # 执行命令
+        result = subprocess.run(
+            command,
+            shell=True,
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            timeout=30  # 30秒超时
+        )
+        
+        # 返回输出
+        if result.returncode == 0:
+            return result.stdout if result.stdout else "命令执行成功，无输出"
+        else:
+            return f"命令执行失败 (返回码: {result.returncode})\n错误信息: {result.stderr}"
+    
+    except subprocess.TimeoutExpired:
+        return "错误: 命令执行超时（超过30秒）"
+    except Exception as e:
+        return f"错误: {str(e)}"
+
+
+def ripgrep_search(pattern: str, path: str = ".", 
+                   file_type: str = None, 
+                   ignore_case: bool = False,
+                   max_count: int = 100) -> str:
+    """
+    使用 ripgrep 在文件中搜索文本模式（比 grep 更快）
+    
+    Args:
+        pattern: 要搜索的正则表达式模式
+        path: 搜索路径，默认为当前目录
+        file_type: 文件类型过滤（如 'py', 'js', 'md'），为 None 则搜索所有文件
+        ignore_case: 是否忽略大小写，默认 False
+        max_count: 最大返回结果数量，默认 100
+    
+    Returns:
+        搜索结果，包含匹配的文件路径和内容
+    
+    Examples:
+        - ripgrep_search("def main", ".", "py") - 在所有 Python 文件中搜索 "def main"
+        - ripgrep_search("TODO", "/path/to/project") - 搜索所有包含 TODO 的行
+        - ripgrep_search("import.*Agent", ".", "py", ignore_case=True) - 不区分大小写搜索导入
+    
+    Features:
+        - 自动忽略 .git, .venv, node_modules 等目录
+        - 支持正则表达式
+        - 显示行号和上下文
+        - 速度比传统 grep 快很多
+        - 使用 ripgrepy 库，无需单独安装 ripgrep
+    """
+    try:
+        # 创建 Ripgrepy 实例
+        rg = Ripgrepy(pattern, path)
+        
+        # 配置选项
+        rg = rg.line_number()  # 显示行号
+        rg = rg.heading()      # 文件名作为标题
+        rg = rg.max_count(max_count)  # 限制每个文件的结果数
+        
+        # 忽略大小写
+        if ignore_case:
+            rg = rg.ignore_case()
+        
+        # 文件类型过滤
+        if file_type:
+            rg = rg.type_add(file_type)
+        
+        # 自动忽略的目录和文件
+        ignore_patterns = [
+            ".git", ".venv", "venv", "env", "node_modules", 
+            "__pycache__", ".pytest_cache", ".mypy_cache",
+            "dist", "build", "target", ".cache", "*.pyc",
+            ".DS_Store", "Thumbs.db", "*.log"
+        ]
+        for ignore_pattern in ignore_patterns:
+            rg = rg.glob(f"!{ignore_pattern}")
+        
+        # 执行搜索
+        result = rg.run().as_string
+        
+        if result.strip():
+            lines = result.strip().split('\n')
+            if len(lines) > max_count:
+                return result + f"\n\n... (结果太多，已截断到前 {max_count} 行)"
+            return result
+        else:
+            return f"未找到匹配 '{pattern}' 的内容"
+    
+    except Exception as e:
+        error_msg = str(e)
+        # 检查是否是 ripgrep 未安装的错误
+        if "rg" in error_msg.lower() and ("not found" in error_msg.lower() or "cannot find" in error_msg.lower()):
+            return "错误: ripgrep (rg) 未安装。请先安装: brew install ripgrep (macOS) 或 apt install ripgrep (Linux)"
+        return f"搜索错误: {error_msg}"
 
 
 def load_prompt(name):
@@ -32,11 +151,18 @@ print("=" * 80)
 prompt = load_prompt("DocumentEngineer")
 print("✓ 已加载系统提示词")
 
+# 创建工具列表
+tools = [
+    execute_command,    # 执行系统命令
+    ripgrep_search,     # 快速文本搜索
+]
+
 agent = create_deep_agent(
-    [],
+    tools,
     prompt,
 )
 print("✓ 已创建 AI Agent")
+print(f"✓ 已注册 {len(tools)} 个自定义工具: {', '.join([t.__name__ for t in tools])}")
 print("=" * 80)
 
 # 使用流式输出来查看实时进度（参考文档中的例子）

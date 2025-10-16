@@ -21,7 +21,19 @@ codeviewx/
 pip install -r requirements.txt
 ```
 
-3. 设置 API 密钥：
+3. 安装 ripgrep（用于代码搜索）：
+```bash
+# macOS
+brew install ripgrep
+
+# Ubuntu/Debian
+sudo apt install ripgrep
+
+# Windows
+choco install ripgrep
+```
+
+4. 设置 API 密钥：
 ```bash
 export ANTHROPIC_API_KEY='your-api-key-here'
 ```
@@ -192,4 +204,5 @@ MIT License
 ## 贡献
 
 欢迎提交 Issue 和 Pull Request！
+
 
