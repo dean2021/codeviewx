@@ -1,9 +1,12 @@
 # 标准库导入
+import os  # 操作系统接口
 import logging  # 日志记录
 from datetime import datetime
+from pathlib import Path
 
 # 第三方库导入
 from deepagents import create_deep_agent  # 创建深度代理的工具
+from langchain_core.prompts import PromptTemplate  # LangChain Prompt 模板
 
 # 项目工具导入
 from tools import (
@@ -26,10 +29,53 @@ logging.getLogger("langchain").setLevel(logging.DEBUG)
 logging.getLogger("langgraph").setLevel(logging.DEBUG)
 
 
-def load_prompt(name):
-    """加载 AI 文档生成的系统提示词"""
-    with open(f"prompt/{name}.md", "r") as f:
-        return f.read()
+def load_prompt(name: str, **kwargs) -> str:
+    """
+    加载 AI 文档生成的系统提示词
+    
+    使用 LangChain 的 PromptTemplate 支持变量插值和动态参数。
+    支持在提示词模板中使用 {variable_name} 占位符。
+    
+    Args:
+        name: 提示词文件名（不含扩展名）
+        **kwargs: 可选的模板变量，用于替换提示词中的占位符
+                 例如: project_type="Web应用", language="Python"
+    
+    Returns:
+        格式化后的提示词文本
+    
+    Examples:
+        # 简单加载（无变量替换）
+        prompt = load_prompt("DocumentEngineer")
+        
+        # 带变量替换（需要模板中有对应的 {project_type} 占位符）
+        prompt = load_prompt("DocumentEngineer", 
+                           project_type="Web应用", 
+                           language="Python")
+    
+    Note:
+        - 如果模板中包含 {variable} 占位符，必须提供对应的 kwargs
+        - 如果不提供 kwargs，将直接返回原始模板文本
+        - 使用 LangChain PromptTemplate 的默认格式（{variable}）
+    """
+    prompt_path = Path(f"prompt/{name}.md")
+    
+    # 读取提示词文件
+    with open(prompt_path, "r", encoding="utf-8") as f:
+        template_text = f.read()
+    
+    # 如果提供了变量，使用 PromptTemplate 进行格式化
+    if kwargs:
+        try:
+            # 创建 PromptTemplate（使用默认格式：{variable}）
+            template = PromptTemplate.from_template(template_text)
+            return template.format(**kwargs)
+        except KeyError as e:
+            # 如果模板中需要的变量未提供，抛出更友好的错误
+            raise ValueError(f"模板需要变量 {e}，但未在参数中提供") from e
+    
+    # 如果没有提供变量，直接返回原始文本
+    return template_text
 
 
 if __name__ == "__main__":
@@ -38,8 +84,13 @@ if __name__ == "__main__":
     print(f"🚀 启动 CodeViewX 文档生成器 - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 80)
 
-    prompt = load_prompt("DocumentEngineer")
-    print("✓ 已加载系统提示词")
+    # 获取当前工作目录
+    working_directory = os.getcwd()
+    print(f"📂 工作目录: {working_directory}")
+    
+    # 加载系统提示词并注入工作目录
+    prompt = load_prompt("DocumentEngineer", working_directory=working_directory)
+    print("✓ 已加载系统提示词（已注入工作目录）")
 
     # 创建工具列表
     tools = [
@@ -63,7 +114,7 @@ if __name__ == "__main__":
 
     step_count = 0
     for chunk in agent.stream(
-        {"messages": [{"role": "user", "content": "当前工作目录为:/Users/deanlu/Desktop/projects/codeviewx,请生成一份该项目的深度技术文档"}]},
+        {"messages": [{"role": "user", "content": "请根据系统提示词中的工作目录，分析该项目并生成深度技术文档"}]},
         stream_mode="values",  # 使用 values 模式
         config={"recursion_limit": 1000}  # 增加递归限制到1000步
     ):
