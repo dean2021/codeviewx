@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "codeviewx"
 version = "0.1.0"
-description = "AI 驱动的代码文档生成器，基于 DeepAgents 和 LangChain"
+description = "AI-powered code documentation generator based on DeepAgents and LangChain"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "GPL-3.0-or-later"}
