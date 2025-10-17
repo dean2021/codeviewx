@@ -1,6 +1,5 @@
 """
 Internationalization (i18n) support module
-国际化支持模块
 """
 
 import os
@@ -8,7 +7,6 @@ import locale
 from typing import Dict, Optional
 
 
-# Message translations / 消息翻译字典
 MESSAGES: Dict[str, Dict[str, str]] = {
     'en': {
         # Generator messages
@@ -178,10 +176,8 @@ Environment variables:
 class I18n:
     """
     Internationalization manager
-    国际化管理器
     
     Supports multiple languages with automatic detection and manual override.
-    支持多语言，可自动检测或手动指定。
     
     Examples:
         >>> i18n = I18n('en')
@@ -208,7 +204,6 @@ class I18n:
     def t(self, key: str, **kwargs) -> str:
         """
         Translate message key to current locale
-        将消息键翻译为当前语言
         
         Args:
             key: Message key
@@ -228,13 +223,11 @@ class I18n:
         try:
             return msg.format(**kwargs) if kwargs else msg
         except KeyError as e:
-            # If formatting fails, return the original message
             return msg
     
     def set_locale(self, locale: str):
         """
         Set the current locale
-        设置当前语言
         
         Args:
             locale: Language code ('en' or 'zh')
@@ -245,7 +238,6 @@ class I18n:
     def get_locale(self) -> str:
         """
         Get current locale
-        获取当前语言
         
         Returns:
             Current language code
@@ -255,7 +247,6 @@ class I18n:
     def available_locales(self) -> list:
         """
         Get list of available locales
-        获取可用语言列表
         
         Returns:
             List of available language codes
@@ -263,14 +254,12 @@ class I18n:
         return list(MESSAGES.keys())
 
 
-# Global instance / 全局实例
 _i18n = I18n()
 
 
 def get_i18n() -> I18n:
     """
     Get the global I18n instance
-    获取全局国际化实例
     
     Returns:
         Global I18n instance
@@ -281,7 +270,6 @@ def get_i18n() -> I18n:
 def t(key: str, **kwargs) -> str:
     """
     Shortcut function for translation
-    快捷翻译函数
     
     Args:
         key: Message key
@@ -303,7 +291,6 @@ def t(key: str, **kwargs) -> str:
 def set_locale(locale: str):
     """
     Set the global locale
-    设置全局语言
     
     Args:
         locale: Language code ('en' or 'zh')
@@ -314,32 +301,27 @@ def set_locale(locale: str):
 def detect_ui_language() -> str:
     """
     Auto-detect UI language based on system locale
-    根据系统语言自动检测界面语言
     
     Returns:
         'en' for English or 'zh' for Chinese
     
     Examples:
         >>> detect_ui_language()
-        'zh'  # On Chinese system
+        'zh'
         >>> detect_ui_language()
-        'en'  # On English system
+        'en'
     """
     try:
-        # Try to get system locale
         lang, _ = locale.getdefaultlocale()
         
         if lang:
-            # Normalize language code
             if lang.startswith('zh'):
-                return 'zh'  # Chinese
+                return 'zh'
             else:
-                return 'en'  # Default to English
+                return 'en'
         
-        # If detection fails, default to English
         return 'en'
         
     except Exception:
-        # If any exception occurs, default to English
         return 'en'
 

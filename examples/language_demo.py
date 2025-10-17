@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CodeViewX 多语言文档生成示例
+CodeViewX Multi-language Documentation Generation Demo
 """
 
 import os
@@ -8,44 +8,44 @@ from codeviewx import generate_docs, detect_system_language, load_prompt
 
 
 def demo_detect_language():
-    """演示系统语言检测"""
+    """Demonstrate system language detection"""
     print("=" * 60)
-    print("示例 1: 系统语言检测")
+    print("Example 1: System Language Detection")
     print("=" * 60)
     
     detected_lang = detect_system_language()
-    print(f"检测到的系统语言: {detected_lang}")
+    print(f"Detected system language: {detected_lang}")
     print()
 
 
 def demo_auto_language():
-    """演示自动检测语言生成文档"""
+    """Demonstrate auto-detecting language for documentation"""
     print("=" * 60)
-    print("示例 2: 自动检测语言")
+    print("Example 2: Auto-detect Language")
     print("=" * 60)
-    print("生成文档时自动检测系统语言...")
-    print("用法: generate_docs()  # 不指定 doc_language")
+    print("Auto-detect system language when generating docs...")
+    print("Usage: generate_docs()  # No doc_language specified")
     print()
 
 
 def demo_specify_language():
-    """演示指定语言生成文档"""
+    """Demonstrate specifying language for documentation"""
     print("=" * 60)
-    print("示例 3: 指定文档语言")
+    print("Example 3: Specify Documentation Language")
     print("=" * 60)
     
     languages = ['Chinese', 'English', 'Japanese']
     
     for lang in languages:
-        print(f"  • 使用 {lang}:")
+        print(f"  • Using {lang}:")
         print(f"    generate_docs(doc_language='{lang}')")
     print()
 
 
 def demo_load_prompt_with_language():
-    """演示加载带语言的提示词"""
+    """Demonstrate loading prompt with language parameter"""
     print("=" * 60)
-    print("示例 4: 加载带语言参数的提示词")
+    print("Example 4: Load Prompt with Language Parameter")
     print("=" * 60)
     
     prompt = load_prompt(
@@ -55,23 +55,23 @@ def demo_load_prompt_with_language():
         doc_language="English"
     )
     
-    print(f"提示词长度: {len(prompt)} 字符")
-    print("✅ 语言参数已成功注入到提示词中")
+    print(f"Prompt length: {len(prompt)} characters")
+    print("✅ Language parameter injected into prompt successfully")
     print()
 
 
 def demo_cli_usage():
-    """演示 CLI 命令行用法"""
+    """Demonstrate CLI command line usage"""
     print("=" * 60)
-    print("示例 5: CLI 命令行用法")
+    print("Example 5: CLI Command Line Usage")
     print("=" * 60)
     
     examples = [
-        ("自动检测语言", "codeviewx"),
-        ("指定中文", "codeviewx -l Chinese"),
-        ("指定英文", "codeviewx -l English -o docs"),
-        ("日语文档", "codeviewx -l Japanese -o docs"),
-        ("完整配置", "codeviewx -w /path/to/project -o docs -l Chinese --verbose"),
+        ("Auto-detect", "codeviewx"),
+        ("Chinese", "codeviewx -l Chinese"),
+        ("English", "codeviewx -l English -o docs"),
+        ("Japanese", "codeviewx -l Japanese -o docs"),
+        ("Full config", "codeviewx -w /path/to/project -o docs -l Chinese --verbose"),
     ]
     
     for desc, cmd in examples:
@@ -80,9 +80,9 @@ def demo_cli_usage():
 
 
 def demo_supported_languages():
-    """演示支持的语言列表"""
+    """Demonstrate supported language list"""
     print("=" * 60)
-    print("支持的语言")
+    print("Supported Languages")
     print("=" * 60)
     
     languages = {
@@ -102,34 +102,34 @@ def demo_supported_languages():
 
 
 def demo_practical_examples():
-    """实际应用示例"""
+    """Practical application examples"""
     print("=" * 60)
-    print("实际应用场景")
+    print("Practical Use Cases")
     print("=" * 60)
     
-    print("\n场景 1: 国际化项目")
-    print("  # 生成中文文档")
+    print("\nScenario 1: Internationalized Project")
+    print("  # Generate Chinese docs")
     print("  generate_docs(output_directory='docs/zh', doc_language='Chinese')")
     print()
-    print("  # 生成英文文档")
+    print("  # Generate English docs")
     print("  generate_docs(output_directory='docs/en', doc_language='English')")
     
-    print("\n场景 2: 面向中国用户的项目")
-    print("  # 使用中文")
+    print("\nScenario 2: Chinese User-focused Project")
+    print("  # Use Chinese")
     print("  generate_docs(doc_language='Chinese')")
     
-    print("\n场景 3: 开源项目（国际用户）")
-    print("  # 使用英文")
+    print("\nScenario 3: Open Source Project (International Users)")
+    print("  # Use English")
     print("  generate_docs(doc_language='English')")
     
-    print("\n场景 4: 自动适配")
-    print("  # 根据用户系统语言自动选择")
-    print("  generate_docs()  # 自动检测")
+    print("\nScenario 4: Auto-adapt")
+    print("  # Auto-select based on user's system language")
+    print("  generate_docs()  # Auto-detect")
     print()
 
 
 if __name__ == "__main__":
-    print("\n🌍 CodeViewX 多语言文档生成演示\n")
+    print("\n🌍 CodeViewX Multi-language Documentation Generation Demo\n")
     
     demo_detect_language()
     demo_auto_language()
@@ -140,11 +140,11 @@ if __name__ == "__main__":
     demo_practical_examples()
     
     print("=" * 60)
-    print("✨ 演示完成！")
+    print("✨ Demo completed!")
     print("=" * 60)
-    print("\n💡 提示:")
-    print("  - 默认情况下会自动检测系统语言")
-    print("  - 使用 -l/--language 参数可以指定语言")
-    print("  - 支持 8 种主要语言")
-    print("  - 可以为不同语言生成多份文档\n")
+    print("\n💡 Tips:")
+    print("  - Auto-detects system language by default")
+    print("  - Use -l/--language parameter to specify language")
+    print("  - Supports 8 major languages")
+    print("  - Can generate multiple documentation versions for different languages\n")
 

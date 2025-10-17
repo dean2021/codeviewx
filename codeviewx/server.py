@@ -1,6 +1,5 @@
 """
 Web documentation server module
-Web 文档服务器模块
 """
 
 import os
@@ -10,20 +9,19 @@ from .i18n import t
 
 def get_markdown_title(file_path):
     """
-    从 Markdown 文件中提取第一个标题
+    Extract the first title from a Markdown file
     
     Args:
-        file_path (str): Markdown 文件路径
+        file_path (str): Markdown file path
     
     Returns:
-        str: 第一个标题内容，如果没有则返回 None
+        str: First title content, or None if not found
     """
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
                 if line.startswith('#'):
-                    # 移除 # 符号和空格
                     title = line.lstrip('#').strip()
                     if title:
                         return title
@@ -34,18 +32,18 @@ def get_markdown_title(file_path):
 
 def generate_file_tree(directory, current_file=None):
     """
-    生成目录的文件树数据结构
+    Generate file tree data structure for a directory
     
     Args:
-        directory (str): 要扫描的目录路径
-        current_file (str, optional): 当前激活的文件名
+        directory (str): Directory path to scan
+        current_file (str, optional): Currently active file name
     
     Returns:
-        list[dict]: 文件树数据，每个元素包含:
-            - name: 文件名
-            - path: 相对路径
-            - type: 文件类型 ('markdown' 或 'file')
-            - active: 是否是当前文件
+        list[dict]: File tree data, each element contains:
+            - name: File name
+            - path: Relative path
+            - type: File type ('markdown' or 'file')
+            - active: Whether it's the current file
             
     Examples:
         >>> generate_file_tree("/path/to/wiki", "README.md")
@@ -60,44 +58,38 @@ def generate_file_tree(directory, current_file=None):
     file_tree = []
 
     try:
-        # 获取所有文件并排序
         items = []
         for item in os.listdir(directory):
             item_path = os.path.join(directory, item)
             if os.path.isfile(item_path):
                 items.append(item)
 
-        items.sort()  # 按文件名排序
+        items.sort()
 
         for item in items:
             file_path = os.path.join(directory, item)
             rel_path = os.path.relpath(file_path, directory)
 
-            # 确定文件类型
             file_type = 'file'
-            display_name = item  # 默认显示文件名
+            display_name = item
             
             if item.lower().endswith('.md'):
                 file_type = 'markdown'
                 
-                # README.md 特殊处理：直接显示文件名，不读取标题
                 if item.upper() == 'README.MD':
                     display_name = 'README'
                 else:
-                    # 其他 Markdown 文件：尝试读取第一个标题
                     title = get_markdown_title(file_path)
                     if title:
                         display_name = title
                     else:
-                        # 如果没有标题，使用文件名（去掉.md后缀）
                         display_name = item[:-3] if item.endswith('.md') else item
 
-            # 检查是否是当前文件
             is_active = (item == current_file)
 
             file_tree.append({
-                'name': item,  # 保留原始文件名用于链接
-                'display_name': display_name,  # 用于显示的名称（标题或文件名）
+                'name': item,
+                'display_name': display_name,
                 'path': rel_path,
                 'type': file_type,
                 'active': is_active
@@ -112,12 +104,11 @@ def generate_file_tree(directory, current_file=None):
 
 def start_document_web_server(output_directory):
     """
-    启动文档浏览 Web 服务器
+    Start documentation web server
     
     Args:
-        output_directory: 文档输出目录路径
+        output_directory: Documentation output directory path
     """
-    # 获取当前文件所在目录
     current_dir = os.path.dirname(os.path.abspath(__file__))
     template_dir = os.path.join(current_dir, 'tpl')
     static_dir = os.path.join(current_dir, 'static')
@@ -133,35 +124,29 @@ def start_document_web_server(output_directory):
         if not filename or filename == "":
             filename = "README.md"
         
-        # Print debug information / 打印调试信息
         print(t('server_debug_accessing', filename=filename))
         print(t('server_debug_output_dir', directory=output_directory))
         
         index_file_path = os.path.join(output_directory, filename)
         if os.path.exists(index_file_path):
             with open(index_file_path, "r") as f:
-                content = f.read()    
-                    # 在文档开头自动插入 TOC 标记（如果还没有的话）
+                content = f.read()
             if '[TOC]' not in content:
-                # 在第一个标题前插入 TOC
                 lines = content.split('\n')
                 insert_index = 0
 
-                # 找到第一个标题的位置
                 for i, line in enumerate(lines):
                     if line.strip().startswith('#'):
                         insert_index = i
                         break
 
-                # 插入 TOC 标记
                 lines.insert(insert_index, '[TOC]')
-                lines.insert(insert_index + 1, '')  # 空行
+                lines.insert(insert_index + 1, '')
                 content = '\n'.join(lines)
                 
             import markdown
             from markdown.extensions.toc import TocExtension
 
-            # Configure markdown extensions / 配置 markdown 扩展
             toc_extension = TocExtension(
                 permalink=True,
                 permalink_class='headerlink',
@@ -182,12 +167,11 @@ def start_document_web_server(output_directory):
                 extension_configs={
                     'codehilite': {
                         'css_class': 'language-',
-                        'use_pygments': False  # 禁用 Pygments，使用 Prism.js
+                        'use_pygments': False
                     }
                 }
             )
 
-            # Generate file tree data / 生成文件树数据
             file_tree_data = generate_file_tree(output_directory, filename)
             print(t('server_debug_file_tree', data=str(file_tree_data)))
             print(t('server_debug_file_count', count=len(file_tree_data) if file_tree_data else 0))

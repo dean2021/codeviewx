@@ -1,5 +1,5 @@
 """
-语言检测模块
+Language detection module
 """
 
 import locale
@@ -7,42 +7,38 @@ import locale
 
 def detect_system_language() -> str:
     """
-    检测系统语言
+    Detect system language
     
     Returns:
-        语言代码字符串，如 'Chinese', 'English', 'Japanese' 等
+        Language code string, e.g. 'Chinese', 'English', 'Japanese', etc.
     
     Examples:
         >>> detect_system_language()
-        'Chinese'  # 在中文系统上
+        'Chinese'
     """
     try:
-        # 尝试获取系统语言设置
         lang, encoding = locale.getdefaultlocale()
         
         if lang:
-            # 规范化语言代码
             if lang.startswith('zh'):
-                return 'Chinese'  # 中文
+                return 'Chinese'
             elif lang.startswith('ja'):
-                return 'Japanese'  # 日语
+                return 'Japanese'
             elif lang.startswith('ko'):
-                return 'Korean'  # 韩语
+                return 'Korean'
             elif lang.startswith('fr'):
-                return 'French'  # 法语
+                return 'French'
             elif lang.startswith('de'):
-                return 'German'  # 德语
+                return 'German'
             elif lang.startswith('es'):
-                return 'Spanish'  # 西班牙语
+                return 'Spanish'
             elif lang.startswith('ru'):
-                return 'Russian'  # 俄语
+                return 'Russian'
             else:
-                return 'English'  # 默认英文
+                return 'English'
         
-        # 如果无法检测，返回英文
         return 'English'
         
     except Exception:
-        # 发生异常时默认返回英文
         return 'English'
 

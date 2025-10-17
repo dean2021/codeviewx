@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 CodeViewX Command Line Interface
-CodeViewX 命令行工具
 """
 
 import argparse
@@ -17,9 +16,7 @@ from .i18n import get_i18n, t, detect_ui_language
 def main():
     """
     Command line entry point
-    命令行入口函数
     """
-    # Auto-detect UI language / 自动检测界面语言
     ui_lang = detect_ui_language()
     get_i18n().set_locale(ui_lang)
     
@@ -70,7 +67,7 @@ def main():
         "--recursion-limit",
         type=int,
         default=1000,
-        help="Agent recursion limit (default: 1000) / Agent 递归限制（默认：1000）"
+        help="Agent recursion limit (default: 1000)"
     )
     
     parser.add_argument(
@@ -91,13 +88,10 @@ def main():
         print(f"CodeViewX v{__version__}")
         print()
         
-        # Update UI language if specified / 如果指定了界面语言，更新设置
         if hasattr(args, 'ui_language') and args.ui_language:
             get_i18n().set_locale(args.ui_language)
         
-        # If serve mode, start web server / 如果是 serve 模式，启动 Web 服务器
         if args.serve:
-            # Check if documentation directory exists / 检查文档目录是否存在
             if not os.path.exists(args.output_directory):
                 print(t('cli_missing_docs', path=args.output_directory))
                 print(t('cli_serve_hint'))
@@ -114,7 +108,6 @@ def main():
             
             start_document_web_server(args.output_directory)
         else:
-            # Generate documentation mode / 生成文档模式
             generate_docs(
                 working_directory=args.working_directory,
                 output_directory=args.output_directory,
@@ -125,10 +118,10 @@ def main():
             )
         
     except KeyboardInterrupt:
-        print("\n\n⚠️  User interrupted / 用户中断", file=sys.stderr)
+        print("\n\n⚠️  User interrupted", file=sys.stderr)
         sys.exit(130)
     except Exception as e:
-        print(f"\n❌ Error / 错误: {e}", file=sys.stderr)
+        print(f"\n❌ Error: {e}", file=sys.stderr)
         if args.verbose:
             import traceback
             traceback.print_exc()
