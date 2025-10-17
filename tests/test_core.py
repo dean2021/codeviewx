@@ -16,13 +16,13 @@ def test_load_prompt_with_variables():
     prompt = load_prompt(
         "DocumentEngineer",
         working_directory="/test/path",
-        output_directory=".wiki",
+        output_directory="docs",
         doc_language="English"
     )
     
     # 检查变量是否被替换
     assert "/test/path" in prompt
-    assert ".wiki" in prompt
+    assert "docs" in prompt
     assert "English" in prompt
     
     # 检查占位符是否被完全替换
@@ -82,7 +82,7 @@ def test_prompt_content_structure():
     prompt = load_prompt(
         "DocumentEngineer",
         working_directory="/test",
-        output_directory=".wiki",
+        output_directory="docs",
         doc_language="Chinese"
     )
     

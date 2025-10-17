@@ -29,7 +29,7 @@ def demo_simple_progress():
     # 实际执行
     # generate_docs(
     #     working_directory=".",
-    #     output_directory=".wiki",
+    #     output_directory="docs",
     #     verbose=False  # 默认值，简洁模式
     # )
 
@@ -54,7 +54,7 @@ def demo_verbose_progress():
     # 实际执行
     # generate_docs(
     #     working_directory=".",
-    #     output_directory=".wiki",
+    #     output_directory="docs",
     #     verbose=True  # 详细模式
     # )
 
@@ -101,7 +101,7 @@ def progress_output_example():
 🚀 启动 CodeViewX 文档生成器 - 2024-10-16 14:30:00
 ================================================================================
 📂 工作目录: /Users/deanlu/projects/myapp
-📝 输出目录: .wiki
+📝 输出目录: docs
 🌍 文档语言: Chinese (自动检测)
 ✓ 已加载系统提示词（已注入工作目录、输出目录和文档语言）
 ✓ 已创建 AI Agent
@@ -124,7 +124,7 @@ def progress_output_example():
 
 📊 总结:
    ✓ 共生成 6 个文档文件
-   ✓ 文档位置: .wiki/
+   ✓ 文档位置: docs/
    ✓ 执行步骤: 42 步
     """)
 

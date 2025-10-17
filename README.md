@@ -75,7 +75,7 @@ export OPENAI_API_KEY='your-api-key-here'
 ### 命令行使用
 
 ```bash
-# 分析当前目录，输出到 .wiki/（默认显示简洁进度）
+# 分析当前目录，输出到 docs/（默认显示简洁进度）
 codeviewx
 
 # 分析指定项目
@@ -148,7 +148,7 @@ codeviewx --help
 生成文档后，可以启动内置的 Web 服务器来浏览文档：
 
 ```bash
-# 启动服务器（默认 .wiki 目录）
+# 启动服务器（默认 docs 目录）
 codeviewx --serve
 
 # 指定文档目录
@@ -206,7 +206,7 @@ generate_docs(
 prompt = load_prompt(
     "DocumentEngineer",
     working_directory="/path/to/project",
-    output_directory=".wiki"
+    output_directory="docs"
 )
 ```
 
@@ -215,7 +215,7 @@ prompt = load_prompt(
 生成的文档包含以下文件：
 
 ```
-.wiki/                          # 默认输出目录
+docs/                          # 默认输出目录
 ├── README.md                   # 文档索引和导航
 ├── 01-overview.md             # 项目概览
 ├── 02-quickstart.md           # 快速入门

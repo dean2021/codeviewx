@@ -48,13 +48,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 系统提示词动态注入文档语言变量
 
 ### 修复 (Fixed)
-- 🐛 **Web 服务器模板路径修复**
+- 🐛 **Web 服务器模板和功能修复**
   - 修复模板文件 `doc_detail.html` 找不到的问题
   - 使用绝对路径配置 Flask 的 template_folder 和 static_folder
   - 在 `pyproject.toml` 中添加模板和静态文件到 package-data
   - 创建 `codeviewx/static/` 目录以存放静态资源
+  - **修复文档目录列表为空的问题**：添加缺失的 `get_markdown_title()` 函数
+  - 移除"返回首页"按钮及相关 CSS 样式
+  - 添加根路由 `/` 自动跳转到 `README.md`
+  - 添加调试日志以便排查问题
 
 ### 优化 (Optimized)
+- 🎨 **文档目录显示优化**
+  - `README.md` 文件直接显示为 "README"，不读取内部标题
+  - 减少不必要的文件读取操作
+  - 保持文档目录更简洁统一
+
 - ⚡ **系统提示词压缩** 🔥
   - 精简 `DocumentEngineer.md` 从 **33KB (868行) → 10KB (275行)**
   - **减少 70% 大小**，解决 API Prompt 超长错误（error type 1261）

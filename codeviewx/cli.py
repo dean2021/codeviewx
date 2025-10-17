@@ -25,8 +25,8 @@ def main():
   codeviewx -o docs                   # 输出到 docs 目录
   codeviewx -l English                # 使用英文生成文档
   codeviewx -l Chinese -o docs        # 使用中文，输出到 docs
-  codeviewx -w . -o .wiki --verbose   # 完整配置 + 详细日志
-  codeviewx --serve                   # 启动文档 Web 服务器（默认 .wiki 目录）
+  codeviewx -w . -o docs --verbose   # 完整配置 + 详细日志
+  codeviewx --serve                   # 启动文档 Web 服务器（默认 docs 目录）
   codeviewx --serve -o docs           # 启动服务器并指定文档目录
   
 支持的语言:
@@ -54,8 +54,8 @@ def main():
     parser.add_argument(
         "-o", "--output-dir",
         dest="output_directory",
-        default=".wiki",
-        help="文档输出目录（默认：.wiki）"
+        default="docs",
+        help="文档输出目录（默认：docs）"
     )
     
     parser.add_argument(

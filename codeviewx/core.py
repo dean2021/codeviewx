@@ -29,10 +29,20 @@ def start_document_web_server(output_directory):
     static_dir = os.path.join(current_dir, 'static')
     
     app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
-    @app.route("/<path:filename>", methods=['GET'])
+    
+    @app.route("/")
+    def home():
+        return index("README.md")
+    
+    @app.route("/<path:filename>")
     def index(filename):
-        if filename == "":
+        if not filename or filename == "":
             filename = "README.md"
+        
+        # 打印调试信息
+        print(f"[DEBUG] 访问文件: {filename}")
+        print(f"[DEBUG] 输出目录: {output_directory}")
+        
         index_file_path = os.path.join(output_directory, filename)
         if os.path.exists(index_file_path):
             with open(index_file_path, "r") as f:
@@ -85,6 +95,8 @@ def start_document_web_server(output_directory):
 
             # 生成文件树数据
             file_tree_data = generate_file_tree(output_directory, filename)
+            print(f"[DEBUG] 文件树数据: {file_tree_data}")
+            print(f"[DEBUG] 文件树条目数: {len(file_tree_data) if file_tree_data else 0}")
 
             return render_template('doc_detail.html', markdown_html_content=html, file_tree=file_tree_data)
         else:
@@ -133,6 +145,29 @@ def detect_system_language() -> str:
         # 发生异常时默认返回英文
         return 'English'
 
+def get_markdown_title(file_path):
+    """
+    从 Markdown 文件中提取第一个标题
+    
+    Args:
+        file_path (str): Markdown 文件路径
+    
+    Returns:
+        str: 第一个标题内容，如果没有则返回 None
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith('#'):
+                    # 移除 # 符号和空格
+                    title = line.lstrip('#').strip()
+                    if title:
+                        return title
+        return None
+    except Exception:
+        return None
+
 def generate_file_tree(directory, current_file=None):
     """
     生成目录的文件树数据结构
@@ -180,13 +215,18 @@ def generate_file_tree(directory, current_file=None):
             
             if item.lower().endswith('.md'):
                 file_type = 'markdown'
-                # 尝试读取Markdown文件的第一个标题
-                title = get_markdown_title(file_path)
-                if title:
-                    display_name = title
+                
+                # README.md 特殊处理：直接显示文件名，不读取标题
+                if item.upper() == 'README.MD':
+                    display_name = 'README'
                 else:
-                    # 如果没有标题，使用文件名（去掉.md后缀）
-                    display_name = item[:-3] if item.endswith('.md') else item
+                    # 其他 Markdown 文件：尝试读取第一个标题
+                    title = get_markdown_title(file_path)
+                    if title:
+                        display_name = title
+                    else:
+                        # 如果没有标题，使用文件名（去掉.md后缀）
+                        display_name = item[:-3] if item.endswith('.md') else item
 
             # 检查是否是当前文件
             is_active = (item == current_file)
@@ -228,7 +268,7 @@ def load_prompt(name: str, **kwargs) -> str:
         # 带变量替换
         prompt = load_prompt("DocumentEngineer", 
                            working_directory="/path/to/project",
-                           output_directory=".wiki")
+                           output_directory="docs")
     
     Note:
         - 如果模板中包含 {variable} 占位符，必须提供对应的 kwargs
@@ -271,7 +311,7 @@ def load_prompt(name: str, **kwargs) -> str:
 
 def generate_docs(
     working_directory: Optional[str] = None,
-    output_directory: str = ".wiki",
+    output_directory: str = "docs",
     doc_language: Optional[str] = None,
     recursion_limit: int = 1000,
     verbose: bool = False
@@ -281,7 +321,7 @@ def generate_docs(
     
     Args:
         working_directory: 项目工作目录（默认：当前目录）
-        output_directory: 文档输出目录（默认：.wiki）
+        output_directory: 文档输出目录（默认：docs）
         doc_language: 文档语言（默认：自动检测系统语言）
                      支持：'Chinese', 'English', 'Japanese', 等
         recursion_limit: Agent 递归限制（默认：1000）

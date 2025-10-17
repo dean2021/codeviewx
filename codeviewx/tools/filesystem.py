@@ -18,7 +18,7 @@ def write_real_file(file_path: str, content: str) -> str:
         操作结果消息
     
     Examples:
-        - write_real_file(".wiki/README.md", "# 文档标题")
+        - write_real_file("docs/README.md", "# 文档标题")
         - write_real_file("output/data.json", json_string)
     
     Features:

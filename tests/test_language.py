@@ -25,13 +25,13 @@ def test_load_prompt_with_language():
     prompt = load_prompt(
         "DocumentEngineer",
         working_directory="/test/path",
-        output_directory=".wiki",
+        output_directory="docs",
         doc_language="English"
     )
     
     # 检查所有变量都被注入
     assert "/test/path" in prompt
-    assert ".wiki" in prompt
+    assert "docs" in prompt
     assert "English" in prompt
     
     # 检查占位符被完全替换

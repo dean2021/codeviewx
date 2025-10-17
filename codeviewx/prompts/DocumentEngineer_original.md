@@ -113,22 +113,22 @@
   - **示例**:
     - `execute_command("ls -la /path/to/project")`
     - `execute_command("find . -name '*.py' | head -20")`
-    - `execute_command("mkdir -p .wiki")`
+    - `execute_command("mkdir -p docs")`
 
 #### 文件读写操作 ⭐⭐⭐
 - **`write_real_file`**: 写入真实文件系统 **强烈推荐用于文档生成**
   - **何时使用**: 
-    - **直接生成文档到 .wiki/ 目录**（推荐）
+    - **直接生成文档到 docs/ 目录**（推荐）
     - 保存任何文件到真实文件系统
     - 自动创建目录结构
   - **参数**:
     - `file_path`: 文件路径（相对或绝对）
     - `content`: 文件内容
   - **示例**:
-    - `write_real_file(".wiki/README.md", "# 文档内容")`
-    - `write_real_file(".wiki/01-overview.md", content)`
+    - `write_real_file("docs/README.md", "# 文档内容")`
+    - `write_real_file("docs/01-overview.md", content)`
   - **特性**:
-    - ✅ 支持子目录路径（如 `.wiki/README.md`）
+    - ✅ 支持子目录路径（如 `docs/README.md`）
     - ✅ 自动创建不存在的目录
     - ✅ 直接保存到真实文件系统
     - ✅ 返回写入结果和文件大小

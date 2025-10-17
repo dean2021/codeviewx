@@ -31,14 +31,14 @@ def test_tool_call_detection():
     
     # 测试 write_real_file 检测
     tool_call = MockToolCall('write_real_file', {
-        'file_path': '.wiki/README.md',
+        'file_path': 'docs/README.md',
         'content': '# Test'
     })
     
     tool_name = tool_call.get('name', 'unknown')
     args = tool_call.get('args', {})
     file_path = args.get('file_path', '')
-    output_directory = '.wiki'
+    output_directory = 'docs'
     
     print(f"工具名称: {tool_name}")
     print(f"文件路径: {file_path}")
@@ -61,9 +61,9 @@ def test_path_matching():
     print("=" * 60)
     
     test_cases = [
-        ('.wiki', '.wiki/README.md', True),
-        ('.wiki', '.wiki/01-overview.md', True),
-        ('.wiki', 'docs/README.md', False),
+        ('docs', 'docs/README.md', True),
+        ('docs', 'docs/01-overview.md', True),
+        ('docs', 'docs/README.md', False),
         ('docs', 'docs/api.md', True),
         ('/absolute/path/docs', '/absolute/path/docs/README.md', True),
     ]
@@ -83,9 +83,9 @@ def test_filename_extraction():
     print("=" * 60)
     
     test_paths = [
-        '.wiki/README.md',
-        '.wiki/01-overview.md',
-        '/absolute/path/.wiki/README.md',
+        'docs/README.md',
+        'docs/01-overview.md',
+        '/absolute/path/docs/README.md',
         'docs/api/reference.md',
     ]
     
@@ -163,7 +163,7 @@ def test_progress_output():
     
     print(f"\n📊 总结:")
     print(f"   ✓ 共生成 {len(docs)} 个文档文件")
-    print(f"   ✓ 文档位置: .wiki/")
+    print(f"   ✓ 文档位置: docs/")
     print(f"   ✓ 执行步骤: 42 步")
     
     print()

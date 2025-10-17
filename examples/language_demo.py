@@ -70,7 +70,7 @@ def demo_cli_usage():
         ("自动检测语言", "codeviewx"),
         ("指定中文", "codeviewx -l Chinese"),
         ("指定英文", "codeviewx -l English -o docs"),
-        ("日语文档", "codeviewx -l Japanese -o .wiki"),
+        ("日语文档", "codeviewx -l Japanese -o docs"),
         ("完整配置", "codeviewx -w /path/to/project -o docs -l Chinese --verbose"),
     ]
     

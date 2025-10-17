@@ -32,7 +32,7 @@ CodeViewX v0.1.0+ 新增了实时进度显示功能，让用户可以清楚看�
 
 📊 总结:
    ✓ 共生成 6 个文档文件
-   ✓ 文档位置: .wiki/
+   ✓ 文档位置: docs/
    ✓ 执行步骤: 42 步
 ```
 
@@ -164,7 +164,7 @@ codeviewx  # 不要加 --verbose
 codeviewx --verbose 2>&1 | grep "进度检测异常"
 
 # 3. 检查输出目录设置
-codeviewx -o .wiki  # 明确指定输出目录
+codeviewx -o docs  # 明确指定输出目录
 ```
 
 ### 问题：文档计数不准确
@@ -190,7 +190,7 @@ codeviewx --verbose | grep "write_real_file"
 - [ ] 统计摘要正确
 
 ### 路径场景
-- [ ] 相对路径输出目录（`.wiki`）
+- [ ] 相对路径输出目录（`docs`）
 - [ ] 绝对路径输出目录（`/path/to/docs`）
 - [ ] 嵌套目录（`docs/api`）
 

@@ -13,7 +13,7 @@ def example1_simple_usage():
     print("示例 1: 分析当前目录")
     print("=" * 60)
     
-    # 分析当前目录，文档输出到 .wiki/
+    # 分析当前目录，文档输出到 docs/
     generate_docs()
 
 
@@ -39,7 +39,7 @@ def example3_verbose_mode():
     # 启用详细日志
     generate_docs(
         working_directory=os.getcwd(),
-        output_directory=".wiki",
+        output_directory="docs",
         verbose=True
     )
 
