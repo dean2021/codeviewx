@@ -136,6 +136,18 @@ flake8 codeviewx/   # Lint code
 mypy codeviewx/     # Type checking
 ```
 
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
+
+- How to submit issues and feature requests
+- Development setup and workflow
+- Coding standards and best practices
+- Testing guidelines
+- Pull request process
+
+For the Chinese version, see [贡献指南](CONTRIBUTING.zh.md).
+
 ## Project Structure
 
 ```

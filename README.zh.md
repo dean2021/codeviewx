@@ -136,6 +136,18 @@ flake8 codeviewx/   # 代码检查
 mypy codeviewx/     # 类型检查
 ```
 
+## 贡献
+
+我们欢迎贡献！请查看我们的[贡献指南](CONTRIBUTING.zh.md)了解以下详情：
+
+- 如何提交问题和功能请求
+- 开发环境设置和工作流程
+- 编码标准和最佳实践
+- 测试指南
+- Pull Request 流程
+
+英文版本请参阅 [Contributing Guide](CONTRIBUTING.md)。
+
 ## 项目结构
 
 ```
