@@ -25,7 +25,7 @@ CodeViewX 是一个智能的代码文档生成工具，它使用 AI 技术深入
 
 ```bash
 # 克隆项目
-git clone https://github.com/dean2022/codeviewx.git
+git clone https://github.com/dean2021/codeviewx.git
 cd codeviewx
 
 # 安装包（可编辑模式，包含所有依赖）
@@ -278,7 +278,7 @@ pytest --cov=codeviewx --cov-report=html
 
 ```bash
 # 克隆项目
-git clone https://github.com/dean2022/codeviewx.git
+git clone https://github.com/dean2021/codeviewx.git
 cd codeviewx
 
 # 创建虚拟环境
@@ -349,7 +349,7 @@ twine check dist/*
 
 ## 📮 联系方式
 
-- GitHub Issues: [https://github.com/dean2022/codeviewx/issues](https://github.com/dean2022/codeviewx/issues)
+- GitHub Issues: [https://github.com/dean2021/codeviewx/issues](https://github.com/dean2021/codeviewx/issues)
 - Email: dean@csoio.com
 
 ## 🗺️ 路线图

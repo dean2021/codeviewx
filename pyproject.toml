@@ -64,10 +64,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/dean2022/codeviewx"
-Documentation = "https://github.com/dean2022/codeviewx/tree/main/docs"
-Repository = "https://github.com/dean2022/codeviewx"
-"Bug Tracker" = "https://github.com/dean2022/codeviewx/issues"
+Homepage = "https://github.com/dean2021/codeviewx"
+Documentation = "https://github.com/dean2021/codeviewx/tree/main/docs"
+Repository = "https://github.com/dean2021/codeviewx"
+"Bug Tracker" = "https://github.com/dean2021/codeviewx/issues"
 
 [project.scripts]
 codeviewx = "codeviewx.cli:main"
