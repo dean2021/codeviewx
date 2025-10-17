@@ -1,9 +1,7 @@
 """
 CodeViewX - AI-Driven Code Documentation Generator
-CodeViewX - AI 驱动的代码文档生成器
 
 Intelligent documentation generation tool based on DeepAgents and LangChain.
-基于 DeepAgents 和 LangChain 的智能文档生成工具。
 """
 
 from .__version__ import __version__, __author__, __description__

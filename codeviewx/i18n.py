@@ -88,6 +88,18 @@ Environment variables:
         'server_file_not_found': 'File not found: {path}',
         'server_error_generating_tree': 'Error generating file tree: {error}',
         'server_toc_title': 'Table of Contents',
+        
+        # Web UI messages
+        'web_title': 'CodeViewX - Documentation',
+        'web_logo': 'CodeViewX',
+        'web_subtitle': 'See the Wisdom Behind the Code',
+        'web_file_tree_title': 'File Tree',
+        'web_toc_toggle': 'Toggle TOC',
+        'web_file_tree_toggle': 'Toggle File Tree',
+        'web_mermaid_view_fullscreen': 'Click to view full size',
+        'web_footer_text': '© 2025 CodeViewX - Documentation powered by AI',
+        'web_footer_about': 'About',
+        'web_footer_docs': 'Documentation',
     },
     'zh': {
         # Generator messages
@@ -169,6 +181,18 @@ Environment variables:
         'server_file_not_found': '文件未找到: {path}',
         'server_error_generating_tree': '生成文件树时出错: {error}',
         'server_toc_title': '目录',
+        
+        # Web UI messages
+        'web_title': 'CodeViewX - 文档展示',
+        'web_logo': 'CodeViewX',
+        'web_subtitle': '看见代码背后的智慧',
+        'web_file_tree_title': '文档目录',
+        'web_toc_toggle': '切换目录',
+        'web_file_tree_toggle': '切换文件目录',
+        'web_mermaid_view_fullscreen': '点击查看大图',
+        'web_footer_text': '© 2025 CodeViewX - 文档由AI强力驱动',
+        'web_footer_about': '关于',
+        'web_footer_docs': '文档',
     }
 }
 

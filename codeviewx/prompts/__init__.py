@@ -1,5 +1,5 @@
-"""CodeViewX 提示词模块
+"""CodeViewX prompts module
 
-提示词作为包资源，通过 load_prompt 函数访问。
+Prompts are stored as package resources and accessed via the load_prompt function.
 """
 

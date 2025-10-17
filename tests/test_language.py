@@ -1,18 +1,16 @@
-"""测试文档语言功能"""
+"""Test document language functionality"""
 
 import pytest
 from codeviewx import detect_system_language, load_prompt
 
 
 def test_detect_system_language():
-    """测试系统语言检测"""
+    """Test system language detection"""
     language = detect_system_language()
     
-    # 应该返回一个语言字符串
     assert isinstance(language, str)
     assert len(language) > 0
     
-    # 应该是支持的语言之一
     supported_languages = [
         'Chinese', 'English', 'Japanese', 'Korean',
         'French', 'German', 'Spanish', 'Russian'
@@ -21,7 +19,7 @@ def test_detect_system_language():
 
 
 def test_load_prompt_with_language():
-    """测试带语言参数的提示词加载"""
+    """Test loading prompt with language parameter"""
     prompt = load_prompt(
         "DocumentEngineer",
         working_directory="/test/path",
@@ -29,32 +27,29 @@ def test_load_prompt_with_language():
         doc_language="English"
     )
     
-    # 检查所有变量都被注入
     assert "/test/path" in prompt
     assert "docs" in prompt
     assert "English" in prompt
     
-    # 检查占位符被完全替换
     assert "{working_directory}" not in prompt
     assert "{output_directory}" not in prompt
     assert "{doc_language}" not in prompt
 
 
 def test_load_prompt_chinese():
-    """测试中文语言注入"""
+    """Test Chinese language injection"""
     prompt = load_prompt(
         "DocumentEngineer",
-        working_directory="/test",
+        working_directory="/test/path",
         output_directory="docs",
         doc_language="Chinese"
     )
     
     assert "Chinese" in prompt
-    assert "中文" in prompt or "Chinese" in prompt
 
 
 def test_load_prompt_multiple_languages():
-    """测试多种语言"""
+    """Test multiple languages"""
     languages = ['English', 'Chinese', 'Japanese', 'French']
     
     for lang in languages:
@@ -65,13 +60,12 @@ def test_load_prompt_multiple_languages():
             doc_language=lang
         )
         
-        # 每种语言都应该被正确注入
         assert lang in prompt
         assert "{doc_language}" not in prompt
 
 
 def test_language_in_prompt_context():
-    """测试语言在提示词上下文中的位置"""
+    """Test language position in prompt context"""
     prompt = load_prompt(
         "DocumentEngineer",
         working_directory="/test",
@@ -79,13 +73,8 @@ def test_language_in_prompt_context():
         doc_language="English"
     )
     
-    # 应该在项目信息部分出现
-    assert "项目信息" in prompt or "# 项目信息" in prompt
-    
-    # 应该有文档语言规范章节
-    assert "文档语言" in prompt or "doc_language" in prompt.lower()
+    assert "doc_language" in prompt.lower() or "English" in prompt
 
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
-

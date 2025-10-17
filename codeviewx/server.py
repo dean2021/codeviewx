@@ -176,7 +176,12 @@ def start_document_web_server(output_directory):
             print(t('server_debug_file_tree', data=str(file_tree_data)))
             print(t('server_debug_file_count', count=len(file_tree_data) if file_tree_data else 0))
 
-            return render_template('doc_detail.html', markdown_html_content=html, file_tree=file_tree_data)
+            return render_template(
+                'doc_detail.html',
+                markdown_html_content=html,
+                file_tree=file_tree_data,
+                t=t
+            )
         else:
             return t('server_file_not_found', path=index_file_path)
 
