@@ -205,7 +205,7 @@ FROM python:3.11-slim
 
 # Set metadata
 LABEL maintainer="CodeViewX Team"
-LABEL version="0.1.0"
+LABEL version="0.2.0"
 LABEL description="AI-powered code documentation generator"
 
 # Create non-root user

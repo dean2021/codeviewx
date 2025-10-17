@@ -725,8 +725,8 @@ CodeViewX follows semantic versioning (MAJOR.MINOR.PATCH):
 4. **Update documentation**
 5. **Tag release**:
 ```bash
-git tag -a v0.1.0 -m "Release version 0.1.0"
-git push origin v0.1.0
+git tag -a v0.2.0 -m "Release version 0.2.0"
+git push origin v0.2.0
 ```
 6. **Build and publish**:
 ```bash

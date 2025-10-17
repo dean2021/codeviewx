@@ -883,7 +883,7 @@ What actually happened
 ## Environment
 - OS: [e.g., Ubuntu 20.04]
 - Python: [e.g., 3.11.0]
-- CodeViewX: [e.g., 0.1.0]
+- CodeViewX: [e.g., 0.2.0]
 - ripgrep: [e.g., 14.0.3]
 
 ## Additional Context

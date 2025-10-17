@@ -4,9 +4,10 @@
 
 中文 | [English](README.md)
 
+[![PyPI version](https://badge.fury.io/py/codeviewx.svg)](https://pypi.org/project/codeviewx/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![Version](https://img.shields.io/badge/version-0.1.0-green.svg)](https://github.com/dean2021/codeviewx)
+[![Downloads](https://pepy.tech/badge/codeviewx)](https://pepy.tech/project/codeviewx)
 
 CodeViewX 使用 AI（Anthropic Claude + DeepAgents + LangChain）自动分析您的代码库并生成专业的技术文档。
 
@@ -20,11 +21,10 @@ CodeViewX 使用 AI（Anthropic Claude + DeepAgents + LangChain）自动分析�
 
 ## 安装
 
+**从 PyPI 安装（推荐）：**
 ```bash
 # 安装 CodeViewX
-git clone https://github.com/dean2021/codeviewx.git
-cd codeviewx
-pip install -e .
+pip install codeviewx
 
 # 安装 ripgrep
 brew install ripgrep  # macOS
@@ -32,6 +32,13 @@ brew install ripgrep  # macOS
 
 # 配置 API 密钥
 export ANTHROPIC_API_KEY='your-api-key-here'
+```
+
+**从源码安装（开发）：**
+```bash
+git clone https://github.com/dean2021/codeviewx.git
+cd codeviewx
+pip install -e .
 ```
 
 获取 API 密钥：访问 [Anthropic Console](https://console.anthropic.com/)

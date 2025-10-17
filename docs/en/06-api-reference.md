@@ -535,7 +535,7 @@ Reference: [cli.py](../codeviewx/cli.py#L16)
 ```python
 from codeviewx import __version__, __author__, __description__
 
-print(__version__)      # "0.1.0"
+print(__version__)      # "0.2.0"
 print(__author__)        # "CodeViewX Team"
 print(__description__)   # "AI-Driven Code Documentation Generator"
 ```

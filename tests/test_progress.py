@@ -113,7 +113,7 @@ def test_progress_output():
     
     print("🔍 Analyzing project structure...")
     print("   📁 Listing: ✓ 8 items | codeviewx, tests, examples ... (+5)")
-    print("   📖 Reading: ✓ 42 lines | [tool.poetry] name = \"codeviewx\" version = \"0.1.0\"...")
+    print("   📖 Reading: ✓ 42 lines | [tool.poetry] name = \"codeviewx\" version = \"0.2.0\"...")
     print("   📖 Reading: ✓ 156 lines | # CodeViewX 🚀 AI-driven project documentation generator...")
     print("   📁 Listing: ✓ 5 items | __init__.py, core.py, cli.py ... (+2)")
     print("   🔎 Searching: ✓ 127 matches | from deepagents import Agent...")

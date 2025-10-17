@@ -689,7 +689,7 @@ if __name__ == "__main__":
                 "pyproject.toml": """
 [project]
 name = "sample-project"
-version = "0.1.0"
+version = "0.2.0"
 description = "A sample project"
 """
             }
@@ -946,7 +946,7 @@ git commit -m "refactor(tools): simplify file system operations"
 
 ```python
 # codeviewx/__version__.py
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __author__ = "CodeViewX Team"
 __description__ = "AI-powered code documentation generator"
 ```

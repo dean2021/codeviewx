@@ -152,7 +152,7 @@ codeviewx/
 ```toml
 [project]
 name = "codeviewx"
-version = "0.1.0"
+version = "0.2.0"
 description = "AI-powered code documentation generator based on DeepAgents and LangChain"
 requires-python = ">=3.8"
 license = {text = "GPL-3.0-or-later"}

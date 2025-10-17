@@ -266,7 +266,7 @@ class SecureHTTPClient:
         
         # Set secure headers
         self.session.headers.update({
-            'User-Agent': 'CodeViewX/0.1.0',
+            'User-Agent': 'CodeViewX/0.2.0',
             'Accept': 'application/json',
             'Accept-Encoding': 'gzip, deflate'
         })

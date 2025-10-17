@@ -69,7 +69,7 @@ If applicable, add screenshots or error logs.
 **Environment:**
 - OS: [e.g., macOS 13.0, Ubuntu 22.04]
 - Python Version: [e.g., 3.9.7]
-- CodeViewX Version: [e.g., 0.1.0]
+- CodeViewX Version: [e.g., 0.2.0]
 - Installation Method: [pip, source]
 
 **Additional Context**

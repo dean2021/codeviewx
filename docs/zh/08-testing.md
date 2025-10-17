@@ -522,7 +522,7 @@ pytest==6.0.0
 """,
                 "pyproject.toml": """[project]
 name = "python-project"
-version = "0.1.0"
+version = "0.2.0"
 description = "A sample Python project"
 requires-python = ">=3.8"
 dependencies = [
@@ -927,7 +927,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="mycli",
-    version="0.1.0",
+    version="0.2.0",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=["click>=8.0"],

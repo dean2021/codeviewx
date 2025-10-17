@@ -24,7 +24,7 @@
 - **Project Type**: CLI Tool / Documentation Generator
 - **Analysis Scope**: Core modules + main business logic
 - **Code Version**: Current development branch
-- **Analysis Tool**: CodeViewX v0.1.0
+- **Analysis Tool**: CodeViewX v0.2.0
 
 ## Quick Navigation
 
@@ -60,6 +60,6 @@ CodeViewX is an AI-powered intelligent code documentation generator based on Ant
 
 **Project Type**: CLI Tool / Documentation Generator
 **License**: GPL-3.0-or-later
-**Version**: 0.1.0
+**Version**: 0.2.0
 
 For more information about the project, visit the [GitHub repository](https://github.com/dean2021/codeviewx).
