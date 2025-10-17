@@ -1,4 +1,5 @@
 """
+Document generation module
 文档生成模块
 """
 
@@ -18,41 +19,66 @@ from .tools import (
 )
 from .language import detect_system_language
 from .prompt import load_prompt
+from .i18n import get_i18n, t, detect_ui_language
 
 
 def generate_docs(
     working_directory: Optional[str] = None,
     output_directory: str = "docs",
     doc_language: Optional[str] = None,
+    ui_language: Optional[str] = None,
     recursion_limit: int = 1000,
     verbose: bool = False
 ) -> None:
     """
-    生成项目文档
+    Generate project documentation using AI
+    使用 AI 生成项目文档
     
     Args:
-        working_directory: 项目工作目录（默认：当前目录）
-        output_directory: 文档输出目录（默认：docs）
-        doc_language: 文档语言（默认：自动检测系统语言）
+        working_directory: Project working directory (default: current directory)
+                          项目工作目录（默认：当前目录）
+        output_directory: Documentation output directory (default: docs)
+                         文档输出目录（默认：docs）
+        doc_language: Documentation language (default: auto-detect system language)
+                     Supports: 'Chinese', 'English', 'Japanese', etc.
+                     文档语言（默认：自动检测系统语言）
                      支持：'Chinese', 'English', 'Japanese', 等
-        recursion_limit: Agent 递归限制（默认：1000）
-        verbose: 是否显示详细日志（默认：False）
+        ui_language: User interface language (default: auto-detect, options: 'en', 'zh')
+                    用户界面语言（默认：自动检测，选项：'en', 'zh'）
+        recursion_limit: Agent recursion limit (default: 1000)
+                        Agent 递归限制（默认：1000）
+        verbose: Show detailed logs (default: False)
+                是否显示详细日志（默认：False）
     
     Examples:
+        # Analyze current directory with auto-detected language
         # 分析当前目录，自动检测语言
         generate_docs()
         
-        # 分析指定项目，使用英文
+        # Analyze specific project with English documentation and UI
+        # 分析指定项目，使用英文文档和界面
         generate_docs(
             working_directory="/path/to/project",
             output_directory="docs",
-            doc_language="English"
+            doc_language="English",
+            ui_language="en"
         )
         
-        # 使用中文生成文档
-        generate_docs(doc_language="Chinese", verbose=True)
+        # Generate Chinese documentation with Chinese UI
+        # 使用中文生成文档，中文界面
+        generate_docs(doc_language="Chinese", ui_language="zh", verbose=True)
     """
-    # 配置日志
+    # Set UI language / 设置界面语言
+    if ui_language is None:
+        ui_language = detect_ui_language()
+        ui_language_source = t('auto_detected')
+    else:
+        ui_language_source = t('user_specified')
+    
+    # Set global i18n locale / 设置全局语言
+    get_i18n().set_locale(ui_language)
+    
+    # Configure logging / 配置日志
     log_level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(
         level=log_level,
@@ -60,6 +86,7 @@ def generate_docs(
         datefmt='%H:%M:%S'
     )
     
+    # Disable HTTP request logs (always hidden, even in verbose mode)
     # 禁用 HTTP 请求日志（总是隐藏，即使在 verbose 模式）
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.getLogger("httpcore").setLevel(logging.WARNING)
@@ -68,34 +95,35 @@ def generate_docs(
         logging.getLogger("langchain").setLevel(logging.DEBUG)
         logging.getLogger("langgraph").setLevel(logging.DEBUG)
     
-    # 获取工作目录
+    # Get working directory / 获取工作目录
     if working_directory is None:
         working_directory = os.getcwd()
     
-    # 检测或使用指定的文档语言
+    # Detect or use specified document language / 检测或使用指定的文档语言
     if doc_language is None:
         doc_language = detect_system_language()
-        language_source = "自动检测"
+        doc_language_source = t('auto_detected')
     else:
-        language_source = "用户指定"
+        doc_language_source = t('user_specified')
     
     print("=" * 80)
-    print(f"🚀 启动 CodeViewX 文档生成器 - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"{t('starting')} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 80)
-    print(f"📂 工作目录: {working_directory}")
-    print(f"📝 输出目录: {output_directory}")
-    print(f"🌍 文档语言: {doc_language} ({language_source})")
+    print(f"{t('working_dir')}: {working_directory}")
+    print(f"{t('output_dir')}: {output_directory}")
+    print(f"{t('doc_language')}: {doc_language} ({doc_language_source})")
+    print(f"{t('ui_language')}: {ui_language} ({ui_language_source})")
     
-    # 加载提示词
+    # Load prompt / 加载提示词
     prompt = load_prompt(
         "DocumentEngineer_compact",
         working_directory=working_directory,
         output_directory=output_directory,
         doc_language=doc_language
     )
-    print("✓ 已加载系统提示词（已注入工作目录、输出目录和文档语言）")
+    print(t('loading_prompt'))
     
-    # 创建工具列表
+    # Create tools list / 创建工具列表
     tools = [
         execute_command,
         ripgrep_search,
@@ -104,14 +132,14 @@ def generate_docs(
         list_real_directory,
     ]
     
-    # 创建 Agent
+    # Create Agent / 创建 Agent
     agent = create_deep_agent(tools, prompt)
-    print("✓ 已创建 AI Agent")
-    print(f"✓ 已注册 {len(tools)} 个自定义工具: {', '.join([t.__name__ for t in tools])}")
+    print(t('created_agent'))
+    print(t('registered_tools', count=len(tools), tools=', '.join([t.__name__ for t in tools])))
     print("=" * 80)
     
-    # 生成文档
-    print("\n📝 开始分析项目并生成文档...\n")
+    # Generate documentation / 生成文档
+    print(f"\n{t('analyzing')}\n")
     
     step_count = 0
     docs_generated = 0
@@ -120,7 +148,7 @@ def generate_docs(
     todos_shown = False   # 是否已显示过 todo
     
     for chunk in agent.stream(
-        {"messages": [{"role": "user", "content": "请根据系统提示词中的工作目录，分析该项目并生成深度技术文档"}]},
+        {"messages": [{"role": "user", "content": t('agent_task_instruction')}]},
         stream_mode="values",
         config={"recursion_limit": recursion_limit}
     ):
@@ -211,12 +239,13 @@ def generate_docs(
                             else:
                                 result_info = "✓ 完成"
                         
+                        # Print tool call and result (concise one-liner)
                         # 打印工具调用和结果（简洁的一行式）
                         tool_display = {
-                            'read_real_file': '📖 读取',
-                            'list_real_directory': '📁 列表',
-                            'ripgrep_search': '🔎 搜索',
-                            'execute_command': '⚙️ 命令',
+                            'read_real_file': t('reading'),
+                            'list_real_directory': t('listing'),
+                            'ripgrep_search': t('searching'),
+                            'execute_command': t('executing'),
                         }
                         display_name = tool_display.get(tool_name, f'🔧 {tool_name}')
                         print(f"   {display_name}: {result_info}")
@@ -306,50 +335,50 @@ def generate_docs(
                                 doc_file = file_path.split('/')[-1]
                         except Exception as e:
                             if verbose:
-                                print(f"⚠️  进度检测异常: {e}")
+                                print(t('verbose_progress_error', error=str(e)))
                 
-                # 显示工具调用摘要
+                # Display tool call summary / 显示工具调用摘要
                 if tool_names:
-                    # 显示 todos（最高优先级）
+                    # Display todos (highest priority) / 显示 todos（最高优先级）
                     if todos_info:
-                        print(f"\n📋 任务规划:")
+                        print(f"\n{t('task_planning')}:")
                         for todo_summary in todos_info:
                             print(f"   {todo_summary}")
                         print()
-                    # 显示文档生成（第二优先级）
+                    # Display document generation (second priority) / 显示文档生成（第二优先级）
                     elif doc_file:
                         docs_generated += 1
-                        print(f"📄 正在生成文档 ({docs_generated}): {doc_file}")
+                        print(t('generating_doc', current=docs_generated, filename=doc_file))
                         analysis_phase = False
-                    # 显示分析阶段提示（只显示一次）
+                    # Display analysis phase hint (only once) / 显示分析阶段提示（只显示一次）
                     elif analysis_phase and any(t in ['list_real_directory', 'ripgrep_search'] for t in tool_names):
-                        print(f"🔍 分析项目结构...")
+                        print(t('analyzing_structure'))
                         analysis_phase = False
             
-            # verbose 模式：显示详细信息
+            # Verbose mode: show detailed information / verbose 模式：显示详细信息
             if verbose:
                 print(f"\n{'='*80}")
-                print(f"📍 步骤 {step_count} - {last_message.__class__.__name__}")
+                print(t('verbose_step', step=step_count, message_type=last_message.__class__.__name__))
                 print(f"{'='*80}")
                 last_message.pretty_print()
                 
                 if hasattr(last_message, 'tool_calls') and last_message.tool_calls:
-                    print(f"\n🔧 调用了 {len(last_message.tool_calls)} 个工具:")
+                    print(f"\n{t('verbose_tools_called', count=len(last_message.tool_calls))}")
                     for tool_call in last_message.tool_calls:
                         print(f"   - {tool_call.get('name', 'unknown')}")
     
     print("\n" + "=" * 80)
-    print("✅ 文档生成完成!")
+    print(t('completed'))
     print("=" * 80)
     
     if docs_generated > 0:
-        print(f"\n📊 总结:")
-        print(f"   ✓ 共生成 {docs_generated} 个文档文件")
-        print(f"   ✓ 文档位置: {output_directory}/")
-        print(f"   ✓ 执行步骤: {step_count} 步")
+        print(f"\n{t('summary')}:")
+        print(f"   {t('generated_files', count=docs_generated)}")
+        print(f"   {t('doc_location')}: {output_directory}/")
+        print(f"   {t('execution_steps', steps=step_count)}")
     
     if "files" in chunk:
-        print("\n📄 生成的文件:")
+        print(f"\n{t('generated_file_list')}:")
         for filename in chunk["files"].keys():
             print(f"   - {filename}")
 

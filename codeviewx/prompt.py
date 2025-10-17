@@ -1,9 +1,11 @@
 """
+Prompt loading module
 提示词加载模块
 """
 
 from pathlib import Path
 from langchain_core.prompts import PromptTemplate
+from .i18n import t
 
 
 def load_prompt(name: str, **kwargs) -> str:
@@ -49,21 +51,23 @@ def load_prompt(name: str, **kwargs) -> str:
             with open_text("codeviewx.prompts", f"{name}.md", encoding="utf-8") as f:
                 template_text = f.read()
     except (FileNotFoundError, ModuleNotFoundError):
+        # Development mode: read directly from file system
         # 开发模式：直接从文件系统读取
         package_dir = Path(__file__).parent
         prompt_path = package_dir / "prompts" / f"{name}.md"
         if not prompt_path.exists():
-            raise FileNotFoundError(f"找不到提示词文件: {name}.md")
+            raise FileNotFoundError(t('error_file_not_found', filename=f"{name}.md"))
         with open(prompt_path, "r", encoding="utf-8") as f:
             template_text = f.read()
     
+    # If variables are provided, format using PromptTemplate
     # 如果提供了变量，使用 PromptTemplate 进行格式化
     if kwargs:
         try:
             template = PromptTemplate.from_template(template_text)
             return template.format(**kwargs)
         except KeyError as e:
-            raise ValueError(f"模板需要变量 {e}，但未在参数中提供") from e
+            raise ValueError(t('error_template_variable', variable=str(e))) from e
     
     return template_text
 

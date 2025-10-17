@@ -1,9 +1,11 @@
 """
+Web documentation server module
 Web 文档服务器模块
 """
 
 import os
 from flask import Flask, render_template, redirect
+from .i18n import t
 
 
 def get_markdown_title(file_path):
@@ -102,7 +104,7 @@ def generate_file_tree(directory, current_file=None):
             })
 
     except Exception as e:
-        print(f"Error generating file tree: {e}")
+        print(t('server_error_generating_tree', error=str(e)))
         return []
 
     return file_tree
@@ -131,9 +133,9 @@ def start_document_web_server(output_directory):
         if not filename or filename == "":
             filename = "README.md"
         
-        # 打印调试信息
-        print(f"[DEBUG] 访问文件: {filename}")
-        print(f"[DEBUG] 输出目录: {output_directory}")
+        # Print debug information / 打印调试信息
+        print(t('server_debug_accessing', filename=filename))
+        print(t('server_debug_output_dir', directory=output_directory))
         
         index_file_path = os.path.join(output_directory, filename)
         if os.path.exists(index_file_path):
@@ -159,11 +161,11 @@ def start_document_web_server(output_directory):
             import markdown
             from markdown.extensions.toc import TocExtension
 
-            # 配置 markdown 扩展
+            # Configure markdown extensions / 配置 markdown 扩展
             toc_extension = TocExtension(
                 permalink=True,
                 permalink_class='headerlink',
-                title='目录',
+                title=t('server_toc_title'),
                 baselevel=1,
                 toc_depth=6,
                 marker='[TOC]'
@@ -185,14 +187,14 @@ def start_document_web_server(output_directory):
                 }
             )
 
-            # 生成文件树数据
+            # Generate file tree data / 生成文件树数据
             file_tree_data = generate_file_tree(output_directory, filename)
-            print(f"[DEBUG] 文件树数据: {file_tree_data}")
-            print(f"[DEBUG] 文件树条目数: {len(file_tree_data) if file_tree_data else 0}")
+            print(t('server_debug_file_tree', data=str(file_tree_data)))
+            print(t('server_debug_file_count', count=len(file_tree_data) if file_tree_data else 0))
 
             return render_template('doc_detail.html', markdown_html_content=html, file_tree=file_tree_data)
         else:
-            return f"File not found: {index_file_path}"
+            return t('server_file_not_found', path=index_file_path)
 
     app.run(debug=True)
 
