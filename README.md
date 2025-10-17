@@ -8,6 +8,12 @@
 
 CodeViewX 是一个智能的代码文档生成工具，它使用 AI 技术深入分析您的代码库，自动生成全面、专业的技术文档。支持多语言文档生成，内置美观的 Web 文档浏览器。
 
+---
+
+**📚 完整技术文档：** [中文文档](docs/zh/README.md) | [English Documentation](docs/en/README.md)
+
+---
+
 ## 📑 目录
 
 - [✨ 特性](#-特性)
@@ -268,32 +274,68 @@ prompt = load_prompt(
 )
 ```
 
+---
+
+**💡 提示：** 想了解更多详细信息？查看我们的完整技术文档：
+- 📖 [中文完整文档](docs/zh/README.md) - 包含架构设计、核心机制、API 参考等
+- 📖 [English Documentation](docs/en/README.md) - Architecture, mechanisms, API reference and more
+
+---
+
 ## 📖 文档结构
 
-生成的文档包含以下文件：
+本项目使用 CodeViewX 自动生成了完整的技术文档，包含中文和英文两个版本。
 
-```
-docs/                          # 默认输出目录
-├── README.md                   # 文档索引和导航
-├── 01-overview.md             # 项目概览（技术栈、目录结构）
-├── 02-quickstart.md           # 快速入门指南
-├── 03-architecture.md         # 系统架构（含 Mermaid 图表）
-├── 04-core-mechanisms.md      # 核心工作机制详解
-├── 05-data-models.md          # 数据模型分析
-├── 06-api-reference.md        # API 参考文档
-├── 07-development-guide.md    # 开发指南（环境配置、贡献指南）
-├── 08-testing.md              # 测试策略和框架
-├── 09-security.md             # 安全性分析（如适用）
-├── 10-performance.md          # 性能优化建议（如适用）
-└── 11-deployment.md           # 部署运维指南（如适用）
-```
+### 📚 中文文档（docs/zh/）
 
-**文档特点：**
-- 📊 支持 Mermaid 图表（架构图、流程图、类图等）
-- 🎨 代码高亮和语法突出
-- 📑 自动生成目录（TOC）
-- 🔍 结构化、易于导航
-- 🌍 支持多语言生成
+| 文档 | 说明 | 链接 |
+|------|------|------|
+| 📖 文档导航 | 文档索引和快速导航 | [README.md](docs/zh/README.md) |
+| 01 项目概览 | 技术栈、目录结构、核心功能 | [01-overview.md](docs/zh/01-overview.md) |
+| 02 快速开始 | 安装配置、基本使用、示例 | [02-quickstart.md](docs/zh/02-quickstart.md) |
+| 03 系统架构 | 架构设计、模块关系、数据流 | [03-architecture.md](docs/zh/03-architecture.md) |
+| 04 核心机制 | 工作原理、实现细节、流程图 | [04-core-mechanisms.md](docs/zh/04-core-mechanisms.md) |
+| 05 数据模型 | 数据结构、类定义、关系图 | [05-data-models.md](docs/zh/05-data-models.md) |
+| 06 API 参考 | 完整 API 文档、参数说明 | [06-api-reference.md](docs/zh/06-api-reference.md) |
+| 07 开发指南 | 环境配置、贡献指南、规范 | [07-development-guide.md](docs/zh/07-development-guide.md) |
+| 08 测试文档 | 测试策略、框架、覆盖率 | [08-testing.md](docs/zh/08-testing.md) |
+
+### 📚 English Documentation (docs/en/)
+
+| Document | Description | Link |
+|----------|-------------|------|
+| 📖 Documentation | Index and navigation | [README.md](docs/en/README.md) |
+| 01 Overview | Tech stack, structure, features | [01-overview.md](docs/en/01-overview.md) |
+| 02 Quick Start | Installation, usage, examples | [02-quickstart.md](docs/en/02-quickstart.md) |
+| 03 Architecture | System design, modules, data flow | [03-architecture.md](docs/en/03-architecture.md) |
+| 04 Core Mechanisms | Working principles, implementation | [04-core-mechanisms.md](docs/en/04-core-mechanisms.md) |
+| 05 Data Models | Data structures, classes, diagrams | [05-data-models.md](docs/en/05-data-models.md) |
+| 06 API Reference | Complete API docs, parameters | [06-api-reference.md](docs/en/06-api-reference.md) |
+| 07 Development Guide | Setup, contribution, standards | [07-development-guide.md](docs/en/07-development-guide.md) |
+| 08 Testing | Testing strategy, framework, coverage | [08-testing.md](docs/en/08-testing.md) |
+
+### ✨ 文档特点
+
+- 📊 **丰富图表** - 支持 Mermaid 架构图、流程图、类图等
+- 🎨 **语法高亮** - 代码块自动高亮，支持多种编程语言
+- 📑 **自动目录** - 每个文档自动生成目录（TOC）
+- 🔍 **结构清晰** - 分层合理，易于导航和查找
+- 🌍 **多语言版本** - 中英文对照，方便国际团队使用
+- 🤖 **AI 生成** - 基于代码自动分析生成，内容全面准确
+
+### 🌐 在线浏览
+
+使用内置 Web 服务器浏览文档：
+
+```bash
+# 浏览中文文档
+codeviewx --serve -o docs/zh
+
+# 浏览英文文档
+codeviewx --serve -o docs/en
+
+# 访问 http://127.0.0.1:5000
+```
 
 ## 🏗️ 项目结构
 
@@ -322,7 +364,17 @@ codeviewx/
 │   ├── test_language.py     # 语言检测测试
 │   ├── test_progress.py     # 进度提示测试
 │   └── test_tools.py        # 工具模块测试
-├── docs/                     # 项目文档
+├── docs/                     # 项目文档（自动生成）
+│   ├── zh/                  # 中文文档
+│   │   ├── README.md        # 文档导航
+│   │   ├── 01-overview.md   # 项目概览
+│   │   ├── 02-quickstart.md # 快速开始
+│   │   └── ...              # 其他文档章节
+│   └── en/                  # 英文文档
+│       ├── README.md        # Documentation index
+│       ├── 01-overview.md   # Overview
+│       ├── 02-quickstart.md # Quick start
+│       └── ...              # Other sections
 ├── examples/                 # 使用示例
 │   ├── basic_usage.py       # 基础用法
 │   ├── language_demo.py     # 多语言示例
@@ -444,7 +496,20 @@ pip install -e ".[dev]"
    codeviewx --serve
    ```
 
-2. **多语言项目**
+2. **查看项目文档**
+   ```bash
+   # 本项目已包含完整的技术文档示例
+   # 查看中文文档
+   codeviewx --serve -o docs/zh
+   
+   # 查看英文文档
+   codeviewx --serve -o docs/en
+   
+   # 浏览器访问 http://127.0.0.1:5000
+   # 可以看到包括架构图、API 文档、开发指南等完整内容
+   ```
+
+3. **多语言项目**
    ```bash
    # 为国际团队生成英文文档
    codeviewx -l English -o docs/en
@@ -453,13 +518,13 @@ pip install -e ".[dev]"
    codeviewx -l Chinese -o docs/zh
    ```
 
-3. **调试模式**
+4. **调试模式**
    ```bash
    # 使用 verbose 模式查看详细日志
    codeviewx --verbose
    ```
 
-4. **Python 集成**
+5. **Python 集成**
    ```python
    from codeviewx import generate_docs
    
@@ -472,6 +537,9 @@ pip install -e ".[dev]"
    ```
 
 ### 常见问题
+
+**Q: 如何查看 CodeViewX 生成的文档示例？**  
+A: 本项目自带完整的文档示例！运行 `codeviewx --serve -o docs/zh` 查看中文文档，或 `codeviewx --serve -o docs/en` 查看英文文档。也可以直接浏览 [docs/zh/](docs/zh/README.md) 或 [docs/en/](docs/en/README.md) 目录。
 
 **Q: 支持哪些 AI 模型？**  
 A: 默认使用 Anthropic Claude，也支持 OpenAI 模型。通过设置相应的 API 密钥即可。
