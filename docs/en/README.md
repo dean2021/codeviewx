@@ -2,102 +2,80 @@
 
 ## Overview
 
-CodeViewX is an AI-driven code documentation generator that leverages DeepAgents and LangChain to automatically analyze codebases and generate comprehensive technical documentation. This documentation provides in-depth technical insights into the project architecture, implementation details, and usage guidelines.
+**CodeViewX** is an AI-driven code documentation generator that uses advanced AI technology to deeply analyze codebases and automatically generate comprehensive, professional technical documentation. The project supports multi-language documentation generation and includes a built-in beautiful web documentation browser.
 
-## Documentation Structure
+## Document Structure
 
 This documentation is organized into the following sections:
 
-- **README.md** - This file, providing an overview and navigation
-- **01-overview.md** - Project overview with technology stack and directory structure
-- **02-quickstart.md** - Quick start guide for installation and basic usage
-- **03-architecture.md** - System architecture and component design
-- **04-core-mechanisms.md** - Detailed analysis of core workflows and implementation
-- **05-data-models.md** - Data models and structures analysis
+- **README.md** - This file, providing overview and navigation
+- **01-overview.md** - Project overview, technology stack, and directory structure
+- **02-quickstart.md** - Quick start guide and basic usage
+- **03-architecture.md** - System architecture and design principles
+- **04-core-mechanisms.md** - Deep dive into core workflows and mechanisms
+- **05-data-models.md** - Data models and structures (if applicable)
 - **06-api-reference.md** - Complete API reference documentation
-- **07-development-guide.md** - Development setup and contribution guidelines
-- **08-testing.md** - Testing strategy and framework
+- **07-development-guide.md** - Development guidelines and contribution guide
+- **08-testing.md** - Testing strategy and guidelines
 
-## Document Metadata
+## Documentation Metadata
 
-- **Generated**: 2025-06-17
-- **Analysis Scope**: 18 files analyzed, 1,200+ lines of code
-- **Primary Technology Stack**: Python 3.8+, DeepAgents, LangChain, Flask, ripgrep
-- **Document Language**: English
-
-## Quick Navigation
-
-### For Users
-- [Getting Started](02-quickstart.md) - Installation and basic usage
-- [Project Overview](01-overview.md) - Understand the project structure
-- [Web Server Usage](03-architecture.md#web-server) - Using the built-in documentation browser
-
-### For Developers
-- [System Architecture](03-architecture.md) - Component design and data flow
-- [Core Mechanisms](04-core-mechanisms.md) - In-depth implementation analysis
-- [API Reference](06-api-reference.md) - Complete API documentation
-- [Development Guide](07-development-guide.md) - Setup and contribution guidelines
-
-### For Advanced Users
-- [Testing Strategy](08-testing.md) - Testing framework and coverage
-- [Data Models](05-data-models.md) - Internal data structures
+- **Generated Time**: 2025-06-17
+- **Analysis Scope**: 32 files analyzed, approximately 2,000+ lines of code
+- **Primary Technology Stack**: Python 3.8+, LangChain, DeepAgents, Flask, ripgrep
+- **Project Type**: CLI tool and Python library for AI-powered documentation generation
 
 ## Key Features
 
-### 🤖 AI-Driven Analysis
-- Powered by DeepAgents and LangChain framework
-- Intelligent code analysis and documentation generation
-- Multi-language support (8 languages)
+### 🤖 AI-Powered Analysis
+- Built on DeepAgents and LangChain framework
+- Intelligent code structure analysis
+- Automated documentation generation with comprehensive coverage
 
-### 🌐 Web Documentation Browser
-- Built-in Flask web server for document browsing
+### 📝 Comprehensive Documentation
+- Multi-dimensional documentation including project overview, architecture diagrams, core mechanisms
+- Support for Mermaid diagrams and visualizations
+- Structured document generation with 8 main sections
+
+### 🌐 Web Server Integration
+- Built-in documentation web server
 - Beautiful Markdown rendering with syntax highlighting
 - File tree navigation and table of contents
-- Mermaid diagram support for visualizations
+- Mermaid diagram support for visual documentation
 
-### 🔧 Comprehensive Toolset
-- Command-line interface (CLI) for automation
-- Python API for integration
-- Fast code search using ripgrep
-- Multi-format document generation
+### 🌍 Multi-Language Support
+- Supports 8 languages: Chinese, English, Japanese, Korean, French, German, Spanish, Russian
+- Automatic system language detection
+- Language-specific documentation generation
 
 ### 📊 Smart Progress Tracking
-- Real-time progress indication during document generation
-- Task management with TODO tracking
-- Verbose and concise output modes
+- Real-time progress indicators during documentation generation
+- Intelligent task planning and status updates
+- Clean, informative output with detailed logging options
+
+### 🔧 Tool Integration
+- **CLI Interface**: Simple command-line tool
+- **Python API**: Library integration support
+- **Fast Search**: Integrated ripgrep for high-speed code searching
+- **File System Tools**: Real file system operations
+
+## Quick Links
+
+- [Installation Guide](02-quickstart.md#installation)
+- [Basic Usage](02-quickstart.md#basic-usage)
+- [Architecture Overview](03-architecture.md)
+- [Core Mechanisms](04-core-mechanisms.md)
+- [API Reference](06-api-reference.md)
+- [Development Guide](07-development-guide.md)
 
 ## Getting Started
 
-1. **Installation**
-   ```bash
-   pip install -e .
-   ```
+For a quick introduction to using CodeViewX, see the [Quick Start Guide](02-quickstart.md).
 
-2. **Generate Documentation**
-   ```bash
-   codeviewx -w /path/to/project -o docs
-   ```
+For understanding how CodeViewX works internally, see the [Architecture Documentation](03-architecture.md).
 
-3. **Browse Documents**
-   ```bash
-   codeviewx --serve -o docs
-   # Visit http://127.0.0.1:5000
-   ```
-
-## System Requirements
-
-- **Python**: 3.8 or higher
-- **Dependencies**: 
-  - DeepAgents >= 0.0.5
-  - LangChain >= 0.3.27
-  - Flask >= 2.0.0
-  - ripgrep (system dependency)
-- **AI API**: Anthropic Claude or OpenAI API key
-
-## License
-
-This project is licensed under GPL-3.0. See the [LICENSE](../../LICENSE) file for details.
+For detailed information about the core mechanisms and workflows, see the [Core Mechanisms Documentation](04-core-mechanisms.md).
 
 ---
 
-*This documentation was automatically generated by CodeViewX. For the most up-to-date information, please refer to the source code and the project repository.*
+**Note**: This documentation was automatically generated by CodeViewX based on code analysis. For the most up-to-date information, please refer to the source code and official repository.
