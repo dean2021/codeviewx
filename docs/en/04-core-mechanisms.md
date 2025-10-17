@@ -1,633 +1,459 @@
-# Core Working Mechanisms
+# Core Mechanisms
 
-## Overview
+> This document provides an in-depth analysis of CodeViewX's most critical functional components and workflows.
 
-This document provides an in-depth analysis of CodeViewX's core working mechanisms, including the AI-driven documentation generation workflow, tool system architecture, and key implementation details.
-
-## Core Flow #1: Documentation Generation Workflow
+## Core Mechanism #1: AI-Powered Documentation Generation Workflow
 
 ### Overview
-The documentation generation process transforms a codebase into comprehensive technical documentation through AI analysis, file processing, and structured output generation.
 
-**Input**: Project directory path and configuration parameters  
-**Processing**: AI-powered code analysis and document generation  
-**Output**: Complete technical documentation set in Markdown format
+The documentation generation workflow is the heart of CodeViewX, representing a sophisticated AI-driven process that transforms raw code into comprehensive technical documentation. This mechanism combines multi-step reasoning, tool orchestration, and intelligent content synthesis to deliver high-quality documentation that accurately reflects the codebase's structure, design patterns, and architectural decisions.
 
-### Sequence Diagram
+**Key Purpose**: Automate the complex process of technical documentation creation while maintaining accuracy, completeness, and contextual relevance through AI-driven analysis and synthesis.
+
+**Trigger Conditions**:
+- User initiates documentation generation via CLI, API, or web interface
+- Target project directory is specified or defaults to current directory
+- Output directory and language preferences are configured
+
+**Expected Results**:
+- Complete set of technical documentation files (8+ chapters)
+- Accurate code analysis and dependency mapping
+- Contextually appropriate content in specified language
+- Structured documentation with cross-references and navigation
+
+### Workflow Architecture Diagram
 
 ```mermaid
 sequenceDiagram
-    participant User as User
-    participant CLI as CLI Interface
-    participant Core as Core Module
-    participant Gen as Generator
+    participant User as User/CLI
+    participant Generator as Generator
     participant Agent as AI Agent
-    participant Anthropic as Anthropic Claude
     participant Tools as Tool System
+    participant Claude as Anthropic Claude
     participant FS as File System
     
-    User->>CLI: codeviewx command
-    CLI->>CLI: Parse arguments & detect languages
-    CLI->>Core: generate_docs(params)
-    Core->>Gen: generate_docs()
+    User->>Generator: generate_docs(params)
+    Generator->>Generator: Setup logging & configuration
+    Generator->>Generator: Load prompt templates
+    Generator->>Agent: create_deep_agent(tools, prompt)
     
-    Gen->>Gen: Load prompt template
-    Gen->>Gen: Register custom tools
-    Gen->>Agent: create_deep_agent(tools, prompt)
+    Note over Agent: AI Agent Initialization
+    Agent->>Agent: Initialize LangChain workflow
+    Agent->>Agent: Register tools with DeepAgents
+    Agent->>Agent: Configure Claude integration
     
-    loop Analysis & Generation
-        Gen->>Agent: Stream task execution
-        Agent->>Anthropic: Process current state
-        Anthropic->>Agent: Determine next actions
+    Generator->>Agent: Stream analysis task
+    Agent->>Agent: Create analysis plan
+    
+    loop Project Analysis Phase
+        Agent->>Tools: list_real_directory(working_dir)
+        Tools->>FS: Scan directory structure
+        FS-->>Tools: File/directory listing
+        Tools-->>Agent: Formatted directory info
         
-        alt Need file system access
-            Agent->>Tools: read_real_file/list_real_directory
-            Tools->>FS: Access files/directories
-            FS->>Tools: File content/directory listing
-            Tools->>Agent: Tool results
-        else Need code search
-            Agent->>Tools: ripgrep_search
-            Tools->>Tools: Execute ripgrep command
-            Tools->>Agent: Search results
-        else Need system commands
-            Agent->>Tools: execute_command
-            Tools->>Tools: Execute shell command
-            Tools->>Agent: Command output
-        else Need to generate document
-            Agent->>Tools: write_real_file
-            Tools->>FS: Write documentation file
-            FS->>Tools: Write confirmation
-            Tools->>Agent: File write result
-        end
+        Agent->>Tools: ripgrep_search(config_patterns)
+        Tools->>Tools: Execute ripgrep search
+        Tools-->>Agent: Configuration file locations
         
-        Agent->>Anthropic: Update context with tool results
+        Agent->>Tools: read_real_file(config_files)
+        Tools->>FS: Read configuration files
+        FS-->>Tools: File contents
+        Tools-->>Agent: Formatted configuration data
+        
+        Agent->>Tools: ripgrep_search(entry_point_patterns)
+        Tools-->>Agent: Entry point locations
+        
+        Agent->>Tools: read_real_file(entry_files)
+        Tools-->>Agent: Core source code
     end
     
-    Agent->>Gen: Generation complete
-    Gen->>Core: Return success/failure
-    Core->>CLI: Final result
-    CLI->>User: Output completion message
-```
-
-### Detailed Steps
-
-#### Step 1: CLI Initialization and Configuration
-
-**Trigger Condition**: User executes `codeviewx` command
-
-**Core Code**:
-```python
-# File: codeviewx/cli.py | Lines: 16-40 | Description: CLI main function initialization
-def main():
-    ui_lang = detect_ui_language()
-    get_i18n().set_locale(ui_lang)
+    Note over Agent: AI Analysis & Planning
+    Agent->>Claude: Analyze collected code data
+    Claude-->>Agent: Project understanding & structure
+    Agent->>Agent: Create documentation plan
+    Agent->>Agent: Generate task list (write_todos)
     
-    parser = argparse.ArgumentParser(
-        prog="codeviewx",
-        description=t('cli_description'),
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=t('cli_examples')
-    )
+    loop Documentation Generation Phase
+        Agent->>Claude: Plan next document section
+        Claude-->>Agent: Content strategy & structure
+        
+        Agent->>Claude: Generate document content
+        Claude-->>Agent: Formatted markdown content
+        
+        Agent->>Tools: write_real_file(doc_path, content)
+        Tools->>FS: Write documentation file
+        FS-->>Tools: Write confirmation
+        Tools-->>Agent: Success/failure status
+        
+        Agent->>Agent: Update task progress
+        Agent->>User: Progress feedback
+    end
+    
+    Agent-->>Generator: Generation complete
+    Generator-->>User: Summary & results
 ```
 
-**Data Flow**: Command line arguments → Argument parser → Configuration object  
-**Key Points**: 
-- Auto-detects UI language based on system locale
-- Supports both documentation language and UI language settings
-- Comprehensive argument validation and help system
+### Detailed Step Analysis
 
-#### Step 2: Generator Initialization
+#### Step 1: System Initialization and Configuration
+- **Trigger**: `generate_docs()` function invocation
+- **Executor**: `generator.py:generate_docs()`
+- **Input**: Working directory, output directory, language preferences, recursion limit, verbose flag
+- **Processing Logic**:
+  1. **Language Detection**: Automatically detect UI language and documentation language preferences
+  2. **Logging Setup**: Configure appropriate logging levels based on verbose flag
+  3. **Configuration Validation**: Validate paths and parameters
+  4. **Prompt Loading**: Load appropriate prompt templates based on target language
+  5. **Tool Registration**: Register all available tools for AI agent use
 
-**Trigger Condition**: CLI passes control to core generator
-
-**Core Code**:
+**Key Implementation Details**:
 ```python
-# File: codeviewx/generator.py | Lines: 24-65 | Description: Generator setup and configuration
-def generate_docs(
-    working_directory: Optional[str] = None,
-    output_directory: str = "docs",
-    doc_language: Optional[str] = None,
-    ui_language: Optional[str] = None,
-    recursion_limit: int = 1000,
-    verbose: bool = False
-) -> None:
-    # Auto-detect languages if not specified
+def generate_docs(working_directory=None, output_directory="docs", 
+                  doc_language=None, ui_language=None, recursion_limit=1000, 
+                  verbose=False):
+    # Language detection and setup
     if ui_language is None:
         ui_language = detect_ui_language()
+    get_i18n().set_locale(ui_language)
+    
+    # Logging configuration
+    log_level = logging.DEBUG if verbose else logging.INFO
+    logging.basicConfig(level=log_level, format='%(asctime)s - %(levelname)s - %(message)s')
+    
+    # Directory validation and defaults
+    if working_directory is None:
+        working_directory = os.getcwd()
     if doc_language is None:
         doc_language = detect_system_language()
-    
-    # Setup logging based on verbose flag
-    log_level = logging.DEBUG if verbose else logging.INFO
 ```
 
-**Data Flow**: Configuration parameters → Language detection → Logging setup  
-**Key Points**:
-- Graceful fallback to auto-detection when languages not specified
-- Configurable logging levels for debugging vs production use
-- Input validation and sanitization
+Reference: [generator.py](../codeviewx/generator.py#L25-L60)
 
-#### Step 3: AI Agent Creation and Tool Registration
+- **Output**: Configured system ready for AI agent initialization
+- **Side Effects**: Logging system initialized, internationalization configured, directories validated
+- **Error Handling**: Comprehensive error handling for missing directories, invalid configurations, and language detection failures
 
-**Trigger Condition**: Generator creates AI processing engine
+#### Step 2: AI Agent Creation and Tool Registration
+- **Trigger**: System initialization completion
+- **Executor**: `generator.py:generate_docs()` via DeepAgents framework
+- **Input**: Tool list, prompt template, configuration parameters
+- **Processing Logic**:
+  1. **Tool Collection**: Gather all available tools (filesystem, search, command execution)
+  2. **Agent Initialization**: Create DeepAgents instance with tool access
+  3. **Prompt Integration**: Load and format prompt templates with project-specific parameters
+  4. **Workflow Configuration**: Set up LangChain workflow with recursion limits and streaming
 
-**Core Code**:
+**Critical Code Section**:
 ```python
-# File: codeviewx/generator.py | Lines: 66-85 | Description: AI agent creation
-prompt = load_prompt(
-    "document_engineer",
-    working_directory=working_directory,
-    output_directory=output_directory,
-    doc_language=doc_language
-)
+# Load and configure prompt
+prompt = load_prompt("document_engineer", 
+                    working_directory=working_directory,
+                    output_directory=output_directory, 
+                    doc_language=doc_language)
 
-tools = [
-    execute_command,
-    ripgrep_search,
-    write_real_file,
-    read_real_file,
-    list_real_directory,
-]
+# Register tools for AI agent
+tools = [execute_command, ripgrep_search, write_real_file, read_real_file, list_real_directory]
 
+# Create AI agent with tool access
 agent = create_deep_agent(tools, prompt)
 ```
 
-**Data Flow**: Prompt template → Tool registration → DeepAgents agent creation  
-**Key Points**:
-- Prompt template loaded with project-specific context
-- Custom tools provide AI agent with file system and search capabilities
-- DeepAgents framework handles agent orchestration
+Reference: [generator.py](../codeviewx/generator.py#L75-L85)
 
-#### Step 4: AI Agent Execution Loop
+- **Output**: Fully configured AI agent ready for analysis tasks
+- **Side Effects**: AI agent initialized with tool access, prompt loaded with project context
+- **Performance Considerations**: Agent creation is one-time cost; subsequent operations reuse the same agent instance
 
-**Trigger Condition**: Agent starts processing documentation task
+#### Step 3: Project Structure Analysis
+- **Trigger**: AI agent begins analysis workflow
+- **Executor**: AI Agent via `list_real_directory()` and `ripgrep_search()` tools
+- **Input**: Working directory path
+- **Processing Logic**:
+  1. **Directory Scanning**: Recursively scan project directory structure
+  2. **File Classification**: Identify source files, configuration files, documentation, and build artifacts
+  3. **Pattern Matching**: Search for common project patterns and entry points
+  4. **Dependency Analysis**: Identify import relationships and module dependencies
 
-**Core Code**:
+**Tool Implementation Analysis**:
 ```python
-# File: codeviewx/generator.py | Lines: 88-130 | Description: Agent execution streaming
-for chunk in agent.stream(
-    {"messages": [{"role": "user", "content": t('agent_task_instruction')}]},
-    stream_mode="values",
-    config={"recursion_limit": recursion_limit}
-):
-    if "messages" in chunk:
-        step_count += 1
-        last_message = chunk["messages"][-1]
-        
-        # Process tool calls and update progress
-        if hasattr(last_message, 'tool_calls') and last_message.tool_calls:
-            # Handle tool execution and progress tracking
+def list_real_directory(directory: str = ".") -> str:
+    # Scan directory and classify items
+    items = os.listdir(directory)
+    dirs = [f"📁 {item}/" for item in items if os.path.isdir(os.path.join(directory, item))]
+    files = [f"📄 {item}" for item in items if os.path.isfile(os.path.join(directory, item))]
+    
+    # Format output with statistics
+    result = f"Directory: {os.path.abspath(directory)}\n"
+    result += f"Total {len(dirs)} directories, {len(files)} files\n\n"
+    return result
 ```
 
-**Data Flow**: Task instruction → AI reasoning → Tool execution → Context update → Repeat  
-**Key Points**:
-- Streaming execution allows real-time progress tracking
-- Recursion limit prevents infinite loops
-- Comprehensive error handling and progress reporting
+Reference: [filesystem.py](../codeviewx/tools/filesystem.py#L78)
 
-#### Step 5: Document Generation Sequence
+- **Output**: Structured directory listing with file classification and statistics
+- **Side Effects**: No filesystem modifications, read-only analysis
+- **Performance**: Optimized to avoid scanning ignored directories (.git, node_modules, etc.)
 
-**Trigger Condition**: AI agent decides to generate documentation files
+#### Step 4: Configuration and Dependency Analysis
+- **Trigger**: Directory structure analysis completion
+- **Executor**: AI Agent via `ripgrep_search()` and `read_real_file()` tools
+- **Input**: Identified configuration files and dependency specifications
+- **Processing Logic**:
+  1. **Configuration Discovery**: Search for project configuration files (package.json, requirements.txt, pyproject.toml, etc.)
+  2. **Dependency Parsing**: Analyze dependency specifications and versions
+  3. **Build System Detection**: Identify build tools and frameworks in use
+  4. **Technology Stack Inference**: Determine primary technologies and frameworks
 
-**Core Code**:
+**Search Pattern Implementation**:
 ```python
-# File: codeviewx/tools/filesystem.py | Lines: 8-40 | Description: File writing mechanism
+def ripgrep_search(pattern: str, path: str = ".", file_type: str = None, 
+                   ignore_case: bool = False, max_count: int = 100) -> str:
+    # Initialize ripgrep with pattern and path
+    rg = Ripgrepy(pattern, path)
+    rg = rg.line_number().with_filename().max_count(max_count)
+    
+    # Apply ignore patterns for common non-source files
+    ignore_patterns = [".git", ".venv", "node_modules", "__pycache__", 
+                      ".pytest_cache", "dist", "build", "*.pyc"]
+    for ignore_pattern in ignore_patterns:
+        rg = rg.glob(f"!{ignore_pattern}")
+    
+    # Execute search and return formatted results
+    result = rg.run().as_string
+    return result if result.strip() else f"No matches found for '{pattern}'"
+```
+
+Reference: [search.py](../codeviewx/tools/search.py#L15)
+
+- **Output**: Comprehensive dependency and configuration analysis
+- **Side Effects**: No modifications, analysis only
+- **Error Handling**: Graceful handling of missing files and parse errors
+
+#### Step 5: Source Code Analysis and Entry Point Identification
+- **Trigger**: Configuration analysis completion
+- **Executor**: AI Agent via targeted search and file reading
+- **Input**: Project structure and configuration information
+- **Processing Logic**:
+  1. **Entry Point Detection**: Search for main functions, application entry points, and API endpoints
+  2. **Core Module Analysis**: Identify primary business logic modules and key classes
+  3. **Design Pattern Recognition**: Detect common design patterns and architectural approaches
+  4. **Code Complexity Assessment**: Analyze code complexity and identify critical components
+
+**Entry Point Search Strategy**:
+```python
+# Common entry point patterns searched by AI agent
+entry_patterns = [
+    "def main|if __name__",           # Python entry points
+    "func main|@SpringBootApplication", # Java/Go entry points
+    "app\\.listen|server\\.start",    # Node.js servers
+    "Router|@app\\.route",           # Web framework routes
+    "class.*Controller|@RestController" # MVC controllers
+]
+```
+
+- **Output**: Detailed understanding of project architecture and core functionality
+- **Side Effects**: No modifications, comprehensive code analysis
+- **Performance Considerations**: Efficient search using ripgrep for large codebases
+
+#### Step 6: AI-Powered Content Planning and Structuring
+- **Trigger**: Completion of code analysis phase
+- **Executor**: Anthropic Claude via DeepAgents framework
+- **Input**: All collected project data and analysis results
+- **Processing Logic**:
+  1. **Project Categorization**: Classify project type (web app, CLI tool, library, etc.)
+  2. **Documentation Strategy**: Determine appropriate documentation structure and depth
+  3. **Content Planning**: Create detailed plan for each documentation chapter
+  4. **Task Generation**: Generate structured task list for documentation generation
+
+**AI Planning Process**:
+The AI agent analyzes all collected data to create a comprehensive documentation strategy:
+- **Project Understanding**: Synthesize code structure, dependencies, and architecture
+- **Audience Analysis**: Determine target audience and appropriate technical depth
+- **Content Strategy**: Plan documentation chapters and their relationships
+- **Quality Criteria**: Establish standards for accuracy, completeness, and clarity
+
+- **Output**: Structured documentation plan with task priorities and dependencies
+- **Side Effects**: Internal AI state preparation for content generation
+- **Error Recovery**: AI can adjust plans based on analysis quality and available information
+
+#### Step 7: Progressive Document Generation
+- **Trigger**: Documentation plan approval
+- **Executor**: AI Agent via `write_real_file()` tool
+- **Input**: Structured content plan and project analysis data
+- **Processing Logic**:
+  1. **Chapter-by-Chapter Generation**: Generate each documentation section sequentially
+  2. **Content Synthesis**: Combine code analysis with natural language generation
+  3. **Cross-Reference Integration**: Add links between related sections and code references
+  4. **Quality Assurance**: Internal AI review for accuracy and completeness
+
+**Document Generation Implementation**:
+```python
 def write_real_file(file_path: str, content: str) -> str:
-    try:
-        directory = os.path.dirname(file_path)
-        if directory and not os.path.exists(directory):
-            os.makedirs(directory, exist_ok=True)
-        
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(content)
-        
-        file_size = os.path.getsize(file_path)
-        file_size_kb = file_size / 1024
-        
-        return f"✅ Successfully wrote file: {file_path} ({file_size_kb:.2f} KB)"
+    # Create directory structure if needed
+    directory = os.path.dirname(file_path)
+    if directory and not os.path.exists(directory):
+        os.makedirs(directory, exist_ok=True)
+    
+    # Write content with UTF-8 encoding
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.write(content)
+    
+    # Return operation status
+    file_size = os.path.getsize(file_path)
+    return f"✅ Successfully wrote file: {file_path} ({file_size/1024:.2f} KB)"
 ```
 
-**Data Flow**: Document content → File system write → Size calculation → Confirmation  
-**Key Points**:
-- Automatic directory creation for nested paths
-- UTF-8 encoding for international content support
-- File size tracking for progress reporting
+Reference: [filesystem.py](../codeviewx/tools/filesystem.py#L12)
 
-### Exception Handling
+- **Output**: Complete set of markdown documentation files
+- **Side Effects**: Creates directory structure and writes documentation files
+- **Progress Tracking**: Real-time feedback on generation progress and document completion
 
-- **API Key Errors**: Graceful fallback with user guidance
-- **File System Errors**: Permission handling and path validation
-- **Network Timeouts**: Retry logic with exponential backoff
-- **AI Agent Errors**: Context preservation and recovery attempts
-
-### Design Highlights
-
-1. **Streaming Architecture**: Real-time progress feedback during long-running operations
-2. **Tool-Based Design**: Modular tool system allows extensible AI capabilities
-3. **Multi-Language Support**: Complete internationalization throughout the stack
-4. **Robust Error Handling**: Comprehensive error recovery and user guidance
-
-## Core Flow #2: Web Server Documentation Browsing
-
-### Overview
-The web server provides an interactive interface for browsing generated documentation with enhanced features like table of contents, file trees, and Mermaid diagram support.
-
-**Input**: HTTP requests for documentation files  
-**Processing**: Markdown rendering, template filling, and static asset serving  
-**Output**: HTML pages with enhanced documentation display
-
-### Sequence Diagram
+### Data Flow Architecture
 
 ```mermaid
-sequenceDiagram
-    participant Browser as Browser
-    participant Flask as Flask App
-    participant Renderer as Markdown Renderer
-    participant FS as File System
-    participant Templates as Template Engine
-    participant Static as Static Assets
+flowchart TD
+    START([User Request]) --> INIT[System Initialization]
+    INIT --> CONFIG[Configuration & Language Setup]
+    CONFIG --> AGENT[AI Agent Creation]
+    AGENT --> ANALYSIS[Project Analysis Phase]
     
-    Browser->>Flask: GET /README.md
-    Flask->>FS: Read README.md file
-    FS->>Flask: File content
+    subgraph "Analysis Phase"
+        ANALYSIS --> DIR_SCAN[Directory Scanning]
+        DIR_SCAN --> CONFIG_SEARCH[Configuration Discovery]
+        CONFIG_SEARCH --> CODE_ANALYSIS[Source Code Analysis]
+        CODE_ANALYSIS --> ENTRY_POINTS[Entry Point Identification]
+    end
     
-    Flask->>Flask: Insert [TOC] marker if missing
+    ENTRY_POINTS --> AI_PLANNING[AI Content Planning]
+    AI_PLANNING --> TASK_GEN[Task List Generation]
     
-    Flask->>Renderer: Render markdown with extensions
-    Renderer->>Renderer: Parse markdown content
-    Renderer->>Renderer: Generate table of contents
-    Renderer->>Renderer: Apply syntax highlighting
-    Renderer->>Flask: Rendered HTML content
+    subgraph "Generation Phase"
+        TASK_GEN --> OVERVIEW[Generate 01-overview.md]
+        OVERVIEW --> QUICKSTART[Generate 02-quickstart.md]
+        QUICKSTART --> ARCH[Generate 03-architecture.md]
+        ARCH --> CORE[Generate 04-core-mechanisms.md]
+        CORE --> API[Generate API Documentation]
+        API --> DEV_GUIDE[Generate Development Guide]
+        DEV_GUIDE --> TESTING[Generate Testing Docs]
+        TESTING --> SECURITY[Generate Security Analysis]
+        SECURITY --> PERFORMANCE[Generate Performance Guide]
+        PERFORMANCE --> DEPLOYMENT[Generate Deployment Guide]
+    end
     
-    Flask->>FS: Generate file tree for navigation
-    FS->>Flask: Directory structure data
+    DEPLOYMENT --> REVIEW[Quality Review]
+    REVIEW --> COMPLETE([Documentation Complete])
     
-    Flask->>Templates: Render doc_detail.html template
-    Templates->>Flask: Complete HTML page
-    Flask->>Browser: HTML response
-    
-    Browser->>Flask: GET /static/css/style.css
-    Flask->>Static: Serve CSS file
-    Static->>Browser: CSS content
+    style ANALYSIS fill:#e1f5fe
+    style GENERATION fill:#f3e5f5
 ```
 
-### Detailed Steps
+### Exception Handling and Error Recovery
 
-#### Step 1: Flask Application Initialization
+| Exception Scenario | Detection Method | Recovery Strategy | User Feedback |
+|-------------------|------------------|-------------------|---------------|
+| Missing API Key | API response validation | Prompt for API key configuration | Clear error message with setup instructions |
+| Invalid Project Path | File system validation | Fallback to current directory | Warning about path change |
+| ripgrep Not Installed | Tool execution failure | Suggest installation commands | Installation instructions for current OS |
+| Insufficient Permissions | File system operation errors | Skip inaccessible files, continue analysis | Warning about skipped files |
+| API Rate Limits | HTTP response codes | Exponential backoff, retry with delays | Progress indicator with retry information |
+| Large Project Timeout | Execution time monitoring | Increase recursion limit, suggest project segmentation | Guidance on handling large projects |
 
-**Trigger Condition**: User starts documentation server
+### Performance Optimization Strategies
 
-**Core Code**:
+#### 1. Intelligent File Filtering
+- **Pattern-Based Exclusion**: Automatically ignore common non-source directories (.git, node_modules, build artifacts)
+- **File Type Prioritization**: Prioritize analysis of source files over documentation and test files
+- **Size Limits**: Implement file size limits to prevent analysis of extremely large files
+
+#### 2. Parallel Processing
+- **Concurrent Tool Execution**: Execute multiple analysis tools in parallel where possible
+- **Asynchronous I/O**: Use asynchronous operations for file reading and searching
+- **Resource Pooling**: Reuse tool instances and connections across operations
+
+#### 3. Caching Mechanisms
+- **Analysis Result Caching**: Cache results of expensive analysis operations
+- **Incremental Updates**: Only reanalyze changed files in subsequent runs
+- **Dependency Graph Caching**: Cache discovered dependency relationships
+
+#### 4. AI Optimization
+- **Context Management**: Optimize prompt context to include most relevant information
+- **Streaming Responses**: Process AI responses incrementally for faster feedback
+- **Batch Processing**: Group related analysis tasks to reduce API calls
+
+### Design Highlights and Innovations
+
+#### 1. **AI-First Architecture**
+Unlike traditional documentation generators that rely on templates and static analysis, CodeViewX uses AI as the primary driver for understanding and synthesizing documentation content. This approach enables:
+- **Deep Code Understanding**: Beyond syntax analysis to comprehend design intent
+- **Contextual Generation**: Documentation that reflects project-specific patterns and conventions
+- **Adaptive Content**: Automatic adjustment of technical depth and focus based on project complexity
+
+#### 2. **Tool Integration Pattern**
+The modular tool system provides clean abstractions for AI agents while maintaining robust error handling and performance optimization:
 ```python
-# File: codeviewx/server.py | Lines: 105-115 | Description: Flask server setup
-def start_document_web_server(output_directory):
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    template_dir = os.path.join(current_dir, 'tpl')
-    static_dir = os.path.join(current_dir, 'static')
-    
-    app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
-```
-
-**Data Flow**: Output directory path → Template/static directory resolution → Flask app creation  
-**Key Points**:
-- Automatic template and static asset path resolution
-- Isolated Flask application for documentation serving
-- Debug mode enabled for development
-
-#### Step 2: Request Routing and File Processing
-
-**Trigger Condition**: Browser requests documentation file
-
-**Core Code**:
-```python
-# File: codeviewx/server.py | Lines: 118-160 | Description: Route handling and markdown processing
-@app.route("/<path:filename>")
-def index(filename):
-    if not filename or filename == "":
-        filename = "README.md"
-    
-    index_file_path = os.path.join(output_directory, filename)
-    if os.path.exists(index_file_path):
-        with open(index_file_path, "r") as f:
-            content = f.read()
-        
-        # Auto-insert TOC if missing
-        if '[TOC]' not in content:
-            lines = content.split('\n')
-            insert_index = 0
-            for i, line in enumerate(lines):
-                if line.strip().startswith('#'):
-                    insert_index = i
-                    break
-            lines.insert(insert_index, '[TOC]')
-            lines.insert(insert_index + 1, '')
-            content = '\n'.join(lines)
-```
-
-**Data Flow**: URL path → File path resolution → Content reading → TOC insertion → Markdown rendering  
-**Key Points**:
-- Automatic table of contents generation
-- Graceful handling of missing files
-- Default to README.md for root requests
-
-#### Step 3: Markdown Rendering with Extensions
-
-**Trigger Condition**: File content ready for display
-
-**Core Code**:
-```python
-# File: codeviewx/server.py | Lines: 162-185 | Description: Advanced markdown processing
-import markdown
-from markdown.extensions.toc import TocExtension
-
-toc_extension = TocExtension(
-    permalink=True,
-    permalink_class='headerlink',
-    title=t('server_toc_title'),
-    baselevel=1,
-    toc_depth=6,
-    marker='[TOC]'
-)
-
-html = markdown.markdown(
-    content,
-    extensions=[
-        'tables',
-        'fenced_code',
-        'codehilite',
-        toc_extension
-    ],
-    extension_configs={
-        'codehilite': {
-            'css_class': 'language-',
-            'use_pygments': False
-        }
-    }
-)
-```
-
-**Data Flow**: Raw markdown → Extension processing → HTML generation  
-**Key Points**:
-- Table of contents with permalinks
-- Code syntax highlighting
-- Table and fenced code block support
-- Custom CSS class configuration
-
-#### Step 4: File Tree Generation
-
-**Trigger Condition**: Navigation sidebar needs updating
-
-**Core Code**:
-```python
-# File: codeviewx/server.py | Lines: 33-80 | Description: File tree generation
-def generate_file_tree(directory, current_file=None):
-    if not os.path.exists(directory):
-        return []
-    
-    file_tree = []
+# Standardized tool interface enables seamless AI integration
+def tool_function(param1: str, param2: Optional[str] = None) -> str:
     try:
-        items = []
-        for item in os.listdir(directory):
-            item_path = os.path.join(directory, item)
-            if os.path.isfile(item_path):
-                items.append(item)
-        
-        items.sort()
-        
-        for item in items:
-            file_path = os.path.join(directory, item)
-            rel_path = os.path.relpath(file_path, directory)
-            
-            file_type = 'file'
-            display_name = item
-            
-            if item.lower().endswith('.md'):
-                file_type = 'markdown'
-                if item.upper() == 'README.MD':
-                    display_name = 'README'
-                else:
-                    title = get_markdown_title(file_path)
-                    if title:
-                        display_name = title
+        # Tool-specific logic
+        return "Success: Result information"
+    except Exception as e:
+        return f"Error: {str(e)}"
 ```
 
-**Data Flow**: Directory scan → File type detection → Title extraction → Tree structure  
-**Key Points**:
-- Automatic title extraction from markdown headers
-- README.md special handling
-- Sorted file listing for consistent navigation
+Reference: [tools/__init__.py](../codeviewx/tools/__init__.py#L5)
 
-### Exception Handling
+#### 3. **Progressive Enhancement**
+The system generates documentation progressively, providing real-time feedback and allowing users to monitor progress:
+- **Task Planning**: AI creates structured task lists with clear priorities
+- **Incremental Generation**: Documents are generated one at a time with status updates
+- **Quality Validation**: Each document is validated before moving to the next
 
-- **File Not Found**: Friendly error messages with navigation suggestions
-- **Permission Errors**: Clear indication of access issues
-- **Markdown Parsing Errors**: Graceful fallback to plain text
-- **Template Errors**: Default templates and debugging information
+#### 4. **Multi-Language Architecture**
+Built-in support for generating documentation in multiple languages, not just UI translation:
+- **Cultural Adaptation**: Technical documentation adapted for different technical cultures
+- **Terminology Localization**: Appropriate technical terminology for each language
+- **Structural Variations**: Documentation structure optimized for different documentation traditions
 
-### Design Highlights
+### Integration Points and Dependencies
 
-1. **Progressive Enhancement**: Basic functionality works without JavaScript
-2. **SEO Friendly**: Clean URLs and semantic HTML structure
-3. **Responsive Design**: Mobile-compatible documentation interface
-4. **Performance**: Efficient file caching and lazy loading
+#### Core Dependencies Analysis
+- **LangChain Ecosystem**: Provides the foundation for AI agent orchestration and workflow management
+- **DeepAgents Framework**: Enables sophisticated multi-agent coordination and tool usage
+- **Anthropic Claude**: Powers the core analysis and content generation capabilities
+- **ripgrep Engine**: Provides high-performance code searching and pattern matching
 
-## Core Flow #3: Internationalization System
-
-### Overview
-The internationalization (i18n) system provides multi-language support for both user interface and generated documentation, with automatic language detection and manual override capabilities.
-
-**Input**: User language preference or system locale  
-**Processing**: Message lookup, parameter substitution, and format adaptation  
-**Output**: Localized text strings in target language
-
-### Detailed Steps
-
-#### Step 1: Language Detection
-
-**Trigger Condition**: Application starts or user specifies language
-
-**Core Code**:
-```python
-# File: codeviewx/i18n.py | Lines: 325-345 | Description: UI language detection
-def detect_ui_language() -> str:
-    try:
-        lang, _ = locale.getdefaultlocale()
-        
-        if lang:
-            if lang.startswith('zh'):
-                return 'zh'
-            else:
-                return 'en'
-        
-        return 'en'
-        
-    except Exception:
-        return 'en'
+#### System Integration Points
+```mermaid
+graph LR
+    subgraph "External Systems"
+        ANTHROPIC[Anthropic API]
+        RIPGREP[ripgrep Tool]
+        FILESYSTEM[Local File System]
+    end
+    
+    subgraph "CodeViewX Core"
+        AI_CORE[AI Agent Core]
+        TOOL_LAYER[Tool Layer]
+        FILE_LAYER[File Operations Layer]
+    end
+    
+    subgraph "User Interfaces"
+        CLI[Command Line]
+        WEB[Web Server]
+        API[Python API]
+    end
+    
+    ANTHROPIC -.->|Claude API| AI_CORE
+    RIPGREP -.->|Search Commands| TOOL_LAYER
+    FILESYSTEM -.->|Read/Write| FILE_LAYER
+    
+    CLI --> AI_CORE
+    WEB --> AI_CORE
+    API --> AI_CORE
+    
+    AI_CORE --> TOOL_LAYER
+    TOOL_LAYER --> FILE_LAYER
 ```
 
-**Data Flow**: System locale → Language code extraction → Default fallback  
-**Key Points**:
-- Automatic Chinese vs English detection
-- Graceful error handling with English fallback
-- Support for future language extensions
-
-#### Step 2: Message Translation
-
-**Trigger Condition**: Application needs to display user-facing text
-
-**Core Code**:
-```python
-# File: codeviewx/i18n.py | Lines: 228-250 | Description: Message translation
-def t(self, key: str, **kwargs) -> str:
-    msg = MESSAGES.get(self.locale, {}).get(key, key)
-    try:
-        return msg.format(**kwargs) if kwargs else msg
-    except KeyError as e:
-        return msg
-```
-
-**Data Flow**: Message key → Language-specific lookup → Parameter formatting → Final string  
-**Key Points**:
-- Parameterized message support for dynamic content
-- Fallback to key if translation missing
-- Error handling for missing format parameters
-
-### Design Highlights
-
-1. **Comprehensive Coverage**: All user-facing text internationalized
-2. **Parameter Support**: Dynamic content insertion in translations
-3. **Graceful Degradation**: Fallback mechanisms for missing translations
-4. **Extensible Design**: Easy addition of new languages
-
-## Core Flow #4: Tool System Architecture
-
-### Overview
-The tool system provides AI agents with capabilities to interact with the external environment, including file system operations, code searching, and command execution.
-
-### Tool Implementations
-
-#### File System Tools
-
-**Core Code**:
-```python
-# File: codeviewx/tools/filesystem.py | Lines: 70-116 | Description: Directory listing
-def list_real_directory(directory: str = ".") -> str:
-    try:
-        items = os.listdir(directory)
-        dirs = [f"📁 {item}/" for item in items if os.path.isdir(os.path.join(directory, item))]
-        files = [f"📄 {item}" for item in items if os.path.isfile(os.path.join(directory, item))]
-        
-        result = f"Directory: {os.path.abspath(directory)}\n"
-        result += f"Total {len(dirs)} directories, {len(files)} files\n\n"
-        
-        if dirs:
-            result += "Directories:\n" + "\n".join(sorted(dirs)) + "\n\n"
-        if files:
-            result += "Files:\n" + "\n".join(sorted(files))
-        
-        return result if result else "Directory is empty"
-```
-
-#### Search Tools
-
-**Core Code**:
-```python
-# File: codeviewx/tools/search.py | Lines: 8-40 | Description: Ripgrep search implementation
-def ripgrep_search(pattern: str, path: str = ".", 
-                   file_type: str = None, 
-                   ignore_case: bool = False,
-                   max_count: int = 100) -> str:
-    try:
-        import subprocess
-        
-        cmd = ["rg", pattern, path, "--no-heading", "--line-number"]
-        
-        if file_type:
-            cmd.extend(["--type", file_type])
-        if ignore_case:
-            cmd.append("--ignore-case")
-        if max_count:
-            cmd.extend(["--max-count", str(max_count)])
-        
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-        
-        if result.returncode == 0:
-            return result.stdout
-        else:
-            return f"No matches found or search error: {result.stderr}"
-```
-
-#### Command Execution Tools
-
-**Core Code**:
-```python
-# File: codeviewx/tools/command.py | Lines: 8-40 | Description: System command execution
-def execute_command(command: str, working_dir: str = None) -> str:
-    try:
-        result = subprocess.run(
-            command,
-            shell=True,
-            capture_output=True,
-            text=True,
-            cwd=working_dir,
-            timeout=30
-        )
-        
-        output = ""
-        if result.stdout:
-            output += result.stdout
-        if result.stderr:
-            output += f"\n[Error Output]\n{result.stderr}"
-        
-        return output if output else "Command executed successfully, no output"
-```
-
-### Design Highlights
-
-1. **Unified Interface**: All tools follow consistent input/output patterns
-2. **Error Handling**: Comprehensive error handling with user-friendly messages
-3. **Security**: Sandboxed execution with timeouts and path restrictions
-4. **Performance**: Efficient operations with caching where appropriate
-
-## Performance Optimization Mechanisms
-
-### 1. Streaming Processing
-- Real-time progress feedback during documentation generation
-- Memory-efficient handling of large codebases
-- Early termination capabilities for user interruption
-
-### 2. Caching Strategies
-- File system operation results cached during agent execution
-- Search result caching to avoid redundant ripgrep calls
-- Template and prompt caching for repeated operations
-
-### 3. Parallel Processing
-- Independent tool execution when possible
-- Concurrent file reading operations
-- Background processing for web server assets
-
-### 4. Resource Management
-- Configurable recursion limits to prevent infinite loops
-- Memory usage monitoring and cleanup
-- Temporary file management and cleanup
-
-## Security Mechanisms
-
-### 1. Input Validation
-- Path traversal protection in file operations
-- Command injection prevention in system calls
-- Pattern validation in search operations
-
-### 2. Sandboxing
-- Working directory restrictions for file operations
-- Command execution timeouts and resource limits
-- Tool permission restrictions based on context
-
-### 3. Error Isolation
-- Exception boundaries prevent cascade failures
-- Safe fallbacks for critical operations
-- User guidance for security-related errors
-
----
-
-*Next: [Development Guide](07-development-guide.md) - Contributing to CodeViewX*
+This core mechanism represents a sophisticated approach to automated documentation generation that combines state-of-the-art AI capabilities with robust software engineering practices, resulting in a system that can understand, analyze, and document complex codebases with minimal human intervention.

@@ -2,151 +2,177 @@
 
 ## Project Introduction
 
-CodeViewX is an intelligent code documentation generator that leverages artificial intelligence to automatically analyze codebases and generate comprehensive technical documentation. The project combines modern AI technologies with traditional software engineering practices to provide developers with high-quality documentation.
+CodeViewX is an intelligent code documentation generator that leverages state-of-the-art AI technologies to automatically analyze codebases and generate comprehensive technical documentation. Built on the Anthropic Claude model and DeepAgents framework, CodeViewX transforms the tedious task of documentation writing into an automated, intelligent process.
+
+The project addresses a common pain point in software development: maintaining up-to-date, comprehensive documentation. Traditional documentation approaches are time-consuming, error-prone, and quickly become outdated as code evolves. CodeViewX solves this by continuously analyzing code structure, understanding design patterns, and generating documentation that accurately reflects the current state of the codebase.
+
+**Core Value Proposition**: CodeViewX enables development teams to maintain high-quality, consistent documentation with minimal effort, allowing developers to focus on writing code while ensuring that project knowledge is properly documented and accessible.
+
+**Target Problems Solved**:
+- Time-consuming manual documentation process
+- Inconsistent documentation quality across projects
+- Documentation becoming outdated as code changes
+- Difficulty for new developers to understand complex codebases
+- Lack of comprehensive API documentation
+
+**Primary Use Cases**:
+- Legacy system documentation modernization
+- New project documentation bootstrapping
+- Continuous documentation maintenance in CI/CD pipelines
+- Onboarding documentation for new team members
+- API documentation generation for libraries and frameworks
+
+Reference: [README.md](../README.md#L1-L30)
 
 ## Technology Stack
 
-### Core Dependencies
+| Category | Technology | Version | Purpose |
+|----------|------------|---------|---------|
+| **Core Language** | Python | 3.8+ | Main development language |
+| **AI Framework** | LangChain | 0.3.27+ | LLM application framework |
+| **AI Integration** | langchain-anthropic | 0.3.22+ | Anthropic Claude integration |
+| **AI Workflow** | LangGraph | 0.6.10+ | Workflow orchestration |
+| **AI Agents** | DeepAgents | 0.0.5+ | AI agent framework |
+| **Web Framework** | Flask | 3.0.0 | Documentation web server |
+| **Code Search** | ripgrepy | 2.0.0 | Fast code searching |
+| **Documentation** | markdown | 3.5.1 | Markdown processing |
+| **Extensions** | pymdown-extensions | 10.5 | Enhanced Markdown features |
 
-| Dependency | Version | Purpose |
-|------------|---------|---------|
-| **Python** | 3.8+ | Core programming language |
-| **langchain** | 0.3.27 | LLM application framework |
-| **langchain-anthropic** | 0.3.22 | Anthropic Claude integration |
-| **langchain-core** | 0.3.79 | LangChain core components |
-| **langchain-text-splitters** | 0.3.11 | Text processing utilities |
-| **langgraph** | 0.6.10 | Workflow orchestration |
-| **langgraph-checkpoint** | 2.1.2 | State management |
-| **langgraph-prebuilt** | 0.6.4 | Pre-built components |
-| **langgraph-sdk** | 0.2.9 | SDK for LangGraph |
-| **langsmith** | 0.4.34 | Monitoring and tracing |
-| **deepagents** | 0.0.5 | AI Agent framework |
-| **ripgrepy** | 2.0.0 | Python wrapper for ripgrep |
-| **flask** | 3.0.0 | Web server for documentation browsing |
-| **markdown** | 3.5.1 | Markdown processing |
-| **pymdown-extensions** | 10.5 | Markdown extensions |
+**Technology Selection Rationale**:
 
-### Development Dependencies
+1. **LangChain Ecosystem**: Chosen for its mature integration with various LLM providers and comprehensive tooling for building AI applications. The LangGraph component provides robust workflow orchestration capabilities essential for complex documentation generation pipelines.
 
-| Dependency | Purpose |
-|------------|---------|
-| **pytest** | Testing framework |
-| **pytest-cov** | Coverage reporting |
-| **black** | Code formatting |
-| **flake8** | Linting |
-| **mypy** | Type checking |
-| **isort** | Import sorting |
+2. **Anthropic Claude**: Selected for its superior code understanding capabilities, ability to analyze complex code structures, and generate coherent, technical documentation that accurately reflects code intent and design patterns.
 
-## Project Structure
+3. **DeepAgents Framework**: Provides the agent-based architecture necessary for sophisticated code analysis, allowing the system to break down documentation generation into manageable, specialized tasks.
+
+4. **ripgrep Integration**: Offers lightning-fast code searching capabilities, crucial for efficiently analyzing large codebases and identifying relevant code patterns, dependencies, and relationships.
+
+5. **Flask Web Server**: Lightweight yet powerful framework for serving documentation with a clean, browsable interface that supports interactive navigation and search.
+
+Reference: [pyproject.toml](../pyproject.toml#L25-L45)
+Reference: [requirements.txt](../requirements.txt#L1-L14)
+
+## Directory Structure
 
 ```
 codeviewx/
-├── 📁 codeviewx/                 # Main package
-│   ├── 📄 __init__.py           # Package initialization and exports
-│   ├── 📄 __version__.py        # Version information
-│   ├── 📄 cli.py                # Command line interface (CLI)
-│   ├── 📄 core.py               # Core API entry point
-│   ├── 📄 generator.py          # Main documentation generator
-│   ├── 📄 server.py             # Web documentation server
-│   ├── 📄 prompt.py             # Prompt management system
-│   ├── 📄 i18n.py               # Internationalization support
-│   ├── 📄 language.py           # Language detection utilities
-│   ├── 📁 prompts/              # AI prompt templates
-│   │   ├── 📄 document_engineer.md
-│   │   └── 📄 document_engineer_zh.md
-│   ├── 📁 tools/                # Custom tools for AI agents
-│   │   ├── 📄 command.py        # System command execution
-│   │   ├── 📄 filesystem.py     # File system operations
-│   │   └── 📄 search.py         # Code search utilities
-│   ├── 📁 tpl/                  # HTML templates for web server
-│   └── 📁 static/               # Static assets (CSS, JS)
-├── 📁 tests/                    # Test files
-├── 📁 examples/                 # Example usage
-├── 📄 pyproject.toml            # Project configuration
-├── 📄 requirements.txt          # Runtime dependencies
-├── 📄 requirements-dev.txt      # Development dependencies
-├── 📄 MANIFEST.in              # Package manifest
-├── 📄 LICENSE                  # GPL-3.0 license
-└── 📄 README.md                # Project documentation
+├── codeviewx/              # Main package directory
+│   ├── __init__.py        # Package initialization and public API
+│   ├── __version__.py     # Version information
+│   ├── cli.py             # Command-line interface implementation
+│   ├── core.py            # Core API entry points
+│   ├── generator.py       # Main documentation generation logic
+│   ├── server.py          # Web documentation server
+│   ├── prompt.py          # Prompt template management
+│   ├── i18n.py            # Internationalization support
+│   ├── language.py        # Language detection utilities
+│   ├── prompts/           # AI prompt templates directory
+│   │   ├── document_engineer.md
+│   │   └── document_engineer_zh.md
+│   ├── tools/             # Tool modules for code analysis
+│   │   ├── __init__.py
+│   │   ├── command.py     # System command execution
+│   │   ├── filesystem.py  # File system operations
+│   │   └── search.py      # Code search functionality
+│   ├── tpl/               # HTML templates for web interface
+│   │   └── doc_detail.html
+│   └── static/            # Static assets (CSS, JS, images)
+├── tests/                 # Test suite
+│   ├── test_core.py
+│   ├── test_language.py
+│   ├── test_progress.py
+│   └── test_tools.py
+├── examples/              # Usage examples
+│   ├── basic_usage.py
+│   ├── i18n_demo.py
+│   ├── language_demo.py
+│   └── progress_demo.py
+├── docs/                  # Documentation output
+│   ├── en/               # English documentation
+│   └── zh/               # Chinese documentation
+├── pyproject.toml        # Project configuration and dependencies
+├── requirements.txt      # Production dependencies
+├── requirements-dev.txt  # Development dependencies
+├── README.md            # Project documentation
+├── LICENSE              # GPL v3 license
+└── CONTRIBUTING.md      # Contribution guidelines
 ```
 
-## Core Components
+**Directory Purpose Explanation**:
 
-### 1. CLI Module (`cli.py`)
-**Entry Point**: `def main()` (Line 16)
-- Command line argument parsing
-- User interface language detection
-- Workflow orchestration
+- **`codeviewx/`**: Core package containing all functionality, organized by responsibility rather than technical layers
+- **`prompts/`**: Contains carefully crafted AI prompts for different documentation generation tasks, with language-specific variants
+- **`tools/`**: Modular tool system for code analysis, providing clean abstractions for file system operations, command execution, and code searching
+- **`tests/`**: Comprehensive test suite covering core functionality, language detection, and tool behavior
+- **`examples/`**: Practical usage examples demonstrating different features and integration patterns
+- **`docs/`**: Output directory for generated documentation, supporting multiple languages
 
-### 2. Generator Module (`generator.py`)
-**Core Function**: `def generate_docs()` (Line 24)
-- AI agent creation and management
-- Documentation generation workflow
-- Progress tracking and logging
+Reference: [cli.py](../codeviewx/cli.py#L1-L10)
 
-### 3. Server Module (`server.py`)
-**Core Function**: `def start_document_web_server()` (Line 105)
-- Flask web server
-- Markdown rendering
-- File tree generation
+## Project Type
 
-### 4. Internationalization (`i18n.py`)
-**Core Class**: `class I18n:` (Line 200)
-- Multi-language support
-- Message translation
-- Locale detection
+**Primary Category**: CLI Tool / Documentation Generator
 
-### 5. Tools System
-- **Command Tool**: System command execution
-- **Filesystem Tool**: File operations
-- **Search Tool**: Code searching with ripgrep
+**Secondary Categories**: 
+- AI Application
+- Web Application (documentation server)
+- Python Package/Library
+- Development Tool
 
-## Key Features
+**Execution Modes**:
+1. **CLI Mode**: Command-line interface for batch documentation generation
+2. **Server Mode**: Web server for interactive documentation browsing
+3. **API Mode**: Python API for programmatic integration
 
-### AI-Powered Analysis
-- Uses Anthropic Claude for code understanding
-- DeepAgents framework for agent orchestration
-- LangChain for LLM integration
+**Deployment Models**:
+- **Local Installation**: pip install for individual developer use
+- **CI/CD Integration**: Automated documentation generation in build pipelines
+- **Docker Container**: Containerized deployment for consistent environments
 
-### Multi-Language Support
-- 8 documentation languages supported
-- 2 UI languages (English/Chinese)
-- Automatic language detection
+## Core Features
 
-### Web Interface
-- Beautiful documentation browsing
-- Mermaid diagram support
-- Interactive file tree
+### 1. AI-Powered Code Analysis
+- **Deep Code Understanding**: Leverages Claude's advanced code analysis capabilities to comprehend complex code structures, design patterns, and architectural decisions
+- **Multi-Language Support**: Analyzes codebases written in various programming languages with context-aware understanding
+- **Dependency Mapping**: Automatically identifies and documents module dependencies, import relationships, and architectural connections
 
-### High Performance
-- ripgrep for fast code searching
-- Efficient file processing
-- Progressive generation
+### 2. Automated Documentation Generation
+- **8-Chapter Documentation System**: Generates comprehensive documentation covering project overview, architecture, core mechanisms, APIs, development guides, testing, security, and performance
+- **Intelligent Content Organization**: Automatically structures documentation with logical flow, appropriate sectioning, and cross-references
+- **Code Reference Integration**: Includes direct links to source code throughout documentation for easy navigation
 
-## Design Philosophy
+### 3. Multi-Language Support
+- **8 Documentation Languages**: Chinese, English, Japanese, Korean, French, German, Spanish, Russian
+- **Automatic Language Detection**: Intelligently detects system language and documentation language preferences
+- **Localized Output**: Generates documentation in the target language with appropriate technical terminology
 
-1. **Accuracy First**: Only describe verified information from actual code analysis
-2. **Depth Priority**: Provide detailed analysis with sequence diagrams and code examples
-3. **Structured Output**: Clear hierarchy with Markdown formatting
-4. **Practicality**: Explain design decisions and provide actionable guides
-5. **Context Association**: Reference specific code locations in documentation
+### 4. Interactive Web Interface
+- **Beautiful Documentation Browser**: Modern, responsive web interface for browsing generated documentation
+- **Mermaid Diagram Support**: Renders architecture diagrams, flowcharts, and sequence diagrams directly in documentation
+- **Search and Navigation**: Built-in search functionality and intuitive navigation structure
 
-## Configuration
+### 5. High-Performance Analysis
+- **ripgrep Integration**: Leverages ripgrep for lightning-fast code searching and pattern matching
+- **Incremental Analysis**: Efficiently analyzes only changed portions of codebases for faster updates
+- **Parallel Processing**: Optimized performance through concurrent analysis of multiple code modules
 
-### Entry Points
-- **CLI Command**: `codeviewx` (defined in `pyproject.toml`)
-- **Python API**: `from codeviewx import generate_docs`
+### 6. Developer-Friendly Features
+- **CLI and API Interfaces**: Flexible usage options for different workflows
+- **Customizable Prompts**: Extensible prompt system for specialized documentation needs
+- **Progress Tracking**: Real-time progress indication during documentation generation
+- **Verbose Logging**: Detailed logging options for debugging and analysis
 
-### Environment Variables
-- `ANTHROPIC_API_KEY`: Anthropic API key
-- `OPENAI_API_KEY`: OpenAI API key (optional)
+Reference: [generator.py](../codeviewx/generator.py#L1-L25)
 
-### Default Settings
-- **Output Directory**: `docs/`
-- **Language**: Auto-detect system language
-- **Recursion Limit**: 1000 steps
-- **Server Port**: 5000
+## Architecture Philosophy
 
----
+CodeViewX follows a modular, extensible architecture design centered around several key principles:
 
-*Next: [Quick Start Guide](02-quickstart.md)*
+1. **Separation of Concerns**: Clear boundaries between UI (CLI/web), core logic, AI integration, and file system operations
+2. **Extensibility**: Plugin-like architecture allowing easy addition of new analysis tools, documentation formats, and AI models
+3. **Configuration-Driven**: Behavior customization through configuration rather than code changes
+4. **Tool Independence**: Each tool (search, file operations, command execution) operates independently for maintainability
+5. **AI-First Design**: Architecture designed around AI agent capabilities rather than traditional procedural approaches
+
+The system employs an agent-based workflow where AI agents coordinate different tools to analyze code, extract information, and synthesize documentation, making it fundamentally different from traditional template-based documentation generators.

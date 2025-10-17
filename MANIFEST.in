@@ -7,6 +7,12 @@ include pyproject.toml
 # Include prompt template files
 recursive-include codeviewx/prompts *.md
 
+# Include template files
+recursive-include codeviewx/tpl *.html
+
+# Include static files
+recursive-include codeviewx/static **/*
+
 # Include documentation
 recursive-include docs *.md
 

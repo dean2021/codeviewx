@@ -2,429 +2,429 @@
 
 ## Architecture Overview
 
-CodeViewX follows a modular, layered architecture that separates concerns between AI processing, user interface, and core functionality. The system is designed around the principle of using AI agents as the primary driver for documentation generation, with supporting modules for file operations, web serving, and user interaction.
+CodeViewX employs a sophisticated, multi-layered architecture designed around AI agent orchestration and modular tool integration. The system is built on the principle of **AI-first design**, where artificial intelligence agents coordinate various tools to perform complex code analysis and documentation generation tasks.
 
-## High-Level Architecture
+The architecture can be understood as a pipeline of specialized components working in concert: from the user interface layer down through the AI orchestration core, to the tool execution layer, and finally to the file system interface.
+
+### High-Level Architecture Diagram
 
 ```mermaid
 graph TB
     subgraph "User Interface Layer"
-        CLI[CLI Interface]
-        WEB[Web Server]
+        CLI[Command Line Interface]
+        WEB[Web Documentation Server]
+        API[Python API]
     end
     
     subgraph "Core Processing Layer"
-        CORE[Core API]
-        GEN[Document Generator]
-        AI[AI Agent Engine]
-    end
-    
-    subgraph "Support Layer"
-        TOOLS[Custom Tools]
+        CORE[Core Module]
+        GEN[Documentation Generator]
         PROMPT[Prompt Manager]
         I18N[Internationalization]
-        LANG[Language Detection]
     end
     
-    subgraph "External Services"
-        ANTHROPIC[Anthropic Claude]
-        RIPGREP[ripgrep]
-        FILESYSTEM[File System]
+    subgraph "AI Orchestration Layer"
+        AGENTS[DeepAgents Framework]
+        LANGCHAIN[LangChain/LangGraph]
+        CLAUDE[Anthropic Claude]
+    end
+    
+    subgraph "Tool Execution Layer"
+        SEARCH[Code Search Tool]
+        FS[Filesystem Tools]
+        CMD[Command Execution]
+    end
+    
+    subgraph "External Dependencies"
+        RIPGREP[ripgrep Engine]
+        ANTHROPIC[Anthropic API]
+        FILESYSTEM[Local File System]
     end
     
     CLI --> CORE
     WEB --> CORE
+    API --> CORE
+    
     CORE --> GEN
-    GEN --> AI
-    AI --> TOOLS
-    AI --> PROMPT
-    GEN --> I18N
-    GEN --> LANG
+    CORE --> I18N
+    GEN --> PROMPT
     
-    TOOLS --> RIPGREP
-    TOOLS --> FILESYSTEM
-    AI --> ANTHROPIC
+    GEN --> AGENTS
+    AGENTS --> LANGCHAIN
+    LANGCHAIN --> CLAUDE
+    CLAUDE --> ANTHROPIC
+    
+    AGENTS --> SEARCH
+    AGENTS --> FS
+    AGENTS --> CMD
+    
+    SEARCH --> RIPGREP
+    FS --> FILESYSTEM
+    CMD --> FILESYSTEM
 ```
 
-## Core Components
+## Core Architectural Components
 
-### 1. CLI Interface (`cli.py`)
+### 1. User Interface Layer
 
-**Purpose**: Command-line interface for user interaction
-**Key Functions**:
+The UI layer provides multiple interaction patterns to accommodate different use cases and user preferences:
+
+#### Command Line Interface (`cli.py`)
+**Purpose**: Primary interaction method for most users
+**Key Features**:
 - Argument parsing and validation
-- User interface language detection
-- Workflow orchestration
+- Progress monitoring and verbose output
 - Error handling and user feedback
+- Integration with shell environments
 
+**Key Functions**:
 ```python
-# File: codeviewx/cli.py | Lines: 16-134 | Description: Main CLI entry point
-def main():
-    ui_lang = detect_ui_language()
-    get_i18n().set_locale(ui_lang)
-    
-    parser = argparse.ArgumentParser(
-        prog="codeviewx",
-        description=t('cli_description'),
-        # ... argument definitions
-    )
+def main():  # Entry point for CLI
+    # Argument parsing, setup, and execution coordination
 ```
 
-### 2. Document Generator (`generator.py`)
+Reference: [cli.py](../codeviewx/cli.py#L16)
 
-**Purpose**: Core documentation generation engine
+#### Web Documentation Server (`server.py`)
+**Purpose**: Interactive documentation browsing and presentation
+**Key Features**:
+- Flask-based web server
+- Markdown rendering with Mermaid diagram support
+- File tree navigation
+- Responsive design
+
 **Key Functions**:
-- AI agent creation and management
-- Documentation workflow orchestration
-- Progress tracking and logging
-- File output management
-
 ```python
-# File: codeviewx/generator.py | Lines: 24-324 | Description: Main generation function
-def generate_docs(
-    working_directory: Optional[str] = None,
-    output_directory: str = "docs",
-    doc_language: Optional[str] = None,
-    ui_language: Optional[str] = None,
-    recursion_limit: int = 1000,
-    verbose: bool = False
-) -> None:
-```
-
-### 3. Web Server (`server.py`)
-
-**Purpose**: Documentation browsing interface
-**Key Functions**:
-- Flask web application
-- Markdown rendering with extensions
-- File tree generation
-- Static asset serving
-
-```python
-# File: codeviewx/server.py | Lines: 105-190 | Description: Web server startup
 def start_document_web_server(output_directory):
-    app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
-    
-    @app.route("/")
-    def home():
-        return index("README.md")
+    # Initialize and run Flask server for documentation browsing
 ```
 
-### 4. Internationalization (`i18n.py`)
+Reference: [server.py](../codeviewx/server.py#L140)
 
-**Purpose**: Multi-language support system
+#### Python API (`core.py`)
+**Purpose**: Programmatic integration for advanced use cases
+**Key Features**:
+- Clean, function-based API
+- Configuration flexibility
+- Integration with Python workflows
+
 **Key Functions**:
-- Message translation
-- Locale detection
-- Language switching
-- UI string management
-
 ```python
-# File: codeviewx/i18n.py | Lines: 200-325 | Description: I18n class implementation
-class I18n:
-    def __init__(self, locale: str = 'en'):
-        self.locale = locale if locale in MESSAGES else 'en'
-    
-    def t(self, key: str, **kwargs) -> str:
-        msg = MESSAGES.get(self.locale, {}).get(key, key)
-        return msg.format(**kwargs) if kwargs else msg
+def generate_docs(working_directory, output_directory, doc_language, ...):
+    # Main API for documentation generation
 ```
 
-## AI Agent Architecture
+Reference: [core.py](../codeviewx/core.py#L12)
 
-### Agent Design Pattern
+### 2. Core Processing Layer
 
-CodeViewX uses the DeepAgents framework to create AI agents that can use tools for code analysis and document generation.
+This layer contains the main business logic and coordination components:
 
-```mermaid
-sequenceDiagram
-    participant User as User
-    participant CLI as CLI Interface
-    participant Gen as Generator
-    participant Agent as AI Agent
-    participant Tools as Custom Tools
-    participant Anthropic as Anthropic Claude
-    
-    User->>CLI: codeviewx command
-    CLI->>Gen: generate_docs()
-    Gen->>Agent: create_deep_agent(tools, prompt)
-    Gen->>Agent: Stream task execution
-    
-    loop Analysis & Generation
-        Agent->>Anthropic: Think about next action
-        Anthropic->>Agent: Tool calls needed
-        Agent->>Tools: Execute tools (read, search, write)
-        Tools->>Agent: Tool results
-        Agent->>Anthropic: Continue with context
-    end
-    
-    Agent->>Gen: Completion signal
-    Gen->>CLI: Success/Failure
-    CLI->>User: Final output
-```
+#### Documentation Generator (`generator.py`)
+**Purpose**: Central orchestration of the documentation generation process
+**Key Responsibilities**:
+- AI agent initialization and configuration
+- Tool registration and management
+- Progress tracking and user feedback
+- Error handling and recovery
 
-### Tool System Architecture
-
-The tool system provides AI agents with capabilities to interact with the file system and execute commands.
-
-```mermaid
-graph LR
-    subgraph "AI Agent"
-        AGENT[Agent Logic]
-    end
-    
-    subgraph "Tool Interface"
-        CMD[Command Tool]
-        SEARCH[Search Tool]
-        FS[Filesystem Tool]
-    end
-    
-    subgraph "External Tools"
-        RG[ripgrep]
-        SHELL[System Shell]
-        FILES[File System]
-    end
-    
-    AGENT --> CMD
-    AGENT --> SEARCH
-    AGENT --> FS
-    
-    CMD --> SHELL
-    SEARCH --> RG
-    FS --> FILES
-```
-
-**Tool Implementations**:
-
+**Architecture Pattern**: Orchestrator Pattern
 ```python
-# File: codeviewx/tools/command.py | Description: System command execution
-def execute_command(command: str, working_dir: str = None) -> str:
-    """Execute system command and return result"""
-
-# File: codeviewx/tools/search.py | Description: Code searching with ripgrep  
-def ripgrep_search(pattern: str, path: str = ".", 
-                   file_type: str = None, 
-                   ignore_case: bool = False,
-                   max_count: int = 100) -> str:
-    """Search for text patterns in files using ripgrep"""
-
-# File: codeviewx/tools/filesystem.py | Description: File operations
-def write_real_file(file_path: str, content: str) -> str:
-    """Write file to real filesystem"""
-
-def read_real_file(file_path: str) -> str:
-    """Read file content from real filesystem"""
-
-def list_real_directory(directory: str = ".") -> str:
-    """List directory contents in real filesystem"""
+def generate_docs(working_directory, output_directory, doc_language, ...):
+    # 1. Setup and configuration
+    # 2. Load prompts and initialize AI agents
+    # 3. Register tools
+    # 4. Execute analysis workflow
+    # 5. Handle results and errors
 ```
+
+Reference: [generator.py](../codeviewx/generator.py#L25)
+
+#### Prompt Manager (`prompt.py`)
+**Purpose**: Template management for AI interactions
+**Key Features**:
+- Multi-language prompt templates
+- Dynamic prompt composition
+- Context-aware prompt selection
+
+#### Internationalization (`i18n.py`, `language.py`)
+**Purpose**: Multi-language support for both UI and documentation output
+**Key Features**:
+- Automatic language detection
+- Localization of UI messages
+- Documentation language specification
+
+### 3. AI Orchestration Layer
+
+This is the core intelligence layer that makes CodeViewX unique:
+
+#### DeepAgents Framework Integration
+**Purpose**: High-level AI agent orchestration
+**Key Capabilities**:
+- Multi-step reasoning and planning
+- Tool usage coordination
+- Error recovery and alternative strategies
+
+#### LangChain/LangGraph Workflow
+**Purpose**: Structured AI workflow execution
+**Key Features**:
+- State management across analysis steps
+- Tool integration and parameter passing
+- Streaming responses and progress monitoring
+
+#### Anthropic Claude Integration
+**Purpose**: Advanced code analysis and natural language generation
+**Key Capabilities**:
+- Deep code understanding
+- Technical documentation generation
+- Multi-language content creation
+
+### 4. Tool Execution Layer
+
+Modular tool system providing specialized capabilities:
+
+#### Code Search Tool (`tools/search.py`)
+**Purpose**: High-performance code pattern matching
+**Architecture**: Wrapper around ripgrep engine
+```python
+def ripgrep_search(pattern, path, file_type, ignore_case, max_count):
+    # 1. Initialize ripgrep with pattern and path
+    # 2. Configure search parameters
+    # 3. Apply ignore patterns for common non-source files
+    # 4. Execute search and format results
+```
+
+Reference: [search.py](../codeviewx/tools/search.py#L15)
+
+#### Filesystem Tools (`tools/filesystem.py`)
+**Purpose**: File system operations for code analysis and document generation
+**Components**:
+- `write_real_file()`: Document output with directory creation
+- `read_real_file()`: Source code reading with metadata
+- `list_real_directory()`: Directory structure analysis
+
+**Architecture Pattern**: Facade Pattern - provides simplified interface to complex file operations
+
+Reference: [filesystem.py](../codeviewx/filesystem.py#L12)
+
+#### Command Execution Tool (`tools/command.py`)
+**Purpose**: System command execution for build tools, testing, and analysis
+**Key Features**:
+- Safe command execution
+- Output capture and formatting
+- Error handling and status reporting
 
 ## Data Flow Architecture
 
-### Documentation Generation Flow
-
-```mermaid
-flowchart TD
-    START([Start Generation]) --> PARSE[Parse CLI Arguments]
-    PARSE --> DETECT[Detect Languages]
-    DETECT --> LOAD[Load Prompt Template]
-    LOAD --> CREATE[Create AI Agent]
-    CREATE --> REGISTER[Register Tools]
-    REGISTER --> ANALYZE[Analyze Project Structure]
-    
-    ANALYZE --> READ_CONFIG[Read Configuration Files]
-    READ_CONFIG --> SEARCH_CODE[Search Core Patterns]
-    SEARCH_CODE --> READ_FILES[Read Core Files]
-    READ_FILES --> GENERATE{Generate Documents}
-    
-    GENERATE --> README[Generate README.md]
-    GENERATE --> OVERVIEW[Generate 01-overview.md]
-    GENERATE --> QUICKSTART[Generate 02-quickstart.md]
-    GENERATE --> ARCH[Generate 03-architecture.md]
-    GENERATE --> CORE[Generate 04-core-mechanisms.md]
-    
-    README --> COMPLETE[Generation Complete]
-    OVERVIEW --> COMPLETE
-    QUICKSTART --> COMPLETE
-    ARCH --> COMPLETE
-    CORE --> COMPLETE
-    
-    COMPLETE --> SERVE{Start Web Server?}
-    SERVE -->|Yes| WEB[Start Flask Server]
-    SERVE -->|No| END([End])
-    WEB --> END
-```
-
-### Web Server Request Flow
+### Documentation Generation Workflow
 
 ```mermaid
 sequenceDiagram
-    participant Browser as Browser
-    participant Flask as Flask App
-    participant Renderer as Markdown Renderer
-    participant FileSystem as File System
+    participant User
+    participant CLI
+    participant Generator
+    participant AI_Agent
+    participant Tools
+    participant FileSystem
     
-    Browser->>Flask: GET /README.md
-    Flask->>FileSystem: Read README.md
-    FileSystem->>Flask: File content
-    Flask->>Renderer: Render markdown with extensions
-    Renderer->>Flask: HTML content
-    Flask->>Browser: HTML response with template
+    User->>CLI: codeviewx -w /project -o docs
+    CLI->>Generator: generate_docs(working_dir, output_dir, language)
+    Generator->>Generator: Load prompts and setup AI agent
+    Generator->>AI_Agent: Initialize with tools
+    AI_Agent->>Tools: list_real_directory(working_dir)
+    Tools->>FileSystem: Read directory structure
+    FileSystem-->>Tools: Return file list
+    Tools-->>AI_Agent: Directory structure
     
-    Browser->>Flask: GET /static/css/style.css
-    Flask->>Browser: Static CSS file
+    loop Analysis Phase
+        AI_Agent->>Tools: ripgrep_search(pattern, path)
+        Tools->>Tools: Execute code search
+        Tools-->>AI_Agent: Search results
+        AI_Agent->>Tools: read_real_file(file_path)
+        Tools->>FileSystem: Read source file
+        FileSystem-->>Tools: File content
+        Tools-->>AI_Agent: Formatted file content
+    end
+    
+    AI_Agent->>AI_Agent: Analyze code structure and patterns
+    
+    loop Documentation Generation
+        AI_Agent->>Tools: write_real_file(doc_path, content)
+        Tools->>FileSystem: Write documentation
+        FileSystem-->>Tools: Write confirmation
+        Tools-->>AI_Agent: Success status
+    end
+    
+    AI_Agent-->>Generator: Documentation generation complete
+    Generator-->>CLI: Process finished
+    CLI-->>User: Success message
 ```
 
-## Configuration Architecture
-
-### Configuration Sources (Priority Order)
-
-1. **Command Line Arguments** - Highest priority
-2. **Environment Variables** - Medium priority  
-3. **Default Values** - Lowest priority
+### AI Agent Orchestration Pattern
 
 ```mermaid
-graph TD
-    subgraph "Configuration Sources"
-        CLI_ARGS[CLI Arguments]
-        ENV_VARS[Environment Variables]
-        DEFAULTS[Default Values]
-    end
+flowchart TD
+    START([Start Generation]) --> INIT[Initialize Agent]
+    INIT --> PLAN[Create Analysis Plan]
+    PLAN --> ANALYZE[Analyze Project Structure]
     
-    subgraph "Configuration Processing"
-        PARSER[Argument Parser]
-        VALIDATOR[Configuration Validator]
-        MERGER[Configuration Merger]
-    end
+    ANALYZE --> CONFIG{Read Config Files?}
+    CONFIG -->|Yes| CONFIG_FILES[Read package.json, requirements.txt, etc.]
+    CONFIG -->|No| CORE[Analyze Core Files]
     
-    subgraph "Configuration Output"
-        FINAL_CONFIG[Final Configuration]
-    end
+    CONFIG_FILES --> CORE
+    CORE --> SEARCH[Search for Entry Points]
+    SEARCH --> DEPS[Analyze Dependencies]
+    DEPS --> MODULES[Identify Main Modules]
     
-    CLI_ARGS --> PARSER
-    ENV_VARS --> PARSER
-    DEFAULTS --> PARSER
+    MODULES --> GEN_PLAN[Create Documentation Plan]
+    GEN_PLAN --> GEN_DOCS[Generate Documents]
     
-    PARSER --> VALIDATOR
-    VALIDATOR --> MERGER
-    MERGER --> FINAL_CONFIG
+    GEN_DOCS --> OVERVIEW[Generate 01-overview.md]
+    OVERVIEW --> QUICKSTART[Generate 02-quickstart.md]
+    QUICKSTART --> ARCH[Generate 03-architecture.md]
+    ARCH --> CORE_MECH[Generate 04-core-mechanisms.md]
+    CORE_MECH --> API[Generate API docs]
+    API --> DEV_GUIDE[Generate 07-development-guide.md]
+    
+    DEV_GUIDE --> REVIEW[Review and Validate]
+    REVIEW --> DONE([Generation Complete])
 ```
 
-## Error Handling Architecture
+## Design Patterns Employed
 
-### Exception Handling Strategy
+### 1. Orchestrator Pattern
+**Location**: `generator.py`
+**Purpose**: Coordinate multiple AI agents and tools
+**Benefits**: 
+- Centralized control of complex workflows
+- Error handling and recovery
+- Progress monitoring and user feedback
 
-```python
-# File: codeviewx/cli.py | Lines: 108-126 | Description: CLI error handling
-try:
-    # Main execution logic
-    if args.serve:
-        start_document_web_server(args.output_directory)
-    else:
-        generate_docs(...)
-        
-except KeyboardInterrupt:
-    print("\n\n⚠️  User interrupted", file=sys.stderr)
-    sys.exit(130)
-except Exception as e:
-    print(f"\n❌ Error: {e}", file=sys.stderr)
-    if args.verbose:
-        import traceback
-        traceback.print_exc()
-    sys.exit(1)
-```
+### 2. Strategy Pattern
+**Location**: `prompt.py`, `language.py`
+**Purpose**: Select appropriate strategies for different languages and project types
+**Benefits**:
+- Flexible adaptation to different contexts
+- Easy addition of new languages or project types
+- Clean separation of concerns
 
-### Error Recovery Mechanisms
+### 3. Facade Pattern
+**Location**: `tools/` package
+**Purpose**: Simplified interface to complex operations
+**Benefits**:
+- Clean API for AI agents
+- Consistent error handling
+- Easy testing and maintenance
 
-1. **Graceful Degradation**: Continue with partial functionality when possible
-2. **User Guidance**: Provide clear error messages and solutions
-3. **Debug Mode**: Verbose logging for troubleshooting
-4. **Safe Defaults**: Fallback to default configurations
+### 4. Factory Pattern
+**Location**: AI agent creation in `generator.py`
+**Purpose**: Create appropriately configured agents
+**Benefits**:
+- Centralized agent configuration
+- Easy addition of new agent types
+- Consistent setup process
 
-## Performance Architecture
+### 5. Observer Pattern
+**Location**: Progress tracking in `generator.py`
+**Purpose**: Monitor and report progress of long-running operations
+**Benefits**:
+- Real-time user feedback
+- Debugging capabilities
+- Performance monitoring
 
-### Optimization Strategies
+## Integration Architecture
 
-1. **Streaming Processing**: Process documentation generation in chunks
-2. **Lazy Loading**: Load files and resources only when needed
-3. **Caching**: Cache file system operations and search results
-4. **Parallel Processing**: Execute independent operations concurrently
-
-### Memory Management
+### External System Dependencies
 
 ```mermaid
 graph LR
-    subgraph "Memory Management"
-        INPUT[Input Processing]
-        BUFFER[Stream Buffer]
-        OUTPUT[Output Writing]
+    subgraph "CodeViewX System"
+        CVX[CodeViewX Core]
     end
     
-    subgraph "AI Processing"
-        CONTEXT[Context Window]
-        CHUNKS[Text Chunks]
-        PROMPTS[Prompt Templates]
+    subgraph "AI Services"
+        ANTHROPIC[Anthropic Claude API]
     end
     
-    INPUT --> BUFFER
-    BUFFER --> CONTEXT
-    CONTEXT --> CHUNKS
-    CHUNKS --> OUTPUT
+    subgraph "System Tools"
+        RIPGREP[ripgrep]
+        PYTHON[Python Runtime]
+    end
+    
+    subgraph "User Environment"
+        PROJECT[Target Project]
+        OUTPUT[Documentation Output]
+    end
+    
+    CVX -.->|API Calls| ANTHROPIC
+    CVX -.->|Command Execution| RIPGREP
+    CVX -.->|File System Access| PYTHON
+    CVX -->|Read/Analyze| PROJECT
+    CVX -->|Write Documentation| OUTPUT
 ```
+
+### Tool Integration Architecture
+
+The tool system follows a **plugin architecture** where each tool is self-contained but follows a consistent interface:
+
+```python
+# Tool Interface Pattern
+def tool_function(param1: str, param2: Optional[str] = None) -> str:
+    """
+    Standard tool interface:
+    - Input: Well-defined parameters
+    - Output: Formatted string result
+    - Error handling: Descriptive error messages
+    """
+    try:
+        # Tool-specific implementation
+        return "Success: Operation completed"
+    except Exception as e:
+        return f"Error: {str(e)}"
+```
+
+Reference: [tools/__init__.py](../codeviewx/tools/__init__.py#L5)
+
+## Configuration and Extensibility
+
+### Configuration Architecture
+- **Project Configuration**: `pyproject.toml` for dependencies and metadata
+- **Runtime Configuration**: Command-line arguments and environment variables
+- **AI Configuration**: Prompt templates and agent parameters
+
+### Extension Points
+1. **Custom Tools**: Add new analysis tools by implementing the tool interface
+2. **Custom Prompts**: Modify or extend prompt templates for specialized domains
+3. **Language Support**: Add new languages through i18n system
+4. **Output Formats**: Extend to support different documentation formats
+
+## Performance and Scalability Considerations
+
+### Performance Optimizations
+1. **Parallel Processing**: Concurrent tool execution where possible
+2. **Caching**: Intelligent caching of analysis results
+3. **Incremental Analysis**: Only analyze changed files when possible
+4. **Resource Management**: Careful memory and CPU usage management
+
+### Scalability Design
+1. **Modular Architecture**: Components can be scaled independently
+2. **Stateless Design**: Tools are designed to be stateless for better scaling
+3. **Streaming Support**: Large result sets are streamed rather than loaded entirely
+4. **Error Recovery**: Robust error handling prevents cascading failures
 
 ## Security Architecture
 
-### Security Considerations
-
-1. **Input Validation**: Validate all user inputs and file paths
-2. **Sandboxing**: Limit AI agent tool access to specified directories
+### Security Measures
+1. **Input Validation**: All user inputs are validated and sanitized
+2. **Safe Command Execution**: Commands are executed in controlled environments
 3. **API Key Protection**: Secure handling of API credentials
-4. **File Access Control**: Restrict file system access patterns
+4. **File System Sandboxing**: Limited file system access to prevent unauthorized operations
 
-### Security Implementation
+### Threat Mitigation
+- **Command Injection**: Parameterized command execution
+- **Path Traversal**: Path validation and normalization
+- **Resource Exhaustion**: Limits on file sizes and execution times
+- **Information Disclosure**: Controlled error messages to prevent information leaks
 
-```python
-# File: codeviewx/tools/filesystem.py | Security controls in file operations
-def write_real_file(file_path: str, content: str) -> str:
-    # Path validation and sanitization
-    # Output directory restriction
-    # Content validation
-```
-
-## Extensibility Architecture
-
-### Plugin System Design
-
-CodeViewX is designed to be extensible through:
-
-1. **Custom Tools**: Add new tools for AI agents
-2. **Prompt Templates**: Modify AI behavior through prompts
-3. **Output Formats**: Support new documentation formats
-4. **Language Support**: Add new languages for internationalization
-
-### Extension Points
-
-```mermaid
-graph TB
-    subgraph "Core System"
-        AI_ENGINE[AI Engine]
-        TOOL_SYSTEM[Tool System]
-        OUTPUT_RENDERER[Output Renderer]
-    end
-    
-    subgraph "Extension Points"
-        CUSTOM_TOOLS[Custom Tools]
-        PROMPTS[Prompt Templates]
-        FORMATS[Output Formats]
-        LANGUAGES[Language Packs]
-    end
-    
-    AI_ENGINE -.-> PROMPTS
-    TOOL_SYSTEM -.-> CUSTOM_TOOLS
-    OUTPUT_RENDERER -.-> FORMATS
-    I18N -.-> LANGUAGES
-```
-
----
-
-*Next: [Core Mechanisms](04-core-mechanisms.md) - Deep dive into implementation details*
+This architecture enables CodeViewX to provide powerful, flexible, and secure code documentation generation while maintaining clean separation of concerns and extensibility for future enhancements.

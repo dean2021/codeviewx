@@ -1,351 +1,339 @@
 # Quick Start Guide
 
-## Prerequisites
+## System Requirements
 
-### System Requirements
+Before installing CodeViewX, ensure your system meets the following requirements:
+
+### Core Requirements
 - **Python**: 3.8 or higher
-- **pip**: Package manager
+- **pip**: Python package manager (included with Python)
+- **Operating System**: Windows 10+, macOS 10.14+, or Linux (Ubuntu 18.04+)
+
+### External Dependencies
 - **ripgrep (rg)**: High-performance code search tool
-- **API Key**: Anthropic API key for AI analysis
+- **Anthropic API Key**: Required for AI-powered analysis
 
-### Installing ripgrep
-
-```bash
-# macOS
-brew install ripgrep
-
-# Ubuntu/Debian
-sudo apt install ripgrep
-
-# Windows (with Chocolatey)
-choco install ripgrep
-
-# Windows (with Scoop)
-scoop install ripgrep
-
-# Manual installation
-# Download from: https://github.com/BurntSushi/ripgrep/releases
-```
-
-### Getting API Key
-
-1. Visit [Anthropic Console](https://console.anthropic.com/)
-2. Sign up or log in
-3. Navigate to API Keys section
-4. Create a new API key
-5. Copy the key for configuration
+### Recommended System Resources
+- **RAM**: 4GB minimum, 8GB recommended for large projects
+- **Storage**: 1GB free space for installation and documentation output
+- **Network**: Internet connection for AI API calls
 
 ## Installation
 
-### Option 1: Development Installation (Recommended)
+### Step 1: Clone the Repository
 
 ```bash
-# Clone the repository
+# Clone the CodeViewX repository
 git clone https://github.com/dean2021/codeviewx.git
-cd codeviewx
 
-# Install in development mode
+# Navigate to the project directory
+cd codeviewx
+```
+
+### Step 2: Install ripgrep
+
+**macOS (using Homebrew)**:
+```bash
+brew install ripgrep
+```
+
+**Ubuntu/Debian**:
+```bash
+sudo apt update
+sudo apt install ripgrep
+```
+
+**Windows (using Chocolatey)**:
+```bash
+choco install ripgrep
+```
+
+**Other Systems**: Download from [ripgrep releases](https://github.com/BurntSushi/ripgrep/releases)
+
+### Step 3: Install Python Dependencies
+
+**Development Mode (Recommended)**:
+```bash
 pip install -e .
 ```
 
-### Option 2: Standard Installation
-
+**Standard Installation**:
 ```bash
-# Clone the repository
-git clone https://github.com/dean2021/codeviewx.git
-cd codeviewx
-
-# Install normally
 pip install .
 ```
 
-### Option 3: Install from PyPI (when available)
-
+**With Development Dependencies**:
 ```bash
-pip install codeviewx
+pip install -e ".[dev]"
 ```
 
-## Configuration
+### Step 4: Configure Anthropic API Key
 
-### Setting API Key
-
+**Set Environment Variable (Linux/macOS)**:
 ```bash
-# Method 1: Environment variable (recommended)
-export ANTHROPIC_API_KEY="your-api-key-here"
+# Add to ~/.bashrc or ~/.zshrc
+export ANTHROPIC_API_KEY='your-api-key-here'
 
-# Method 2: Add to shell profile
-echo 'export ANTHROPIC_API_KEY="your-api-key-here"' >> ~/.bashrc
-# or for zsh
-echo 'export ANTHROPIC_API_KEY="your-api-key-here"' >> ~/.zshrc
-
-# Reload shell configuration
-source ~/.bashrc  # or source ~/.zshrc
+# Apply changes immediately
+source ~/.bashrc  # or ~/.zshrc
 ```
 
-### Verification
+**Set Environment Variable (Windows)**:
+```powershell
+# Command Prompt
+set ANTHROPIC_API_KEY="your-api-key-here"
 
-```bash
-# Verify installation
-codeviewx --version
-
-# Verify ripgrep
-rg --version
-
-# Verify API key (optional)
-echo $ANTHROPIC_API_KEY
+# PowerShell
+$env:ANTHROPIC_API_KEY="your-api-key-here"
 ```
+
+**Get Your API Key**: Visit [Anthropic Console](https://console.anthropic.com/) to create an account and obtain your API key.
 
 ## Basic Usage
 
 ### Command Line Interface
 
-#### 1. Analyze Current Directory
-
+#### Generate Documentation for Current Directory
 ```bash
-# Basic usage - analyze current directory
 codeviewx
-
-# Output will be in docs/ directory by default
 ```
 
-#### 2. Specify Project Directory
-
+#### Specify Project and Output Directories
 ```bash
-# Analyze specific project
-codeviewx -w /path/to/your/project
-
-# Example
-codeviewx -w ~/my-project
+codeviewx -w /path/to/your/project -o /path/to/output/docs
 ```
 
-#### 3. Specify Output Directory
-
-```bash
-# Custom output directory
-codeviewx -o my-docs
-
-# Combine with project directory
-codeviewx -w /path/to/project -o documentation
-```
-
-#### 4. Language Selection
-
+#### Generate Documentation in Specific Language
 ```bash
 # Generate English documentation
 codeviewx -l English
 
-# Generate Chinese documentation
+# Generate Chinese documentation  
 codeviewx -l Chinese
-
-# Available languages:
-# Chinese, English, Japanese, Korean, French, German, Spanish, Russian
 ```
 
-#### 5. Verbose Mode
-
+#### Advanced Options
 ```bash
-# Show detailed logs
+# Verbose output for debugging
 codeviewx --verbose
 
-# Useful for debugging and understanding the process
+# Custom recursion limit for complex projects
+codeviewx --recursion-limit 2000
+
+# Specify UI language
+codeviewx --ui-lang en
 ```
 
-#### 6. Complete Example
+### Python API Usage
 
-```bash
-# Full configuration example
-codeviewx -w ~/my-project -o docs -l English --verbose
-```
-
-### Python API
-
-#### Basic Usage
-
+#### Basic Documentation Generation
 ```python
 from codeviewx import generate_docs
 
-# Generate documentation
+# Generate documentation with default settings
+generate_docs()
+
+# Generate with custom settings
 generate_docs(
     working_directory="/path/to/project",
     output_directory="docs",
-    doc_language="English"
-)
-```
-
-#### Advanced Usage
-
-```python
-from codeviewx import generate_docs
-
-# With all parameters
-generate_docs(
-    working_directory="/path/to/project",
-    output_directory="technical-docs",
-    doc_language="Chinese",
-    ui_language="en",
-    recursion_limit=1500,
+    doc_language="English",
     verbose=True
 )
 ```
 
-### Web Server
-
-#### Start Documentation Server
-
-```bash
-# Start server (requires docs to exist)
-codeviewx --serve
-
-# Start with custom directory
-codeviewx --serve -o docs
-
-# Server will be available at: http://127.0.0.1:5000
-```
-
-#### Python API for Server
-
+#### Start Documentation Web Server
 ```python
 from codeviewx import start_document_web_server
 
-# Start web server
+# Start server for generated documentation
 start_document_web_server("docs")
 ```
 
-## Generated Documentation Structure
-
-After running CodeViewX, you'll get a complete documentation set:
-
-```
-docs/
-├── README.md              # Overview and navigation
-├── 01-overview.md         # Project overview and tech stack
-├── 02-quickstart.md       # Quick start guide (like this file)
-├── 03-architecture.md     # System architecture
-├── 04-core-mechanisms.md  # Core working mechanisms
-├── 05-data-models.md      # Data models (if applicable)
-├── 06-api-reference.md    # API documentation (if applicable)
-├── 07-development-guide.md # Development guide
-└── 08-testing.md          # Testing documentation (if applicable)
-```
-
-## Common Use Cases
-
-### 1. Document Your Own Project
-
-```bash
-# Navigate to your project
-cd my-project
+#### Complete Example
+```python
+from codeviewx import generate_docs, start_document_web_server
 
 # Generate documentation
-codeviewx -l English
+generate_docs(
+    working_directory="./my_project",
+    output_directory="./documentation",
+    doc_language="English",
+    verbose=True
+)
 
-# Start web server to view
-codeviewx --serve
+# Start web server to view documentation
+start_document_web_server("./documentation")
 ```
 
-### 2. Analyze Open Source Projects
+## Documentation Web Server
 
+### Start the Server
 ```bash
-# Clone a project
-git clone https://github.com/user/repo.git
-cd repo
-
-# Generate documentation
-codeviewx -w . -o repo-docs -l English
-
-# View documentation
-codeviewx --serve -o repo-docs
+# Generate and serve documentation
+codeviewx --serve -o docs
 ```
 
-### 3. Multi-Language Documentation
+### Access Documentation
+Open your web browser and navigate to:
+```
+http://localhost:5000
+```
 
+### Server Features
+- **Interactive Navigation**: Browse documentation with a clean, modern interface
+- **Search Functionality**: Quick search across all documentation
+- **Code Highlighting**: Syntax-highlighted code examples
+- **Mermaid Diagrams**: Interactive architecture and flow diagrams
+- **Responsive Design**: Works on desktop and mobile devices
+
+### Stop the Server
+Press `Ctrl+C` in the terminal to stop the web server.
+
+## Command Line Options Reference
+
+| Option | Short | Description | Example |
+|--------|-------|-------------|---------|
+| `--working-dir` | `-w` | Project directory to analyze | `-w /path/to/project` |
+| `--output-dir` | `-o` | Documentation output directory | `-o docs` |
+| `--language` | `-l` | Documentation language | `-l English` |
+| `--ui-lang` | | UI language (en/zh) | `--ui-lang en` |
+| `--serve` | | Start web server | `--serve` |
+| `--verbose` | `-v` | Show detailed logs | `--verbose` |
+| `--recursion-limit` | | Agent recursion limit | `--recursion-limit 1500` |
+| `--version` | `-V` | Show version information | `--version` |
+
+## Supported Documentation Languages
+
+CodeViewX supports generating documentation in 8 languages:
+
+- **Chinese** (中文)
+- **English** 
+- **Japanese** (日本語)
+- **Korean** (한국어)
+- **French** (Français)
+- **German** (Deutsch)
+- **Spanish** (Español)
+- **Russian** (Русский)
+
+Example usage:
 ```bash
-# Generate English docs
-codeviewx -l English -o docs-en
-
-# Generate Chinese docs
-codeviewx -l Chinese -o docs-zh
-
-# Generate Japanese docs
-codeviewx -l Japanese -o docs-ja
+codeviewx -l French
+codeviewx -l Japanese
+codeviewx -l German
 ```
 
-## Troubleshooting
+## Example Projects
 
-### Common Issues
-
-#### 1. API Key Not Found
-```
-Error: ANTHROPIC_API_KEY not found
-```
-**Solution**: Set the environment variable properly
+### Analyze a Python Web Application
 ```bash
-export ANTHROPIC_API_KEY="your-key-here"
+# Analyze a Flask/Django project
+codeviewx -w ./my_web_app -o ./web_app_docs -l English
 ```
 
-#### 2. ripgrep Not Found
-```
-Error: rg command not found
-```
-**Solution**: Install ripgrep following the installation instructions
-
-#### 3. Permission Denied
-```
-Error: Permission denied when writing to output directory
-```
-**Solution**: Check directory permissions or use a different output directory
+### Document a CLI Tool
 ```bash
-codeviewx -o /tmp/docs
+# Analyze a command-line tool
+codeviewx -w ./my_cli_tool -o ./cli_docs --verbose
 ```
 
-#### 4. Python Version Incompatible
-```
-Error: Python 3.8+ required
-```
-**Solution**: Upgrade Python or use virtual environment
-
-### Debug Mode
-
-For detailed troubleshooting, use verbose mode:
-
+### Multi-Language Project
 ```bash
+# Analyze a project with multiple programming languages
+codeviewx -w ./multi_lang_project -o ./docs --recursion-limit 2000
+```
+
+### Generate Documentation in Multiple Languages
+```bash
+# English documentation
+codeviewx -w ./project -o ./docs/en -l English
+
+# Chinese documentation  
+codeviewx -w ./project -o ./docs/zh -l Chinese
+
+# Japanese documentation
+codeviewx -w ./project -o ./docs/ja -l Japanese
+```
+
+## Troubleshooting Common Issues
+
+### Installation Issues
+
+**Problem**: `pip install` fails with permission errors
+```bash
+# Solution: Use user installation
+pip install --user -e .
+```
+
+**Problem**: Python version too old
+```bash
+# Check Python version
+python --version
+
+# Update Python (example for Ubuntu)
+sudo apt update
+sudo apt install python3.9
+```
+
+### API Key Issues
+
+**Problem**: Invalid Anthropic API key
+```bash
+# Verify API key is set
+echo $ANTHROPIC_API_KEY
+
+# Test API key (using curl)
+curl -X POST https://api.anthropic.com/v1/messages \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $ANTHROPIC_API_KEY" \
+  -d '{"model": "claude-3-haiku-20240307", "max_tokens": 10, "messages": [{"role": "user", "content": "Hi"}]}'
+```
+
+### ripgrep Issues
+
+**Problem**: `rg` command not found
+```bash
+# Check if ripgrep is installed
+rg --version
+
+# Install ripgrep if missing
+# macOS
+brew install ripgrep
+
+# Ubuntu/Debian
+sudo apt install ripgrep
+```
+
+### Performance Issues
+
+**Problem**: Analysis takes too long for large projects
+```bash
+# Increase recursion limit
+codeviewx --recursion-limit 3000
+
+# Use verbose mode to monitor progress
 codeviewx --verbose
 ```
 
-This will show:
-- Detailed AI agent steps
-- Tool calls and results
-- File processing details
-- Error stack traces
+### Documentation Issues
 
-## Tips and Best Practices
+**Problem**: Generated documentation is incomplete
+```bash
+# Use verbose mode to see detailed analysis
+codeviewx --verbose
 
-### 1. Project Preparation
-- Ensure your project has clear structure
-- Remove sensitive files (`.env`, `.secrets`)
-- Include meaningful file names and comments
-
-### 2. Optimize Performance
-- Use `.gitignore` to exclude unnecessary files
-- Large projects may require higher recursion limits
-- Use specific project directories instead of entire repositories
-
-### 3. Documentation Quality
-- Review generated documentation for accuracy
-- Add project-specific customizations
-- Consider multiple language outputs for international projects
-
-### 4. Workflow Integration
-- Integrate into CI/CD pipelines
-- Generate docs automatically on release
-- Use web server for team collaboration
+# Check for specific errors in the output
+codeviewx --verbose 2>&1 | tee analysis.log
+```
 
 ## Next Steps
 
-- [Project Overview](01-overview.md) - Understand the project structure
-- [Architecture](03-architecture.md) - Learn about system design
-- [Core Mechanisms](04-core-mechanisms.md) - Deep dive into implementation
+After successfully generating your first documentation:
 
----
+1. **Review Generated Documentation**: Check the quality and completeness of generated docs
+2. **Customize Prompts**: Modify prompt templates for project-specific needs
+3. **Integrate with CI/CD**: Add documentation generation to your build pipeline
+4. **Explore Advanced Features**: Learn about custom tools and extensions
+5. **Contribute**: Consider contributing to the CodeViewX project
 
-*Need help? Check the [Development Guide](07-development-guide.md) or open an issue on GitHub.*
+For more advanced usage, see the [Development Guide](./07-development-guide.md) and [API Reference](./06-api-reference.md).
