@@ -1,28 +1,26 @@
 # Development Guide
 
-## Overview
-
-This guide provides comprehensive information for developers who want to contribute to CodeViewX, including development environment setup, coding standards, testing practices, and contribution guidelines.
+This guide provides comprehensive information for developers who want to contribute to CodeViewX, extend its functionality, or understand its internal architecture.
 
 ## Development Environment Setup
 
 ### Prerequisites
 
-- **Python**: 3.8 or higher
-- **Git**: For version control
-- **ripgrep (rg)**: Code search tool
-- **Anthropic API Key**: For AI functionality testing
+Before setting up the development environment, ensure you have:
 
-### Local Development Setup
+- **Python 3.8+** with pip
+- **ripgrep (rg)** installed on your system
+- **Git** for version control
+- **Anthropic API key** for AI functionality
 
-#### 1. Clone and Setup
+### Clone and Setup
 
 ```bash
 # Clone the repository
 git clone https://github.com/dean2021/codeviewx.git
 cd codeviewx
 
-# Create virtual environment
+# Create and activate virtual environment
 python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
@@ -30,200 +28,185 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install -e ".[dev]"
 ```
 
-#### 2. Configuration
+### Development Dependencies
+
+The development setup includes additional tools for code quality and testing:
+
+- **pytest**: Testing framework
+- **pytest-cov**: Coverage reporting
+- **black**: Code formatting
+- **flake8**: Linting
+- **mypy**: Type checking
+- **isort**: Import sorting
+
+### Verify Installation
 
 ```bash
-# Set up environment variables
-export ANTHROPIC_API_KEY="your-api-key-here"
-
-# Verify installation
+# Test the CLI installation
 codeviewx --version
+
+# Run basic functionality test
+codeviewx --help
+
+# Test AI functionality (requires API key)
+export ANTHROPIC_API_KEY="your-api-key"
+codeviewx --working-dir . --output-dir test_docs --verbose
 ```
 
-#### 3. Development Tools Configuration
+## Project Structure Deep Dive
 
-```bash
-# Install pre-commit hooks (if configured)
-pre-commit install
-
-# Verify development tools
-black --version
-flake8 --version
-mypy --version
-```
-
-## Project Structure for Developers
+### Core Package Organization
 
 ```
 codeviewx/
-├── 📁 codeviewx/                 # Main package
-│   ├── 📄 __init__.py           # Package exports
-│   ├── 📄 __version__.py        # Version information
-│   ├── 📄 cli.py                # CLI interface
-│   ├── 📄 core.py               # Core API
-│   ├── 📄 generator.py          # Main generator
-│   ├── 📄 server.py             # Web server
-│   ├── 📄 prompt.py             # Prompt management
-│   ├── 📄 i18n.py               # Internationalization
-│   ├── 📄 language.py           # Language detection
-│   ├── 📁 prompts/              # AI prompt templates
-│   ├── 📁 tools/                # Custom tools
-│   ├── 📁 tpl/                  # HTML templates
-│   └── 📁 static/               # Static assets
-├── 📁 tests/                    # Test files
-├── 📁 examples/                 # Example usage
-├── 📄 pyproject.toml            # Project configuration
-└── 📄 requirements-dev.txt      # Development dependencies
+├── codeviewx/                    # Main package
+│   ├── __init__.py              # Public API exports
+│   ├── __version__.py           # Version information
+│   ├── cli.py                   # Command-line interface
+│   ├── core.py                  # Core API functions
+│   ├── generator.py             # Main documentation generator
+│   ├── server.py                # Web documentation server
+│   ├── prompt.py                # Prompt template management
+│   ├── i18n.py                  # Internationalization system
+│   ├── language.py              # Language detection
+│   ├── tools/                   # Tool modules
+│   │   ├── __init__.py          # Tool exports
+│   │   ├── filesystem.py        # File system operations
+│   │   ├── search.py            # Code search functionality
+│   │   └── command.py           # System command execution
+│   ├── prompts/                 # AI prompt templates
+│   │   ├── document_engineer.md     # English prompts
+│   │   └── document_engineer_zh.md  # Chinese prompts
+│   ├── tpl/                     # Web interface templates
+│   │   └── doc_detail.html      # Documentation viewer template
+│   └── static/                  # Static assets
+│       ├── css/                 # Stylesheets
+│       ├── js/                  # JavaScript files
+│       └── images/              # Images and icons
+├── tests/                       # Test suite
+├── examples/                    # Usage examples
+└── docs/                        # Generated documentation
 ```
 
-## Code Standards and Guidelines
+### Module Responsibilities
 
-### 1. Code Style
+#### `cli.py` - Command-Line Interface
+- **Purpose**: Handle user input, argument parsing, and command coordination
+- **Key Functions**:
+  - `main()`: Primary CLI entry point
+  - Argument parsing and validation
+  - Progress reporting and error handling
+- **Design Pattern**: Command Pattern with argparse
 
-#### Black Formatting
+Reference: [cli.py](../codeviewx/cli.py#L16)
 
-CodeViewX uses Black for code formatting. Configure your editor to use Black or run it manually:
+#### `core.py` - Public API
+- **Purpose**: Provide clean, programmatic access to CodeViewX functionality
+- **Key Functions**: Exports main functions from other modules
+- **Design Pattern**: Facade Pattern - simplifies complex subsystem access
 
+Reference: [core.py](../codeviewx/core.py#L12)
+
+#### `generator.py` - Documentation Generator
+- **Purpose**: Orchestrate the entire documentation generation process
+- **Key Functions**:
+  - `generate_docs()`: Main generation workflow
+  - Progress tracking and user feedback
+  - AI agent coordination
+- **Design Pattern**: Orchestrator Pattern
+
+Reference: [generator.py](../codeviewx/generator.py#L25)
+
+#### `server.py` - Web Server
+- **Purpose**: Provide interactive documentation browsing
+- **Key Functions**:
+  - `start_document_web_server()`: Flask server startup
+  - `generate_file_tree()`: File tree generation
+  - Markdown rendering with extensions
+- **Design Pattern**: MVC Pattern with Flask
+
+Reference: [server.py](../codeviewx/server.py#L140)
+
+## Development Workflow
+
+### Code Style and Quality
+
+CodeViewX follows strict code quality standards:
+
+#### Code Formatting with Black
 ```bash
-# Format all code
+# Format all Python files
 black codeviewx/
 
-# Check formatting without changing files
+# Check formatting without making changes
 black --check codeviewx/
 
 # Format specific file
-black codeviewx/cli.py
+black codeviewx/generator.py
 ```
 
-**Configuration** (from `pyproject.toml`):
-```toml
-[tool.black]
-line-length = 100
-target-version = ['py38', 'py39', 'py310', 'py311']
-```
-
-#### Import Sorting
-
-Use isort for import organization:
-
+#### Import Sorting with isort
 ```bash
-# Sort imports
+# Sort imports in all files
 isort codeviewx/
 
-# Check without changing
+# Check without making changes
 isort --check-only codeviewx/
 ```
 
-**Configuration**:
-```toml
-[tool.isort]
-profile = "black"
-line_length = 100
+#### Linting with flake8
+```bash
+# Run linting
+flake8 codeviewx/
+
+# Check specific file
+flake8 codeviewx/cli.py
 ```
 
-### 2. Type Hints
+#### Type Checking with mypy
+```bash
+# Run type checking
+mypy codeviewx/
 
-CodeViewX uses mypy for type checking. Add type hints to all functions:
-
-```python
-# Good practice
-from typing import Optional, List, Dict
-from pathlib import Path
-
-def generate_docs(
-    working_directory: Optional[str] = None,
-    output_directory: str = "docs",
-    doc_language: Optional[str] = None,
-    verbose: bool = False
-) -> None:
-    """Generate documentation for a project."""
-    pass
-
-# Return type hints
-def detect_system_language() -> str:
-    """Auto-detect system language."""
-    return "English"
+# Check specific module
+mypy codeviewx/generator.py
 ```
 
-### 3. Documentation Standards
+### Pre-commit Hooks
 
-#### Docstrings
+Set up pre-commit hooks to automatically enforce code quality:
 
-Use Google-style docstrings:
+```bash
+# Install pre-commit
+pip install pre-commit
 
-```python
-def read_real_file(file_path: str) -> str:
-    """Read file content from real filesystem.
-    
-    Args:
-        file_path: File path (relative or absolute)
-        
-    Returns:
-        File content, or error message if failed
-        
-    Raises:
-        FileNotFoundError: When file doesn't exist
-        PermissionError: When no read permission
-        
-    Examples:
-        >>> read_real_file("main.py")
-        'print("hello world")'
-    """
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            return f.read()
-    except FileNotFoundError:
-        return f"❌ Error: File '{file_path}' does not exist"
+# Install hooks
+pre-commit install
+
+# Run hooks manually
+pre-commit run --all-files
 ```
 
-#### Comments
-
-Add meaningful comments for complex logic:
-
-```python
-# Check if TOC marker exists, insert if missing for auto-generation
-if '[TOC]' not in content:
-    lines = content.split('\n')
-    insert_index = 0
-    # Find first heading to insert TOC before it
-    for i, line in enumerate(lines):
-        if line.strip().startswith('#'):
-            insert_index = i
-            break
+Example `.pre-commit-config.yaml`:
+```yaml
+repos:
+  - repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+      - id: black
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
 ```
 
-### 4. Error Handling
+### Testing
 
-Follow consistent error handling patterns:
-
-```python
-# Use specific exception types
-try:
-    result = subprocess.run(command, timeout=30)
-except subprocess.TimeoutExpired:
-    return "❌ Error: Command execution timeout (30 seconds)"
-except FileNotFoundError:
-    return f"❌ Error: Command not found: {command}"
-except Exception as e:
-    return f"❌ Unexpected error: {str(e)}"
-
-# Always provide user-friendly error messages
-def validate_file_path(file_path: str) -> bool:
-    """Validate file path is safe and accessible."""
-    if not file_path:
-        raise ValueError("File path cannot be empty")
-    
-    # Prevent path traversal attacks
-    if '..' in file_path or file_path.startswith('/'):
-        raise ValueError("Invalid file path: path traversal not allowed")
-    
-    return True
-```
-
-## Testing
-
-### Running Tests
-
+#### Running Tests
 ```bash
 # Run all tests
 pytest
@@ -232,523 +215,523 @@ pytest
 pytest --cov=codeviewx --cov-report=html
 
 # Run specific test file
-pytest tests/test_generator.py
+pytest tests/test_core.py
 
 # Run with verbose output
 pytest -v
 
 # Run specific test function
-pytest tests/test_cli.py::test_main_help
+pytest tests/test_generator.py::test_generate_docs_basic
 ```
 
-### Test Structure
+#### Writing Tests
 
-```
-tests/
-├── test_cli.py              # CLI interface tests
-├── test_generator.py        # Generator tests
-├── test_server.py           # Web server tests
-├── test_i18n.py             # Internationalization tests
-├── test_tools/              # Tool tests
-│   ├── test_filesystem.py
-│   ├── test_search.py
-│   └── test_command.py
-└── fixtures/                # Test data and mock files
-```
-
-### Writing Tests
-
-#### Unit Tests
-
-```python
-# tests/test_i18n.py
-import pytest
-from codeviewx.i18n import I18n, detect_ui_language
-
-def test_i18n_basic_translation():
-    """Test basic message translation."""
-    i18n = I18n('en')
-    assert i18n.t('starting') == '🚀 Starting CodeViewX Documentation Generator'
-
-def test_i18n_parameter_substitution():
-    """Test parameter substitution in translations."""
-    i18n = I18n('en')
-    result = i18n.t('generated_files', count=5)
-    assert '5' in result
-
-def test_detect_ui_language():
-    """Test UI language detection."""
-    # This test may need mocking for different system locales
-    result = detect_ui_language()
-    assert result in ['en', 'zh']
-```
-
-#### Integration Tests
+Test files follow the pattern `test_*.py` in the `tests/` directory:
 
 ```python
 # tests/test_generator.py
+import pytest
+from unittest.mock import patch, MagicMock
+from codeviewx.generator import generate_docs
+
+class TestGenerateDocs:
+    def test_generate_docs_basic(self):
+        """Test basic documentation generation"""
+        with patch('codeviewx.generator.create_deep_agent') as mock_agent:
+            mock_agent.return_value.stream.return_value = []
+            
+            generate_docs(
+                working_directory="test_project",
+                output_directory="test_docs",
+                doc_language="English"
+            )
+            
+            mock_agent.assert_called_once()
+    
+    def test_generate_docs_with_verbose(self):
+        """Test documentation generation with verbose output"""
+        with patch('codeviewx.generator.create_deep_agent') as mock_agent:
+            mock_agent.return_value.stream.return_value = []
+            
+            generate_docs(verbose=True)
+            
+            # Verify logging level was set to DEBUG
+            import logging
+            assert logging.getLogger().level == logging.DEBUG
+```
+
+#### Test Structure
+
+```python
+# tests/conftest.py - Shared test fixtures
 import pytest
 import tempfile
 import os
-from codeviewx.generator import generate_docs
 
-def test_generate_docs_basic():
-    """Test basic documentation generation."""
+@pytest.fixture
+def temp_project_dir():
+    """Create a temporary project directory for testing"""
     with tempfile.TemporaryDirectory() as temp_dir:
-        # Create a simple test project
-        test_project = os.path.join(temp_dir, "test_project")
-        os.makedirs(test_project)
+        # Create sample project structure
+        os.makedirs(os.path.join(temp_dir, "src"))
         
-        # Write test files
-        with open(os.path.join(test_project, "main.py"), "w") as f:
-            f.write('print("Hello, World!")')
+        # Create sample files
+        with open(os.path.join(temp_dir, "src", "main.py"), "w") as f:
+            f.write("def main():\n    pass\n")
         
-        output_dir = os.path.join(temp_dir, "docs")
-        
-        # Generate documentation (this would need mocking for CI)
-        # generate_docs(
-        #     working_directory=test_project,
-        #     output_directory=output_dir,
-        #     doc_language="English"
-        # )
-        
-        # Verify documentation files exist
-        # assert os.path.exists(os.path.join(output_dir, "README.md"))
+        yield temp_dir
+
+@pytest.fixture
+def mock_api_key():
+    """Provide mock API key for testing"""
+    return "test-api-key-12345"
 ```
 
-#### Mock Tests for AI Components
+### Debugging
 
-```python
-# tests/test_generator.py
-import pytest
-from unittest.mock import Mock, patch
-from codeviewx.generator import generate_docs
-
-@patch('codeviewx.generator.create_deep_agent')
-def test_generate_docs_with_mock_agent(mock_create_agent):
-    """Test documentation generation with mocked AI agent."""
-    # Mock the AI agent
-    mock_agent = Mock()
-    mock_agent.stream.return_value = [
-        {"messages": [Mock(type="AIMessage", content="Documentation generated")]}
-    ]
-    mock_create_agent.return_value = mock_agent
-    
-    with tempfile.TemporaryDirectory() as temp_dir:
-        generate_docs(
-            working_directory=temp_dir,
-            output_directory=os.path.join(temp_dir, "docs"),
-            doc_language="English"
-        )
-        
-        # Verify agent was created and called
-        mock_create_agent.assert_called_once()
-        mock_agent.stream.assert_called_once()
-```
-
-### Coverage Requirements
-
-- **Target Coverage**: 80% or higher
-- **Critical Paths**: 100% coverage for core functionality
-- **Error Handling**: All error paths should be tested
+#### Verbose Mode
+Use verbose mode to see detailed execution information:
 
 ```bash
-# Generate coverage report
-pytest --cov=codeviewx --cov-report=html --cov-fail-under=80
-
-# View coverage report
-open htmlcov/index.html  # On macOS
-xdg-open htmlcov/index.html  # On Linux
+codeviewx --verbose --working-dir /path/to/project
 ```
 
-## Development Workflow
-
-### 1. Feature Development
-
-```bash
-# Create feature branch
-git checkout -b feature/new-ai-tool
-
-# Make changes
-# ... develop feature ...
-
-# Run tests
-pytest
-black codeviewx/
-flake8 codeviewx/
-mypy codeviewx/
-
-# Commit changes
-git add .
-git commit -m "feat: add new AI tool for XYZ analysis"
-
-# Push and create PR
-git push origin feature/new-ai-tool
-```
-
-### 2. Commit Message Standards
-
-Use [Conventional Commits](https://www.conventionalcommits.org/) format:
-
-```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-**Types**:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `test`: Test additions or changes
-- `chore`: Maintenance tasks
-
-**Examples**:
-```
-feat(cli): add verbose mode flag
-fix(generator): handle empty directories gracefully
-docs(readme): update installation instructions
-```
-
-### 3. Code Review Process
-
-#### Before Submitting PR
-
-1. **Code Quality**:
-   ```bash
-   # Run all quality checks
-   black codeviewx/
-   isort codeviewx/
-   flake8 codeviewx/
-   mypy codeviewx/
-   pytest
-   ```
-
-2. **Functionality Testing**:
-   - Test new features manually
-   - Test edge cases and error conditions
-   - Verify backward compatibility
-
-3. **Documentation**:
-   - Update relevant documentation
-   - Add examples for new features
-   - Update CHANGELOG if applicable
-
-#### Review Guidelines
-
-- **Code Review**: Focus on logic, style, and best practices
-- **Test Coverage**: Ensure new code is properly tested
-- **Documentation**: Verify documentation is accurate and complete
-- **Performance**: Consider performance implications
-
-## Architecture Guidelines
-
-### 1. Module Design
-
-#### Single Responsibility
-
-Each module should have a single, well-defined responsibility:
+#### Logging Configuration
+For development, you can enable detailed logging:
 
 ```python
-# Good: Separate concerns
-# cli.py - Command line interface only
-# generator.py - Documentation generation only
-# server.py - Web server only
+import logging
 
-# Avoid: Mixed responsibilities
-# avoid putting CLI logic in generator.py
+# Enable debug logging for all modules
+logging.basicConfig(level=logging.DEBUG)
+
+# Enable specific module logging
+logging.getLogger('codeviewx.generator').setLevel(logging.DEBUG)
 ```
 
-#### Dependency Injection
+#### Common Debugging Scenarios
 
-Use dependency injection for testability:
-
+**AI Agent Issues**:
 ```python
-# Good: Configurable dependencies
-def generate_docs(
-    working_directory: Optional[str] = None,
-    output_directory: str = "docs",
-    doc_language: Optional[str] = None,
-    agent_factory: Callable = create_deep_agent,  # Injectable
-    verbose: bool = False
-) -> None:
-    agent = agent_factory(tools, prompt)
+# Add debugging to generator.py
+import logging
+logger = logging.getLogger(__name__)
+
+# In generate_docs function:
+logger.debug(f"Agent configuration: {agent_config}")
+logger.debug(f"Tools registered: {[t.__name__ for t in tools]}")
 ```
 
-### 2. Tool System Design
-
-When creating new tools for AI agents:
-
+**Tool Execution Issues**:
 ```python
-# New tool template
-def new_tool(
-    parameter1: str,
-    parameter2: Optional[int] = None,
-    **kwargs
-) -> str:
-    """New tool for AI agents.
+# In tools/filesystem.py
+import logging
+logger = logging.getLogger(__name__)
+
+def write_real_file(file_path: str, content: str) -> str:
+    logger.debug(f"Writing to file: {file_path}")
+    # ... implementation
+    logger.debug(f"Successfully wrote {file_size} bytes")
+```
+
+## Adding New Features
+
+### Adding a New Tool
+
+To add a new analysis tool:
+
+1. **Create Tool Function**:
+```python
+# codeviewx/tools/new_tool.py
+def custom_analysis(file_path: str, pattern: str) -> str:
+    """
+    Custom analysis tool for specific patterns
     
     Args:
-        parameter1: Description of parameter1
-        parameter2: Description of parameter2
-        
+        file_path: Path to file to analyze
+        pattern: Pattern to search for
+    
     Returns:
-        Tool result description
-        
-    Examples:
-        >>> new_tool("test")
-        'Success: operation completed'
+        Analysis results as formatted string
     """
     try:
-        # Tool implementation
-        result = perform_operation(parameter1, parameter2)
-        return f"✅ Success: {result}"
+        # Implementation here
+        return f"Analysis complete for {file_path}"
     except Exception as e:
-        return f"❌ Error: {str(e)}"
+        return f"Error: {str(e)}"
 ```
 
-### 3. Internationalization
-
-When adding new user-facing text:
-
+2. **Export from Tools Package**:
 ```python
-# 1. Add to MESSAGES dictionary in i18n.py
-MESSAGES = {
-    'en': {
-        # ... existing messages
-        'new_feature_description': 'New feature description: {detail}',
-    },
-    'zh': {
-        # ... existing messages
-        'new_feature_description': '新功能描述：{detail}',
+# codeviewx/tools/__init__.py
+from .new_tool import custom_analysis
+
+__all__ = [
+    'execute_command',
+    'ripgrep_search', 
+    'write_real_file',
+    'read_real_file',
+    'list_real_directory',
+    'custom_analysis',  # Add new tool
+]
+```
+
+3. **Register Tool in Generator**:
+```python
+# codeviewx/generator.py
+from .tools import (
+    execute_command,
+    ripgrep_search,
+    write_real_file,
+    read_real_file,
+    list_real_directory,
+    custom_analysis,  # Import new tool
+)
+
+# In generate_docs function:
+tools = [
+    execute_command,
+    ripgrep_search,
+    write_real_file,
+    read_real_file,
+    list_real_directory,
+    custom_analysis,  # Add to tools list
+]
+```
+
+4. **Add Tests**:
+```python
+# tests/test_new_tool.py
+import pytest
+from codeviewx.tools import custom_analysis
+
+def test_custom_analysis_success():
+    """Test successful custom analysis"""
+    result = custom_analysis("test_file.py", "pattern")
+    assert "Analysis complete" in result
+
+def test_custom_analysis_error():
+    """Test error handling"""
+    result = custom_analysis("nonexistent.txt", "pattern")
+    assert "Error:" in result
+```
+
+### Adding New Documentation Language
+
+1. **Add Language Support to i18n.py**:
+```python
+# codeviewx/i18n.py
+MESSAGES: Dict[str, Dict[str, str]] = {
+    'en': { /* existing */ },
+    'zh': { /* existing */ },
+    'fr': {  # Add French
+        'starting': '🚀 Démarrage du générateur de documentation CodeViewX',
+        'working_dir': '📂 Répertoire de travail',
+        # ... add all required translations
     }
 }
-
-# 2. Use translation function
-from codeviewx.i18n import t
-print(t('new_feature_description', detail="feature details"))
 ```
 
-## Debugging and Troubleshooting
+2. **Update Language Detection**:
+```python
+# codeviewx/language.py
+def detect_system_language() -> str:
+    # Add French detection logic
+    try:
+        lang, _ = locale.getdefaultlocale()
+        if lang:
+            if lang.startswith('fr'):
+                return 'French'
+            # ... existing logic
+    except Exception:
+        pass
+    return 'English'
+```
 
-### 1. Debug Mode
+3. **Create Language-Specific Prompt**:
+```markdown
+# codeviewx/prompts/document_engineer_fr.md
+# Add French version of the prompt template
+```
 
-Enable verbose logging for development:
+4. **Update CLI Options**:
+```python
+# codeviewx/cli.py
+parser.add_argument(
+    "-l", "--language",
+    dest="doc_language",
+    choices=['Chinese', 'English', 'French', 'Japanese', 'Korean', 'German', 'Spanish', 'Russian'],
+    help="Documentation language"
+)
+```
+
+### Adding New Output Format
+
+To support a new documentation format (e.g., HTML, PDF):
+
+1. **Create Output Formatter**:
+```python
+# codeviewx/formatters/html_formatter.py
+def format_to_html(markdown_content: str) -> str:
+    """Convert markdown to HTML"""
+    import markdown
+    html = markdown.markdown(
+        markdown_content,
+        extensions=['tables', 'fenced_code', 'toc']
+    )
+    return wrap_in_html_template(html)
+
+def wrap_in_html_template(content: str) -> str:
+    """Wrap content in HTML template"""
+    return f"""
+    <!DOCTYPE html>
+    <html>
+    <head><title>Documentation</title></head>
+    <body>{content}</body>
+    </html>
+    """
+```
+
+2. **Integrate with Generator**:
+```python
+# codeviewx/generator.py
+def generate_docs(output_format="markdown", **kwargs):
+    """Generate docs in specified format"""
+    if output_format == "html":
+        # Use HTML formatter
+        from .formatters.html_formatter import format_to_html
+        # Apply formatting to generated content
+```
+
+## Performance Optimization
+
+### Profiling
+
+Use Python's built-in profiling tools:
 
 ```bash
-# Run with debug output
-codeviewx --verbose
+# Profile the generator
+python -m cProfile -o profile.stats codeviewx --working-dir /path/to/project
 
-# Python API with debug
-generate_docs(verbose=True)
+# Analyze profile results
+python -c "
+import pstats
+p = pstats.Stats('profile.stats')
+p.sort_stats('cumulative').print_stats(20)
+"
 ```
 
-### 2. Common Issues
-
-#### API Key Problems
+### Memory Usage Monitoring
 
 ```python
-# Debug API key issues
+# Add memory monitoring to generator.py
+import psutil
 import os
-from dotenv import load_dotenv
 
-load_dotenv()  # Load from .env file
-api_key = os.getenv('ANTHROPIC_API_KEY')
-print(f"API Key present: {bool(api_key)}")
+def log_memory_usage():
+    process = psutil.Process(os.getpid())
+    memory_mb = process.memory_info().rss / 1024 / 1024
+    print(f"Memory usage: {memory_mb:.1f} MB")
+
+# Call this at key points in generate_docs()
 ```
 
-#### Tool Execution Issues
+### Optimization Strategies
+
+1. **Caching**: Cache results of expensive operations
+2. **Lazy Loading**: Load modules and resources only when needed
+3. **Parallel Processing**: Use concurrent operations where possible
+4. **Efficient Search**: Optimize ripgrep patterns and filters
+
+## Architecture Decisions
+
+### Why DeepAgents Framework?
+
+The choice of DeepAgents provides several advantages:
+- **Sophisticated Reasoning**: Multi-step AI reasoning capabilities
+- **Tool Integration**: Natural tool usage and coordination
+- **Error Recovery**: Built-in error handling and alternative strategies
+
+### Why LangChain/LangGraph?
+
+- **Workflow Management**: Structured AI workflow execution
+- **State Management**: Maintains context across analysis steps
+- **Ecosystem Integration**: Broad tool and model support
+
+### Why ripgrep for Search?
+
+- **Performance**: 10-100x faster than traditional grep
+- **Feature Rich**: Regular expressions, file type filtering, ignore patterns
+- **Cross-Platform**: Consistent behavior across operating systems
+
+## Common Development Patterns
+
+### Error Handling Pattern
 
 ```python
-# Debug tool execution
-from codeviewx.tools import execute_command
-
-# Test command execution
-result = execute_command("echo 'test'", working_dir=".")
-print(result)
+def robust_function(param1: str, param2: Optional[str] = None) -> str:
+    """
+    Standard error handling pattern for CodeViewX functions
+    """
+    try:
+        # Validate inputs
+        if not param1:
+            return "❌ Error: Parameter 1 is required"
+        
+        # Core logic
+        result = perform_operation(param1, param2)
+        
+        # Return success message
+        return f"✅ Success: {result}"
+        
+    except FileNotFoundError as e:
+        return f"❌ Error: File not found - {str(e)}"
+    except PermissionError as e:
+        return f"❌ Error: Permission denied - {str(e)}"
+    except Exception as e:
+        return f"❌ Error: Unexpected error - {str(e)}"
 ```
 
-#### Import Issues
+### Logging Pattern
 
 ```python
-# Debug import paths
-import sys
-print(sys.path)
+import logging
 
-# Test module imports
-try:
-    from codeviewx import generate_docs
-    print("Import successful")
-except ImportError as e:
-    print(f"Import failed: {e}")
+logger = logging.getLogger(__name__)
+
+def logged_function():
+    """Standard logging pattern"""
+    logger.debug("Starting function execution")
+    
+    try:
+        result = perform_operation()
+        logger.info(f"Operation completed successfully: {result}")
+        return result
+        
+    except Exception as e:
+        logger.error(f"Operation failed: {e}")
+        raise
 ```
 
-### 3. Performance Profiling
+### Tool Interface Pattern
 
 ```python
-# Profile execution time
-import time
-import cProfile
-
-def profile_generation():
-    start_time = time.time()
-    generate_docs(...)
-    end_time = time.time()
-    print(f"Generation took {end_time - start_time:.2f} seconds")
-
-# Detailed profiling
-cProfile.run('generate_docs(...)', 'profile_output.prof')
-```
-
-## Release Process
-
-### 1. Version Management
-
-Version information is managed in `codeviewx/__version__.py`:
-
-```python
-# __version__.py
-__version__ = "0.1.0"
-__author__ = "CodeViewX Team"
-__description__ = "AI-powered code documentation generator"
-```
-
-### 2. Release Checklist
-
-#### Before Release
-
-- [ ] All tests passing
-- [ ] Documentation updated
-- [ ] CHANGELOG updated
-- [ ] Version number incremented
-- [ ] Performance tests run
-- [ ] Security review completed
-
-#### Release Process
-
-```bash
-# 1. Update version
-echo "__version__ = '0.2.0'" > codeviewx/__version__.py
-
-# 2. Update changelog
-# Edit CHANGELOG.md
-
-# 3. Run full test suite
-pytest --cov=codeviewx
-
-# 4. Build package
-python -m build
-
-# 5. Upload to PyPI (if applicable)
-python -m twine upload dist/*
-
-# 6. Create Git tag
-git tag v0.2.0
-git push origin v0.2.0
-```
-
-### 3. Testing Releases
-
-```bash
-# Test local build
-pip install dist/codeviewx-0.2.0-py3-none-any.whl
-
-# Test installation from source
-pip install git+https://github.com/dean2021/codeviewx.git@v0.2.0
+def standardized_tool(param1: str, param2: Optional[str] = None) -> str:
+    """
+    Standardized tool interface for AI agent integration
+    
+    Args:
+        param1: Description of parameter 1
+        param2: Description of parameter 2 (optional)
+    
+    Returns:
+        Formatted string result or error message
+    
+    Examples:
+        >>> standardized_tool("input")
+        '✅ Success: Operation completed'
+    """
+    # Implementation
 ```
 
 ## Contributing Guidelines
 
-### 1. Types of Contributions
+### Code Review Process
 
-- **Bug Reports**: Use GitHub Issues with detailed information
-- **Feature Requests**: Describe use case and proposed solution
-- **Code Contributions**: Follow development workflow
-- **Documentation**: Improve existing documentation
-- **Testing**: Add tests for uncovered scenarios
-
-### 2. Issue Reporting
-
-#### Bug Report Template
-
-```markdown
-## Bug Description
-Clear description of the issue
-
-## Steps to Reproduce
-1. Run command `...`
-2. With parameters `...`
-3. See error `...`
-
-## Expected Behavior
-What should happen
-
-## Actual Behavior
-What actually happens
-
-## Environment
-- OS: [e.g., macOS 13.0]
-- Python: [e.g., 3.9.0]
-- CodeViewX: [e.g., 0.1.0]
+1. **Create Feature Branch**:
+```bash
+git checkout -b feature/new-feature
 ```
 
-#### Feature Request Template
+2. **Make Changes**:
+   - Follow code style guidelines
+   - Add tests for new functionality
+   - Update documentation
 
-```markdown
-## Feature Description
-Clear description of requested feature
-
-## Use Case
-Why this feature is needed
-
-## Proposed Solution
-How the feature should work
-
-## Alternatives Considered
-Other approaches considered
+3. **Run Quality Checks**:
+```bash
+black codeviewx/
+isort codeviewx/
+flake8 codeviewx/
+mypy codeviewx/
+pytest --cov=codeviewx
 ```
 
-### 3. Community Guidelines
+4. **Submit Pull Request**:
+   - Clear description of changes
+   - Reference related issues
+   - Include testing instructions
 
-- **Be Respectful**: Maintain professional and constructive communication
-- **Be Helpful**: Assist others and share knowledge
-- **Be Patient**: Allow time for review and discussion
-- **Be Thorough**: Provide complete information in issues and PRs
+### Commit Message Format
 
-### 4. Getting Help
+Follow conventional commit format:
 
-- **Documentation**: Check existing documentation first
-- **Issues**: Search existing issues before creating new ones
-- **Discussions**: Use GitHub Discussions for questions
-- **Email**: Contact maintainers for sensitive issues
+```
+type(scope): description
 
-## Resources
+[optional body]
 
-### Development Tools
+[optional footer]
+```
 
-- **Black**: Code formatting
-- **isort**: Import sorting
-- **flake8**: Linting
-- **mypy**: Type checking
-- **pytest**: Testing framework
+Examples:
+```
+feat(generator): add support for custom output formats
 
-### Documentation
+Adds HTML and PDF output generation capabilities through
+new formatter modules. Includes comprehensive tests and
+documentation updates.
 
-- **CodeViewX Documentation**: This guide and other docs
-- **Anthropic Claude API**: https://docs.anthropic.com/
-- **DeepAgents Framework**: https://github.com/whoami1234321/deepagents
-- **LangChain Documentation**: https://python.langchain.com/
+Closes #123
+```
 
-### Community
+```
+fix(tools): handle empty directories in list_real_directory
 
-- **GitHub Repository**: https://github.com/dean2021/codeviewx
-- **Issues**: https://github.com/dean2021/codeviewx/issues
-- **Discussions**: https://github.com/dean2021/codeviewx/discussions
+Prevents crashes when scanning empty directories and
+provides appropriate user feedback.
 
----
+Fixes #456
+```
 
-*Thank you for contributing to CodeViewX! Your contributions help make code documentation more accessible and comprehensive for everyone.*
+### Issue Reporting
+
+When reporting bugs or requesting features:
+
+1. **Search existing issues** first
+2. **Use appropriate templates**
+3. **Provide complete information**:
+   - Python version
+   - Operating system
+   - CodeViewX version
+   - Steps to reproduce
+   - Expected vs actual behavior
+
+## Release Process
+
+### Version Management
+
+CodeViewX follows semantic versioning (MAJOR.MINOR.PATCH):
+
+- **MAJOR**: Breaking changes
+- **MINOR**: New features (backward compatible)
+- **PATCH**: Bug fixes (backward compatible)
+
+### Release Checklist
+
+1. **Update version** in `codeviewx/__version__.py`
+2. **Update changelog** in `CHANGELOG.md`
+3. **Run full test suite** with coverage
+4. **Update documentation**
+5. **Tag release**:
+```bash
+git tag -a v0.1.0 -m "Release version 0.1.0"
+git push origin v0.1.0
+```
+6. **Build and publish**:
+```bash
+python -m build
+twine upload dist/*
+```
+
+This development guide provides comprehensive information for contributing to CodeViewX, from basic setup to advanced feature development. Following these guidelines ensures consistent, high-quality contributions to the project.
