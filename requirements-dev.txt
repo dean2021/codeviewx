@@ -10,3 +10,6 @@ isort>=5.0.0
 build>=0.10.0
 twine>=4.0.0
 
+Flask==3.0.0
+markdown==3.5.1
+pymdown-extensions==10.5

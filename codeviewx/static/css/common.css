@@ -1,0 +1,268 @@
+/* ==================== 全局基础样式 ==================== */
+
+code {
+    color: #1abc9c;
+}
+
+html {
+    background: #f3f2ee;
+}
+
+body {
+    width: 100%;
+    background: #f3f2ee;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ==================== 顶部导航栏 ==================== */
+
+.top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-bottom: 1px solid #e9ecef;
+    padding: 12px 40px;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 600;
+    color: #3e3e3e;
+}
+
+.back-link {
+    color: #3e3e3e;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    background: white;
+}
+
+.back-link:hover {
+    background: #f8f9fa;
+    border-color: #3e3e3e;
+}
+
+/* ==================== 容器 ==================== */
+
+.container {
+    max-width: 1200px;
+    margin: 100px auto 60px auto;
+    padding: 0 40px;
+}
+
+/* ==================== 标题样式 ==================== */
+
+h1 {
+    font-size: 32px;
+    font-weight: 600;
+    color: #3e3e3e;
+    margin: 0 0 30px 0;
+    letter-spacing: -0.5px;
+}
+
+/* ==================== 按钮样式 ==================== */
+
+.btn {
+    padding: 14px 32px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+}
+
+.btn-primary {
+    background: #3e3e3e;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2a2a2a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(62, 62, 62, 0.3);
+}
+
+.btn-primary:disabled {
+    background: #86868b;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-secondary {
+    background: white;
+    color: #3e3e3e;
+    border: 1px solid #e9ecef;
+}
+
+.btn-secondary:hover {
+    background: #f8f9fa;
+    border-color: #3e3e3e;
+}
+
+/* ==================== 表单样式 ==================== */
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: #3e3e3e;
+    font-size: 14px;
+}
+
+.required {
+    color: #ff3b30;
+}
+
+input[type="text"],
+input[type="password"],
+textarea,
+select {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: all 0.3s;
+    background: white;
+    font-family: inherit;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #3e3e3e;
+    box-shadow: 0 0 0 4px rgba(62, 62, 62, 0.1);
+}
+
+textarea {
+    min-height: 120px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    resize: vertical;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+/* ==================== 提示文本 ==================== */
+
+.help-text {
+    font-size: 13px;
+    color: #7f8c8d;
+    margin-top: 5px;
+}
+
+.help-text a {
+    color: #3e3e3e;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.help-text a:hover {
+    text-decoration: underline;
+}
+
+/* ==================== 警告框 ==================== */
+
+.alert {
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    border-radius: 8px;
+    display: none;
+    font-size: 14px;
+}
+
+.alert-success {
+    background: #d1f4e0;
+    color: #0d653a;
+    border: 1px solid #34c759;
+}
+
+.alert-error {
+    background: #ffe5e5;
+    color: #cc0000;
+    border: 1px solid #ff3b30;
+}
+
+.alert.show {
+    display: block;
+}
+
+/* ==================== 加载动画 ==================== */
+
+.loading {
+    display: none;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.loading.show {
+    display: block;
+}
+
+.spinner {
+    border: 3px solid #f3f2ee;
+    border-top: 3px solid #3e3e3e;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ==================== 空状态 ==================== */
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #7f8c8d;
+}
+
+.empty-state h2 {
+    margin-bottom: 10px;
+}
+
+/* ==================== 响应式设计 ==================== */
+
+@media (max-width: 768px) {
+    .container {
+        padding: 60px 20px 40px 20px;
+    }
+    
+    h1 {
+        font-size: 28px;
+    }
+    
+    .btn {
+        padding: 12px 24px;
+        font-size: 14px;
+    }
+    
+    .top-nav {
+        padding: 12px 20px;
+    }
+}
+

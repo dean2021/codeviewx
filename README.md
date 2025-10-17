@@ -12,6 +12,7 @@ CodeViewX 是一个智能的代码文档生成工具，它使用 AI 技术深入
 
 - 🤖 **AI 驱动** - 基于 DeepAgents 和 LangChain 的智能分析
 - 📝 **完整文档** - 生成项目概览、架构图、核心机制等多维度文档
+- 🌐 **Web 服务器** - 内置文档浏览服务器，美观的 Markdown 渲染
 - 🔧 **命令行工具** - 简单易用的 CLI 接口
 - 🐍 **Python API** - 可作为库集成到您的项目中
 - 🚀 **快速搜索** - 集成 ripgrep 实现超快代码搜索
@@ -27,12 +28,17 @@ CodeViewX 是一个智能的代码文档生成工具，它使用 AI 技术深入
 git clone https://github.com/dean2022/codeviewx.git
 cd codeviewx
 
-# 安装包（可编辑模式）
+# 安装包（可编辑模式，包含所有依赖）
 pip install -e .
 
 # 或安装开发依赖
 pip install -e ".[dev]"
 ```
+
+**注意**：安装会自动包含所有必需的依赖：
+- AI 框架：`deepagents`, `langchain`, `langgraph`
+- Web 服务器：`flask`, `markdown`（用于 `--serve` 功能）
+- 代码搜索：`ripgrepy`
 
 ### 安装依赖工具
 
@@ -83,6 +89,12 @@ codeviewx --verbose
 
 # 完整配置
 codeviewx -w /path/to/project -o docs --verbose
+
+# 启动 Web 服务器查看已生成的文档（推荐）🌐
+codeviewx --serve
+
+# 指定文档目录启动服务器
+codeviewx --serve -o docs
 ```
 
 **进度提示说明：**
@@ -129,6 +141,38 @@ codeviewx -w /path/to/project -o docs --verbose
 
 ```bash
 codeviewx --help
+```
+
+### Web 服务器模式 🌐
+
+生成文档后，可以启动内置的 Web 服务器来浏览文档：
+
+```bash
+# 启动服务器（默认 .wiki 目录）
+codeviewx --serve
+
+# 指定文档目录
+codeviewx --serve -o docs
+```
+
+**功能特点**：
+- ✅ 美观的 Markdown 渲染（支持代码高亮、表格、图表）
+- ✅ 自动生成目录（TOC）
+- ✅ 文件树导航
+- ✅ 实时预览文档
+- ✅ 支持 Mermaid 图表渲染
+- 🔗 访问地址：`http://127.0.0.1:5000`
+- ⏹️ 停止服务：按 `Ctrl+C`
+
+**使用流程**：
+```bash
+# 1. 生成文档
+codeviewx -w /path/to/project
+
+# 2. 启动服务器查看
+codeviewx --serve
+
+# 3. 在浏览器中访问 http://127.0.0.1:5000
 ```
 
 ### Python API 使用

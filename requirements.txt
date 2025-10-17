@@ -9,3 +9,6 @@ langgraph-sdk==0.2.9
 langsmith==0.4.34
 deepagents==0.0.5
 ripgrepy==2.0.0
+Flask==3.0.0
+markdown==3.5.1
+pymdown-extensions==10.5

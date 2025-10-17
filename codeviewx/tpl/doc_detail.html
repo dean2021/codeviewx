@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, minimal-ui">
+    <link rel="stylesheet" href="/static/css/typo.css"/>
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <!-- Mermaid.js for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <title>CodeViewX - 文档展示</title>
+    <style>
+    
+
+        html {
+            background: #f3f2ee;
+        }
+
+        body {
+            width: 100%;
+            background: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar container for logo and file tree */
+        .sidebar-container {
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            margin-left: 20px;
+        }
+
+        .main-content {
+            flex: 1;
+    min-width: 300px;
+    margin: 10px;
+    padding: 0px 15px;
+    border-width: 0 1px;
+        }
+
+        /* Logo Area */
+        .logo-area {
+            width: 200px;
+            min-width: 200px;
+            max-width: 200px;
+            margin-top: 20px;
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.2em;
+            text-align: center;
+        }
+
+        .logo-text {
+            font-size: 1.5em;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .logo-text:hover {
+            color: #3e3e3e;
+        }
+
+        .logo-subtitle {
+            font-size: 0.75em;
+            color: #7f8c8d;
+            margin-top: 0.3em;
+            letter-spacing: 0.5px;
+        }
+
+        /* File Tree Styling */
+        .file-tree {
+            width: 200px;
+            min-width: 200px;
+            max-width: 200px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            background: #fff;
+            border: 1px solid #f3f2ee;
+            border-radius: 8px;
+            padding: 1.2em 1.2em 0.8em 1.2em;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        .file-tree-title {
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 0.8em;
+            color: #333;
+            border-bottom: 2px solid #3e3e3e;
+            padding-bottom: 0.4em;
+        }
+
+        .file-tree-title i {
+            margin-right: 0.3em;
+            color: #3e3e3e;
+        }
+
+        .file-tree ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .file-tree .file-item {
+            margin: 0.15em 0;
+            padding: 0.4em 0.6em;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            font-size: 0.85em;
+        }
+
+        .file-tree .file-item a {
+            border-bottom: 0px solid #3e3e3e      
+          }
+
+        .file-tree .file-item:hover {
+            background: #e9ecef;
+        }
+
+        .file-tree .file-item.active {
+            background: #3e3e3e;
+            color: white;
+        }
+
+        .file-tree .file-item.active a {
+            color: white !important;
+        }
+
+        .file-tree .file-item.active:hover {
+            background: #3e3e3e;
+            color: white;
+        }
+
+        .file-tree .file-item.active:hover a {
+            color: white !important;
+        }
+
+        .file-tree .file-icon {
+            margin-right: 0.4em;
+            font-size: 0.85em;
+            width: 14px;
+            text-align: center;
+        }
+
+        .file-tree .folder {
+            font-weight: 500;
+        }
+
+        .file-tree .folder .file-icon {
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+        }
+
+        .file-tree .folder .file-icon::before {
+            content: "\f07b";
+        }
+
+        .file-tree .file .file-icon {
+            font-family: "Font Awesome 6 Free";
+            font-weight: 400;
+        }
+
+        .file-tree .file .file-icon::before {
+            content: "\f15b";
+        }
+
+        .file-tree .markdown .file-icon {
+            font-family: "Font Awesome 6 Free";
+            font-weight: 400;
+        }
+
+        .file-tree .markdown .file-icon::before {
+            content: "\f15c";
+        }
+
+        .file-tree .file a {
+            color: inherit;
+            text-decoration: none;
+            flex: 1;
+        }
+
+        .file-tree .file a:hover {
+            text-decoration: none;
+        }
+
+        /* File tree responsive */
+        @media (max-width: 1200px) {
+            .file-tree {
+                width: 22%;
+                min-width: 160px;
+                padding: 1.2em;
+            }
+
+            .toc-container {
+                width: 28%;
+                min-width: 180px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .file-tree {
+                position: fixed;
+                top: 80px;
+                left: 20px;
+                width: min(280px, 85vw);
+                max-height: 70vh;
+                overflow-y: auto;
+                z-index: 998;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                margin: 0;
+                display: none;
+            }
+
+            .file-tree.visible {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .file-tree {
+                left: 10px;
+                right: 10px;
+                width: auto;
+                max-height: 60vh;
+                padding: 1em;
+            }
+
+            .back-home {
+                margin-top: 1em;
+                padding-top: 1em;
+            }
+
+            .back-home-btn {
+                padding: 0.5em 0.8em;
+                font-size: 0.8em;
+            }
+
+            .back-home-icon {
+                font-size: 1em;
+            }
+        }
+
+        pre {
+            white-space: pre-wrap;
+        }
+
+        i.serif {
+            text-transform: lowercase;
+            color: #3e3e3e;
+        }
+
+        :-moz-any(h1, h2, h3, h4, h5, h5) i.serif {
+            text-transform: capitalize;
+        }
+
+        i.serif:hover {
+            color: inherit;
+        }
+
+
+        #github iframe {
+            display: inline;
+            margin-right: 1em;
+        }
+
+        @media only screen and (max-width: 640px) {
+            table {
+                word-break: break-all;
+                word-wrap: break-word;
+                font-size: 12px;
+            }
+
+            .typo table th, .typo table td, .typo-table th, .typo-table td .typo table caption {
+                padding: 0.5em;
+            }
+
+            #fork {
+                display: none;
+            }
+        }
+
+        .mermaid {
+            margin: 2em 0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 1em;
+            border-radius: 8px;
+        }
+
+        .mermaid:hover {
+            background: #f8f9fa;
+            transform: scale(1.02);
+        }
+
+        .language-mermaid {
+            margin: 2em 0;
+            text-align: center;
+        }
+
+        /* Mermaid fullscreen modal */
+        .mermaid-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 2em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .mermaid-modal.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .mermaid-modal-content {
+            max-width: 95vw;
+            max-height: 95vh;
+            overflow: auto;
+            background: white;
+            padding: 2em;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .mermaid-modal.visible .mermaid-modal-content {
+            transform: scale(1);
+        }
+
+        .mermaid-modal-close {
+            position: absolute;
+            top: 1em;
+            right: 1em;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10000;
+        }
+
+        .mermaid-modal-close:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+
+        .mermaid-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .mermaid-wrapper::after {
+            content: "\f00e  点击查看大图";
+            font-family: "Font Awesome 6 Free", sans-serif;
+            font-weight: 900;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(62, 62, 62, 0.9);
+            color: white;
+            padding: 0.3em 0.8em;
+            border-radius: 4px;
+            font-size: 0.8em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .mermaid-wrapper:hover::after {
+            opacity: 1;
+        }
+
+        /* Footer styling */
+        .footer {
+            /* background: #f8f9fa; */
+            border-top: 1px solid #e9ecef;
+            padding: 2em 0;
+            margin-top: 4em;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2em;
+        }
+
+        .footer-text {
+            margin-bottom: 0.5em;
+        }
+
+        .footer-links {
+            margin-top: 1em;
+        }
+
+        .footer-links a {
+            color: #3e3e3e;
+            text-decoration: none;
+            margin: 0 1em;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #16a085;
+            text-decoration: underline;
+        }
+
+        .footer-divider {
+            margin: 0 0.5em;
+            color: #bdc3c7;
+        }
+
+        .footer-brand {
+            font-weight: bold;
+            color: #3e3e3e;
+        }
+
+        /* Code block styling for Prism.js */
+        pre[class*="language-"] {
+            background: #2d2d2d;
+            border-radius: 6px;
+            padding: 1em;
+            margin: 1.5em 0;
+            overflow: auto;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        code[class*="language-"] {
+            background: transparent;
+            color: inherit;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: inherit;
+        }
+
+        /* Inline code styling */
+        :not(pre) > code[class*="language-"] {
+            background: #f5f5f5;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            color: #3e3e3e;
+        }
+
+        /* Table of Contents Styling - Floating Panel */
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.2em;
+            width: 320px;
+            max-width: 90vw;
+            height: fit-content;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            z-index: 1001;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(20px);
+        }
+
+        .toc.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .toc-container {
+            display: none;
+        }
+
+        /* Overlay for TOC */
+        .toc-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        .toc-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .toc-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 1em;
+            color: #333;
+            border-bottom: 2px solid #3e3e3e;
+            padding-bottom: 0.5em;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .toc .toc-level-1 {
+            counter-reset: h1-counter;
+        }
+
+        .toc .toc-level-2 {
+            padding-left: 2em;
+            margin-top: 0.5em;
+        }
+
+        .toc .toc-level-3 {
+            padding-left: 4em;
+            margin-top: 0.3em;
+        }
+
+        .toc .toc-level-4 {
+            padding-left: 6em;
+            margin-top: 0.3em;
+        }
+
+        .toc .toc-level-5 {
+            padding-left: 8em;
+            margin-top: 0.3em;
+        }
+
+        .toc .toc-level-6 {
+            padding-left: 10em;
+            margin-top: 0.3em;
+        }
+
+        .toc li {
+            margin: 0.3em 0;
+            line-height: 1.4;
+        }
+
+        .toc a {
+            color: #3e3e3e;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .toc a:hover {
+            color: #3e3e3e;
+            text-decoration: underline;
+        }
+
+        .toc .toc-level-1 > li {
+            counter-increment: h1-counter;
+        }
+
+        .toc .toc-level-1 > li > a::before {
+            content: counter(h1-counter) ". ";
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Header link styling */
+        .headerlink {
+            color: #3e3e3e;
+            text-decoration: none;
+            margin-left: 0.5em;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        h1:hover .headerlink,
+        h2:hover .headerlink,
+        h3:hover .headerlink,
+        h4:hover .headerlink,
+        h5:hover .headerlink,
+        h6:hover .headerlink {
+            opacity: 1;
+        }
+
+        /* Responsive TOC */
+        @media (max-width: 768px) {
+            .toc {
+                padding: 1em;
+            }
+
+            .toc .toc-level-2 {
+                padding-left: 1.5em;
+            }
+
+            .toc .toc-level-3 {
+                padding-left: 3em;
+            }
+
+            .toc .toc-level-4 {
+                padding-left: 4.5em;
+            }
+
+            .toc .toc-level-5 {
+                padding-left: 6em;
+            }
+
+            .toc .toc-level-6 {
+                padding-left: 7.5em;
+            }
+        }
+
+        /* Floating Toggle Buttons */
+        .toc-toggle, .file-tree-toggle {
+            position: fixed;
+            background: #3e3e3e;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toc-toggle {
+            top: 20px;
+            right: 20px;
+        }
+
+        .file-tree-toggle {
+            top: 20px;
+            left: 20px;
+        }
+
+        .toc-toggle:hover, .file-tree-toggle:hover {
+            background: #3e3e3e;
+            transform: scale(1.1);
+        }
+
+        .toc-toggle:active, .file-tree-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .toc-toggle i, .file-tree-toggle i {
+            font-size: 18px;
+        }
+
+        /* File tree toggle - only show on mobile */
+        @media (min-width: 1025px) {
+            .file-tree-toggle {
+                display: none;
+            }
+        }
+
+        /* Responsive layout */
+        @media (max-width: 1200px) {
+            .logo-area {
+                width: 180px;
+                min-width: 180px;
+                max-width: 180px;
+            }
+
+            .file-tree {
+                width: 180px;
+                min-width: 180px;
+                max-width: 180px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar-container {
+                margin-left: 0;
+            }
+
+            .logo-area {
+                display: none;
+            }
+
+            .main-content {
+                flex: 1;
+                min-width: 300px;
+                margin: 10px;
+                padding: 0px 15px;
+                border-width: 0 1px;
+            }
+
+            .file-tree {
+                display: none;
+                position: fixed;
+                left: 20px;
+                top: 80px;
+                z-index: 998;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                margin: 0;
+            }
+
+            .file-tree.visible {
+                display: block;
+            }
+
+            .file-tree-toggle {
+                display: flex !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex: 1;
+    min-width: 300px;
+    margin: 10px;
+    padding: 0px 15px;
+    border-width: 0 1px;
+            }
+
+            .toc {
+                top: 70px;
+                right: 10px;
+                width: calc(100vw - 20px);
+                max-width: calc(100vw - 20px);
+                max-height: 65vh;
+                padding: 1em;
+            }
+
+            .file-tree {
+                left: 10px;
+                right: 10px;
+                width: auto;
+                max-width: calc(100vw - 20px);
+            }
+
+            .toc-toggle, .file-tree-toggle {
+                top: 15px;
+                width: 45px;
+                height: 45px;
+                font-size: 16px;
+            }
+
+            .toc-toggle {
+                right: 15px;
+            }
+
+            .file-tree-toggle {
+                left: 15px;
+            }
+
+            .toc .toc-level-2 {
+                padding-left: 1.5em;
+            }
+
+            .toc .toc-level-3 {
+                padding-left: 3em;
+            }
+
+            .toc .toc-level-4 {
+                padding-left: 4.5em;
+            }
+
+            .toc .toc-level-5 {
+                padding-left: 6em;
+            }
+
+            .toc .toc-level-6 {
+                padding-left: 7.5em;
+            }
+
+            .footer {
+                padding: 1.5em 0;
+                margin-top: 2em;
+                font-size: 0.85em;
+            }
+
+            .footer-content {
+                padding: 0 1em;
+            }
+
+            .footer-links a {
+                margin: 0 0.5em;
+                display: inline-block;
+            }
+
+            .footer-divider {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="typo typo-selection">
+<!-- TOC Overlay -->
+<div class="toc-overlay" id="tocOverlay"></div>
+
+<!-- Mermaid Fullscreen Modal -->
+<div class="mermaid-modal" id="mermaidModal">
+    <button class="mermaid-modal-close" id="mermaidModalClose"><i class="fas fa-times"></i></button>
+    <div class="mermaid-modal-content" id="mermaidModalContent">
+        <!-- Mermaid diagram will be inserted here -->
+    </div>
+</div>
+
+<!-- TOC Toggle Button -->
+<button class="toc-toggle" id="tocToggle" title="切换目录"><i class="fas fa-bars"></i></button>
+
+<!-- File Tree Toggle Button -->
+<button class="file-tree-toggle" id="fileTreeToggle" title="切换文件目录"><i class="fas fa-folder"></i></button>
+
+<!-- Sidebar Container -->
+<div class="sidebar-container">
+    <!-- Logo Area -->
+    <div class="logo-area">
+        <a href="/" class="logo-text">CodeViewX</a>
+        <div class="logo-subtitle">看见代码背后的智慧</div>
+    </div>
+
+    <!-- File Tree Sidebar -->
+    <div class="file-tree" id="fileTree">
+        <div class="file-tree-title"><i class="fas fa-folder-open"></i> 文档目录</div>
+        <ul id="fileTreeList">
+            <!-- File tree will be generated by JavaScript -->
+        </ul>
+    </div>
+</div>
+
+<!-- Main Content Area -->
+<div class="main-content typo typo-selection">
+    {{markdown_html_content|safe}}
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-text">
+                © 2025 <span class="footer-brand">CodeViewX</span> - 文档由AI强力驱动
+            </div>
+            <div class="footer-links">
+                <a href="/about">关于</a>
+                <span class="footer-divider">|</span>
+                <a href="/docs">文档</a>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- TOC Sidebar -->
+<div class="toc-container" id="tocContainer">
+    <!-- TOC will be inserted here by JavaScript -->
+</div>
+<script>
+    mermaid.initialize({ startOnLoad: false });
+
+    // File tree data from server
+    const fileTreeData = {{ file_tree|tojson|safe }};
+
+    // 处理 language-mermaid 类的代码块
+    document.addEventListener('DOMContentLoaded', function() {
+        const mermaidElements = document.querySelectorAll('.language-mermaid');
+        mermaidElements.forEach(function(element) {
+            // 将代码块转换为 Mermaid div
+            const mermaidDiv = document.createElement('div');
+            mermaidDiv.className = 'mermaid';
+            mermaidDiv.textContent = element.textContent || element.innerText;
+            element.parentNode.replaceChild(mermaidDiv, element);
+        });
+
+        // 初始化 Mermaid
+        mermaid.init();
+
+        // 重新初始化 Prism.js 以确保所有代码块都被高亮
+        if (window.Prism) {
+            Prism.highlightAll();
+        }
+
+        // 目录功能增强
+        initializeTOC();
+        initializeTOCToggle();
+        moveTOCToSidebar();
+
+        // 文件树功能
+        initializeFileTree();
+        renderFileTree();
+        initializeFileTreeToggle();
+
+        // Mermaid 全屏查看功能
+        initializeMermaidFullscreen();
+    });
+
+    function initializeTOC() {
+        // 为目录链接添加平滑滚动
+        const tocLinks = document.querySelectorAll('.toc a');
+        tocLinks.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+
+                if (targetElement) {
+                    const offsetTop = targetElement.offsetTop - 20;
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+
+                    // 高亮当前活动的目录项
+                    setActiveTOCItem(this);
+                }
+            });
+        });
+
+        // 监听滚动，自动高亮当前章节
+        window.addEventListener('scroll', function() {
+            highlightCurrentSection();
+        });
+
+        // 初始高亮
+        highlightCurrentSection();
+    }
+
+    function setActiveTOCItem(activeLink) {
+        // 移除所有活动状态
+        const tocLinks = document.querySelectorAll('.toc a');
+        tocLinks.forEach(function(link) {
+            link.style.fontWeight = 'normal';
+            link.style.color = '#3e3e3e';
+        });
+
+        // 设置当前活动项
+        activeLink.style.fontWeight = 'bold';
+        activeLink.style.color = '#16a085';
+    }
+
+    function highlightCurrentSection() {
+        const headers = document.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]');
+        const tocLinks = document.querySelectorAll('.toc a');
+
+        if (headers.length === 0) return;
+
+        let currentHeader = null;
+        const scrollTop = window.pageYOffset + 100;
+
+        // 找到当前在视窗中的标题
+        for (let i = headers.length - 1; i >= 0; i--) {
+            const header = headers[i];
+            if (header.offsetTop <= scrollTop) {
+                currentHeader = header;
+                break;
+            }
+        }
+
+        // 更新目录高亮
+        tocLinks.forEach(function(link) {
+            link.style.fontWeight = 'normal';
+            link.style.color = '#3e3e3e';
+        });
+
+        if (currentHeader) {
+            const activeLink = document.querySelector(`.toc a[href="#${currentHeader.id}"]`);
+            if (activeLink) {
+                activeLink.style.fontWeight = 'bold';
+                activeLink.style.color = '#16a085';
+            }
+        }
+    }
+
+    function initializeTOCToggle() {
+        const tocToggle = document.getElementById('tocToggle');
+        const toc = document.querySelector('.toc');
+        const tocOverlay = document.getElementById('tocOverlay');
+
+        if (!tocToggle || !toc) {
+            // 如果没有目录，隐藏切换按钮
+            if (tocToggle) {
+                tocToggle.style.display = 'none';
+            }
+            return;
+        }
+
+        // 初始化目录状态 - 默认关闭
+        toc.classList.remove('visible');
+        if (tocOverlay) {
+            tocOverlay.classList.remove('visible');
+        }
+        tocToggle.innerHTML = '<i class="fas fa-bars"></i>';
+
+        // 打开目录
+        function openTOC() {
+            toc.classList.add('visible');
+            if (tocOverlay) {
+                tocOverlay.classList.add('visible');
+            }
+            tocToggle.innerHTML = '<i class="fas fa-times"></i>';
+        }
+
+        // 关闭目录
+        function closeTOC() {
+            toc.classList.remove('visible');
+            if (tocOverlay) {
+                tocOverlay.classList.remove('visible');
+            }
+            tocToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+
+        // 切换目录显示/隐藏
+        tocToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (toc.classList.contains('visible')) {
+                closeTOC();
+            } else {
+                openTOC();
+            }
+        });
+
+        // 点击遮罩层关闭目录
+        if (tocOverlay) {
+            tocOverlay.addEventListener('click', function() {
+                closeTOC();
+            });
+        }
+
+        // 点击目录外部区域关闭目录
+        document.addEventListener('click', function(e) {
+            if (!toc.contains(e.target) && !tocToggle.contains(e.target)) {
+                if (toc.classList.contains('visible')) {
+                    closeTOC();
+                }
+            }
+        });
+
+        // 点击目录链接后自动关闭目录（移动端体验更好）
+        const tocLinks = toc.querySelectorAll('a');
+        tocLinks.forEach(function(link) {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    setTimeout(function() {
+                        closeTOC();
+                    }, 300);
+                }
+            });
+        });
+
+        // 按 ESC 键关闭目录
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && toc.classList.contains('visible')) {
+                closeTOC();
+            }
+        });
+    }
+
+    function moveTOCToSidebar() {
+        // TOC 现在是浮动的，不需要移动到侧边栏
+        // 这个函数保留为空，以防其他地方调用
+    }
+
+    // File tree functions
+    function initializeFileTree() {
+        // File tree initialization logic here
+    }
+
+    function renderFileTree() {
+        const fileTreeList = document.getElementById('fileTreeList');
+        if (!fileTreeList || !fileTreeData) return;
+
+        fileTreeList.innerHTML = '';
+
+        fileTreeData.forEach(item => {
+            const li = document.createElement('li');
+            li.className = `file-item ${item.type}`;
+            if (item.active) {
+                li.classList.add('active');
+            }
+
+            // Create file icon
+            const icon = document.createElement('span');
+            icon.className = 'file-icon';
+
+            // Create link
+            const link = document.createElement('a');
+            link.href = getFileLink(item);
+            link.textContent = item.display_name || item.name;
+
+            // Set up click handler for navigation
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                navigateToFile(item);
+            });
+
+            li.appendChild(icon);
+            li.appendChild(link);
+            fileTreeList.appendChild(li);
+        });
+    }
+
+    function getFileLink(item) {
+        // Get current URL and construct new URL for the file
+        const currentUrl = new URL(window.location.href);
+        const pathParts = currentUrl.pathname.split('/');
+
+        // Replace the last part (current file) with the new file
+        if (pathParts.length > 0) {
+            pathParts[pathParts.length - 1] = item.name;
+        }
+
+        return pathParts.join('/');
+    }
+
+    function navigateToFile(item) {
+        const newUrl = getFileLink(item);
+        window.location.href = newUrl;
+    }
+
+    function initializeFileTreeToggle() {
+        const fileTreeToggle = document.getElementById('fileTreeToggle');
+        const fileTree = document.getElementById('fileTree');
+
+        if (!fileTreeToggle || !fileTree) {
+            // 如果没有文件树，隐藏切换按钮
+            if (fileTreeToggle) {
+                fileTreeToggle.style.display = 'none';
+            }
+            return;
+        }
+
+        // 检查是否为移动设备
+        function isMobile() {
+            return window.innerWidth <= 1024;
+        }
+
+        // 初始化文件树状态
+        function initializeFileTreeState() {
+            if (isMobile()) {
+                fileTree.classList.remove('visible');
+                fileTree.classList.add('collapsed');
+                fileTreeToggle.innerHTML = '<i class="fas fa-folder"></i>';
+            } else {
+                fileTree.classList.add('visible');
+                fileTree.classList.remove('collapsed');
+                fileTreeToggle.style.display = 'none';
+            }
+        }
+
+        // 切换文件树显示/隐藏
+        fileTreeToggle.addEventListener('click', function() {
+            if (fileTree.classList.contains('visible')) {
+                fileTree.classList.remove('visible');
+                fileTreeToggle.innerHTML = '<i class="fas fa-folder"></i>';
+            } else {
+                fileTree.classList.add('visible');
+                fileTreeToggle.innerHTML = '<i class="fas fa-times"></i>';
+            }
+        });
+
+        // 监听窗口大小变化
+        window.addEventListener('resize', function() {
+            initializeFileTreeState();
+        });
+
+        // 初始化状态
+        initializeFileTreeState();
+    }
+
+    // Mermaid 全屏查看功能
+    function initializeMermaidFullscreen() {
+        const mermaidModal = document.getElementById('mermaidModal');
+        const mermaidModalContent = document.getElementById('mermaidModalContent');
+        const mermaidModalClose = document.getElementById('mermaidModalClose');
+        
+        if (!mermaidModal || !mermaidModalContent || !mermaidModalClose) {
+            return;
+        }
+
+        // 延迟执行，等待 Mermaid 完成渲染
+        setTimeout(function() {
+            // 为所有 mermaid 图表添加点击事件
+            const mermaidDiagrams = document.querySelectorAll('.mermaid');
+            
+            mermaidDiagrams.forEach(function(diagram) {
+                // 添加点击提示样式
+                if (!diagram.parentElement.classList.contains('mermaid-wrapper')) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'mermaid-wrapper';
+                    diagram.parentNode.insertBefore(wrapper, diagram);
+                    wrapper.appendChild(diagram);
+                }
+                
+                // 点击事件
+                diagram.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // 获取 SVG 元素
+                    const svg = diagram.querySelector('svg');
+                    if (!svg) {
+                        console.log('No SVG found in mermaid diagram');
+                        return;
+                    }
+                    
+                    // 克隆 SVG
+                    const clonedSvg = svg.cloneNode(true);
+                    
+                    // 获取原始尺寸
+                    const originalWidth = svg.getBoundingClientRect().width;
+                    const originalHeight = svg.getBoundingClientRect().height;
+                    
+                    // 计算放大后的尺寸（2倍）
+                    const scale = 2;
+                    const newWidth = originalWidth * scale;
+                    const newHeight = originalHeight * scale;
+                    
+                    // 设置新的尺寸
+                    clonedSvg.setAttribute('width', newWidth);
+                    clonedSvg.setAttribute('height', newHeight);
+                    clonedSvg.style.maxWidth = '90vw';
+                    clonedSvg.style.maxHeight = '85vh';
+                    clonedSvg.style.width = 'auto';
+                    clonedSvg.style.height = 'auto';
+                    
+                    // 创建容器
+                    const container = document.createElement('div');
+                    container.style.textAlign = 'center';
+                    container.appendChild(clonedSvg);
+                    
+                    // 清空模态框内容并插入克隆的图表
+                    mermaidModalContent.innerHTML = '';
+                    mermaidModalContent.appendChild(container);
+                    
+                    // 显示模态框
+                    setTimeout(function() {
+                        mermaidModal.classList.add('visible');
+                    }, 10);
+                    
+                    // 禁止页面滚动
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+        }, 500);
+
+        // 关闭模态框
+        function closeMermaidModal() {
+            mermaidModal.classList.remove('visible');
+            document.body.style.overflow = '';
+            
+            // 动画结束后清空内容
+            setTimeout(function() {
+                mermaidModalContent.innerHTML = '';
+            }, 300);
+        }
+
+        // 点击关闭按钮
+        mermaidModalClose.addEventListener('click', function(e) {
+            e.stopPropagation();
+            closeMermaidModal();
+        });
+
+        // 点击模态框背景关闭
+        mermaidModal.addEventListener('click', function(e) {
+            if (e.target === mermaidModal) {
+                closeMermaidModal();
+            }
+        });
+
+        // 点击内容区域不关闭
+        mermaidModalContent.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // ESC 键关闭
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && mermaidModal.classList.contains('visible')) {
+                closeMermaidModal();
+            }
+        });
+    }
+</script>
+</body>
+</html>

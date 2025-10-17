@@ -8,7 +8,7 @@ import os
 import sys
 from pathlib import Path
 
-from .core import generate_docs
+from .core import generate_docs, start_document_web_server
 from .__version__ import __version__
 
 
@@ -26,6 +26,8 @@ def main():
   codeviewx -l English                # 使用英文生成文档
   codeviewx -l Chinese -o docs        # 使用中文，输出到 docs
   codeviewx -w . -o .wiki --verbose   # 完整配置 + 详细日志
+  codeviewx --serve                   # 启动文档 Web 服务器（默认 .wiki 目录）
+  codeviewx --serve -o docs           # 启动服务器并指定文档目录
   
 支持的语言:
   Chinese, English, Japanese, Korean, French, German, Spanish, Russian
@@ -77,19 +79,40 @@ def main():
         help="显示详细日志"
     )
     
+    parser.add_argument(
+        "--serve",
+        action="store_true",
+        help="启动文档 Web 服务器（查看已生成的文档）"
+    )
+    
     args = parser.parse_args()
     
     try:
         print(f"CodeViewX v{__version__}")
         print()
         
-        generate_docs(
-            working_directory=args.working_directory,
-            output_directory=args.output_directory,
-            doc_language=args.doc_language,
-            recursion_limit=args.recursion_limit,
-            verbose=args.verbose
-        )
+        # 如果是 serve 模式，启动 Web 服务器
+        if args.serve:
+            print("=" * 80)
+            print("🌐 启动文档 Web 服务器")
+            print("=" * 80)
+            print(f"📂 文档目录: {args.output_directory}")
+            print(f"🔗 访问地址: http://127.0.0.1:5000")
+            print("=" * 80)
+            print()
+            print("💡 提示: 按 Ctrl+C 停止服务器")
+            print()
+            
+            start_document_web_server(args.output_directory)
+        else:
+            # 生成文档模式
+            generate_docs(
+                working_directory=args.working_directory,
+                output_directory=args.output_directory,
+                doc_language=args.doc_language,
+                recursion_limit=args.recursion_limit,
+                verbose=args.verbose
+            )
         
     except KeyboardInterrupt:
         print("\n\n⚠️  用户中断", file=sys.stderr)

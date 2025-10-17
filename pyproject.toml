@@ -49,6 +49,8 @@ dependencies = [
     "langsmith>=0.4.34",
     "deepagents>=0.0.5",
     "ripgrepy>=2.0.0",
+    "flask>=2.0.0",
+    "markdown>=3.4.0",
 ]
 
 [project.optional-dependencies]
@@ -79,7 +81,11 @@ include = ["codeviewx*"]
 exclude = ["tests*", "docs*", "examples*", "tools", "prompt"]
 
 [tool.setuptools.package-data]
-codeviewx = ["prompts/*.md"]
+codeviewx = [
+    "prompts/*.md",
+    "tpl/*.html",
+    "static/**/*"
+]
 
 [tool.black]
 line-length = 100
