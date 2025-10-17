@@ -172,7 +172,7 @@ codeviewx/
 感谢以下优秀的开源项目：
 
 - [Anthropic Claude](https://www.anthropic.com/) - AI 模型
-- [DeepAgents](https://github.com/whoami1234321/deepagents) - AI Agent 框架
+- [DeepAgents](https://github.com/langchain-ai/deepagents) - AI Agent 框架
 - [LangChain](https://www.langchain.com/) - LLM 应用框架
 - [LangGraph](https://langchain-ai.github.io/langgraph/) - 工作流编排
 - [ripgrep](https://github.com/BurntSushi/ripgrep) - 代码搜索

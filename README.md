@@ -172,7 +172,7 @@ This project is licensed under the GNU General Public License v3.0. See [LICENSE
 Thanks to these excellent open-source projects:
 
 - [Anthropic Claude](https://www.anthropic.com/) - AI Model
-- [DeepAgents](https://github.com/whoami1234321/deepagents) - AI Agent Framework
+- [DeepAgents](https://github.com/langchain-ai/deepagents) - AI Agent Framework
 - [LangChain](https://www.langchain.com/) - LLM Application Framework
 - [LangGraph](https://langchain-ai.github.io/langgraph/) - Workflow Orchestration
 - [ripgrep](https://github.com/BurntSushi/ripgrep) - Code Search
