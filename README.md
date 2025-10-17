@@ -2,7 +2,7 @@
 
 > AI 驱动的代码文档生成器，基于 DeepAgents 和 LangChain
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
 CodeViewX 是一个智能的代码文档生成工具，它使用 AI 技术深入分析您的代码库，自动生成全面、专业的技术文档。
@@ -261,11 +261,27 @@ pip install -e ".[dev]"
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+本项目采用 GPL-3.0 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+### 这意味着：
+
+✅ **你可以：**
+- 自由使用、研究、修改和分发
+- 用于个人和商业项目
+- 提供基于此的服务（SaaS）
+
+⚠️ **但必须：**
+- 保持相同的GPL-3.0许可证
+- 公开修改后的源代码
+- 保留版权和许可声明
+
+❌ **不可以：**
+- 将修改后的代码闭源
+- 用专有许可证重新发布
 
 ## 🙏 致谢
 
-- [DeepAgents](https://github.com/deepagents/deepagents) - 强大的 AI Agent 框架
+- [DeepAgents](https://github.com/langchain-ai/deepagents) - 强大的 AI Agent 框架
 - [LangChain](https://github.com/langchain-ai/langchain) - AI 应用开发框架
 - [ripgrep](https://github.com/BurntSushi/ripgrep) - 超快的代码搜索工具
 - [Anthropic Claude](https://www.anthropic.com) - 优秀的 AI 模型
