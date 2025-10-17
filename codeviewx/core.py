@@ -195,7 +195,7 @@ def generate_docs(
     
     # 加载提示词
     prompt = load_prompt(
-        "DocumentEngineer",
+        "DocumentEngineer_compact",
         working_directory=working_directory,
         output_directory=output_directory,
         doc_language=doc_language
