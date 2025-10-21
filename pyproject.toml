@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "codeviewx"
-version = "0.2.3"
+version = "0.2.4"
 description = "AI-powered code documentation generator based on DeepAgents and LangChain"
 readme = "README.md"
 requires-python = ">=3.8"
