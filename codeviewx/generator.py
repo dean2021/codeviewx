@@ -32,30 +32,30 @@ def validate_api_key():
     Raises:
         ValueError: If API key is not found or invalid
     """
-    api_key = os.getenv('ANTHROPIC_API_KEY')
+    api_key = os.getenv('ANTHROPIC_AUTH_TOKEN')
 
     if not api_key:
         raise ValueError(
-            "❌ " + t('error_api_key_missing', default="ANTHROPIC_API_KEY environment variable not found") + "\n\n" +
+            "❌ " + t('error_api_key_missing', default="ANTHROPIC_AUTH_TOKEN environment variable not found") + "\n\n" +
             t('error_api_key_solution', default=
                 "To fix this issue:\n"
                 "1. Get your API key from https://console.anthropic.com\n"
                 "2. Set the environment variable:\n"
-                "   export ANTHROPIC_API_KEY='your-api-key-here'\n"
+                "   export ANTHROPIC_AUTH_TOKEN='your-api-key-here'\n"
                 "3. Or add it to your shell profile (~/.bashrc, ~/.zshrc, etc.)\n"
                 "4. Restart your terminal or run: source ~/.bashrc")
         )
 
     if len(api_key) < 10:
         raise ValueError(
-            "❌ " + t('error_api_key_invalid', default="ANTHROPIC_API_KEY appears to be invalid (too short)") + "\n\n" +
+            "❌ " + t('error_api_key_invalid', default="ANTHROPIC_AUTH_TOKEN appears to be invalid (too short)") + "\n\n" +
             t('error_api_key_check', default="Please check that your API key is correct and starts with 'sk-ant-api'")
         )
 
     # Validate API key format
     if not api_key.startswith('sk-ant-api'):
         raise ValueError(
-            "⚠️  " + t('error_api_key_format', default="ANTHROPIC_API_KEY format appears incorrect") + "\n\n" +
+            "⚠️  " + t('error_api_key_format', default="ANTHROPIC_AUTH_TOKEN format appears incorrect") + "\n\n" +
             t('error_api_key_format_expected', default="Expected format: sk-ant-api...") + "\n" +
             f"Current format: {api_key[:20]}..."
         )

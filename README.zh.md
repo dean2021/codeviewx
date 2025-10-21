@@ -31,7 +31,7 @@ brew install ripgrep  # macOS
 # sudo apt install ripgrep  # Ubuntu/Debian
 
 # 配置 API 密钥
-export ANTHROPIC_API_KEY='your-api-key-here'
+export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
 
 # 或使用提供的设置脚本（推荐）
 bash scripts/setup_api_key.sh
@@ -93,14 +93,14 @@ flake8 codeviewx/
 
 ### API 密钥相关错误
 
-**Q: 提示"ANTHROPIC_API_KEY environment variable not found"怎么办？**
+**Q: 提示"ANTHROPIC_AUTH_TOKEN environment variable not found"怎么办？**
 
 A: 这表示您还没有设置 Anthropic API 密钥。解决方法：
 
 1. 从 [Anthropic Console](https://console.anthropic.com/) 获取 API 密钥
 2. 设置环境变量：
    ```bash
-   export ANTHROPIC_API_KEY='your-api-key-here'
+   export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
    ```
 3. 或使用提供的设置脚本：
    ```bash

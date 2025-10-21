@@ -136,7 +136,7 @@ def main():
             print(f"\n❌ {t('error_authentication_failed', default='Authentication Failed')}", file=sys.stderr)
             print(f"\n{t('error_auth_cause', default='This error occurs when your Anthropic API key is not properly configured.')}", file=sys.stderr)
             print(f"\n🔧 {t('error_auth_solution', default='Quick Fix:')}", file=sys.stderr)
-            print(f"   export ANTHROPIC_API_KEY='your-api-key-here'", file=sys.stderr)
+            print(f"   export ANTHROPIC_AUTH_TOKEN='your-api-key-here'", file=sys.stderr)
             print(f"\n📚 {t('error_auth_help', default='For detailed help, visit:')} https://console.anthropic.com", file=sys.stderr)
 
             if args.verbose:

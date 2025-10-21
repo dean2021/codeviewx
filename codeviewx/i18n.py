@@ -61,7 +61,7 @@ Supported languages:
   
 Environment variables:
   OPENAI_API_KEY     OpenAI API key (if using OpenAI models)
-  ANTHROPIC_API_KEY  Anthropic API key (if using Claude)
+  ANTHROPIC_AUTH_TOKEN  Anthropic API auth token (if using Claude)
         ''',
         'cli_working_dir_help': 'Project working directory (default: current directory)',
         'cli_output_dir_help': 'Documentation output directory (default: docs)',
@@ -81,16 +81,16 @@ Environment variables:
         'error_directory_not_exist': 'Error: Directory does not exist: {path}',
 
         # API key and authentication errors
-        'error_api_key_missing': 'ANTHROPIC_API_KEY environment variable not found',
+        'error_api_key_missing': 'ANTHROPIC_AUTH_TOKEN environment variable not found',
         'error_api_key_solution': '''To fix this issue:
 1. Get your API key from https://console.anthropic.com
 2. Set the environment variable:
-   export ANTHROPIC_API_KEY='your-api-key-here'
+   export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
 3. Or add it to your shell profile (~/.bashrc, ~/.zshrc, etc.)
 4. Restart your terminal or run: source ~/.bashrc''',
-        'error_api_key_invalid': 'ANTHROPIC_API_KEY appears to be invalid (too short)',
+        'error_api_key_invalid': 'ANTHROPIC_AUTH_TOKEN appears to be invalid (too short)',
         'error_api_key_check': 'Please check that your API key is correct and starts with \'sk-ant-api\'',
-        'error_api_key_format': 'ANTHROPIC_API_KEY format appears incorrect',
+        'error_api_key_format': 'ANTHROPIC_AUTH_TOKEN format appears incorrect',
         'error_api_key_format_expected': 'Expected format: sk-ant-api...',
         'api_help_header': '🔗 Need help?',
         'api_help_get_key': '• Get your API key: https://console.anthropic.com',
@@ -175,7 +175,7 @@ Environment variables:
   
 环境变量:
   OPENAI_API_KEY     OpenAI API 密钥（如使用 OpenAI 模型）
-  ANTHROPIC_API_KEY  Anthropic API 密钥（如使用 Claude）
+  ANTHROPIC_AUTH_TOKEN  Anthropic API 密钥（如使用 Claude）
         ''',
         'cli_working_dir_help': '项目工作目录（默认：当前目录）',
         'cli_output_dir_help': '文档输出目录（默认：docs）',
@@ -195,16 +195,16 @@ Environment variables:
         'error_directory_not_exist': '错误: 目录不存在: {path}',
 
         # API key and authentication errors
-        'error_api_key_missing': '找不到环境变量 ANTHROPIC_API_KEY',
+        'error_api_key_missing': '找不到环境变量 ANTHROPIC_AUTH_TOKEN',
         'error_api_key_solution': '''解决方案:
 1. 从 https://console.anthropic.com 获取您的 API 密钥
 2. 设置环境变量:
-   export ANTHROPIC_API_KEY='your-api-key-here'
+   export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
 3. 或将其添加到 Shell 配置文件 (~/.bashrc, ~/.zshrc 等)
 4. 重启终端或运行: source ~/.bashrc''',
-        'error_api_key_invalid': 'ANTHROPIC_API_KEY 似乎无效（太短）',
+        'error_api_key_invalid': 'ANTHROPIC_AUTH_TOKEN 似乎无效（太短）',
         'error_api_key_check': '请检查您的 API 密钥是否正确，且以 \'sk-ant-api\' 开头',
-        'error_api_key_format': 'ANTHROPIC_API_KEY 格式似乎不正确',
+        'error_api_key_format': 'ANTHROPIC_AUTH_TOKEN 格式似乎不正确',
         'error_api_key_format_expected': '预期格式: sk-ant-api...',
         'api_help_header': '🔗 需要帮助？',
         'api_help_get_key': '• 获取 API 密钥: https://console.anthropic.com',

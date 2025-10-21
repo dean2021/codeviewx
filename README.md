@@ -31,7 +31,7 @@ brew install ripgrep  # macOS
 # sudo apt install ripgrep  # Ubuntu/Debian
 
 # Configure API Key
-export ANTHROPIC_API_KEY='your-api-key-here'
+export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
 
 # Or use the provided setup script (recommended)
 bash scripts/setup_api_key.sh
@@ -93,14 +93,14 @@ flake8 codeviewx/
 
 ### API Key Related Errors
 
-**Q: Getting "ANTHROPIC_API_KEY environment variable not found" error?**
+**Q: Getting "ANTHROPIC_AUTH_TOKEN environment variable not found" error?**
 
 A: This means you haven't set up your Anthropic API key yet. To fix:
 
 1. Get your API key from [Anthropic Console](https://console.anthropic.com/)
 2. Set the environment variable:
    ```bash
-   export ANTHROPIC_API_KEY='your-api-key-here'
+   export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
    ```
 3. Or use the provided setup script:
    ```bash
