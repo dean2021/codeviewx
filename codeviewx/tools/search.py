@@ -3,8 +3,10 @@ Code search tool module
 """
 
 from ripgrepy import Ripgrepy
+from langchain_core.tools import tool
 
 
+@tool
 def ripgrep_search(pattern: str, path: str = ".", 
                    file_type: str = None, 
                    ignore_case: bool = False,

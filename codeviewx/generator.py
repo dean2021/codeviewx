@@ -110,7 +110,7 @@ def generate_docs(
     
     agent = create_deep_agent(tools, prompt)
     print(t('created_agent'))
-    print(t('registered_tools', count=len(tools), tools=', '.join([t.__name__ for t in tools])))
+    print(t('registered_tools', count=len(tools), tools=', '.join([tool.name for tool in tools])))
     print("=" * 80)
     
     print(f"\n{t('analyzing')}\n")

@@ -3,8 +3,10 @@ Filesystem tool module
 """
 
 import os
+from langchain_core.tools import tool
 
 
+@tool
 def write_real_file(file_path: str, content: str) -> str:
     """
     Write file to real filesystem
@@ -42,6 +44,7 @@ def write_real_file(file_path: str, content: str) -> str:
         return f"❌ Failed to write file: {str(e)}"
 
 
+@tool
 def read_real_file(file_path: str) -> str:
     """
     Read file content from real filesystem
@@ -78,6 +81,7 @@ def read_real_file(file_path: str) -> str:
         return f"❌ Error: {str(e)}"
 
 
+@tool
 def list_real_directory(directory: str = ".") -> str:
     """
     List directory contents in real filesystem

@@ -3,8 +3,10 @@ Command execution tool module
 """
 
 import subprocess
+from langchain_core.tools import tool
 
 
+@tool
 def execute_command(command: str, working_dir: str = None) -> str:
     """
     Execute system command and return result
