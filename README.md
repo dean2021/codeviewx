@@ -11,62 +11,47 @@
 
 CodeViewX automatically analyzes your codebase and generates professional technical documentation using AI (Anthropic Claude + DeepAgents + LangChain).
 
-## Features
+## ✨ Key Features
 
-- 🤖 AI-powered code analysis and documentation generation
-- 📝 Generates comprehensive documentation (8 chapters: overview, quick start, architecture, core mechanisms, data models, API reference, development guide, testing)
-- 🌐 Multi-language support (Chinese, English, Japanese, Korean, French, German, Spanish, Russian)
-- 🖥️ Built-in web server for browsing documentation
-- ⚡ Fast code search with ripgrep integration
+- 🤖 **AI-Powered Analysis**: Automatically understands code structure and business logic
+- 📝 **Complete Documentation**: Generates 8 standard chapters (overview, quick start, architecture, core mechanisms, data models, API reference, development guide, testing)
+- 🌐 **Multi-Language**: Supports Chinese, English, Japanese, Korean, French, German, Spanish, Russian
+- 🖥️ **Documentation Browser**: Built-in web server for elegant documentation display
+- ⚡ **Fast Search**: Integrated ripgrep for high-speed code search
 
-## Installation
+## 📦 Quick Start
 
-**From PyPI (Recommended):**
+### Installation
+
 ```bash
 # Install CodeViewX
 pip install codeviewx
 
-# Install ripgrep
+# Install ripgrep (code search tool)
 brew install ripgrep  # macOS
 # sudo apt install ripgrep  # Ubuntu/Debian
 
 # Configure API Key
 export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
-
-# Optional: Configure custom API base URL (for proxy or custom endpoints)
-export ANTHROPIC_BASE_URL='https://your-custom-api.example.com'
-
-# Or use the provided setup script (recommended)
-bash scripts/setup_api_key.sh
-```
-
-**From Source (Development):**
-```bash
-git clone https://github.com/dean2021/codeviewx.git
-cd codeviewx
-pip install -e .
 ```
 
 Get your API key at [Anthropic Console](https://console.anthropic.com/)
 
-## Usage
+### Basic Usage
 
-**Command Line:**
 ```bash
 # Generate documentation for current directory
 codeviewx
 
-# Specify project and language
+# Specify project path and language
 codeviewx -w /path/to/project -l English -o docs
 
-# Use custom API base URL
-codeviewx --base-url https://your-custom-api.example.com
-
-# Browse documentation
+# Start documentation browser
 codeviewx --serve -o docs
 ```
 
-**Python API:**
+### Python API
+
 ```python
 from codeviewx import generate_docs, start_document_web_server
 
@@ -77,71 +62,44 @@ generate_docs(
     doc_language="English"
 )
 
-# Generate documentation with custom API base URL
-generate_docs(
-    working_directory="/path/to/project",
-    base_url="https://your-custom-api.example.com"
-)
-
 # Start web server
 start_document_web_server("docs")
 ```
 
-## Development
+## 📚 Documentation
 
-```bash
-# Install development dependencies
-pip install -e ".[dev]"
+For complete documentation, visit the [docs/en](docs/en/) directory:
 
-# Run tests
-pytest
+- [📖 Overview](docs/en/01-overview.md) - Tech stack and project structure
+- [🚀 Quick Start](docs/en/02-quickstart.md) - Detailed installation and configuration
+- [🏗️ Architecture](docs/en/03-architecture.md) - Architecture design and components
+- [⚙️ Core Mechanisms](docs/en/04-core-mechanisms.md) - Deep dive into how it works
+- [🔌 API Reference](docs/en/06-api-reference.md) - Complete API documentation
+- [👨‍💻 Development Guide](docs/en/07-development-guide.md) - Development and contribution guide
+- [🧪 Testing](docs/en/08-testing.md) - Testing strategies and examples
+- [🔒 Security](docs/en/09-security.md) - Security best practices
+- [⚡ Performance](docs/en/10-performance.md) - Performance optimization
+- [🚀 Deployment](docs/en/11-deployment.md) - Deployment guide
+- [🔧 Troubleshooting](docs/en/12-troubleshooting.md) - Common issues and solutions
 
-# Code quality
-black codeviewx/
-flake8 codeviewx/
-```
+## 🔧 Troubleshooting
 
-## Troubleshooting
+Having issues? Check the [detailed documentation](docs/en/12-troubleshooting.md) for help.
 
-### API Key Related Errors
+**Quick Tips:**
+- API key error? Ensure `ANTHROPIC_AUTH_TOKEN` environment variable is set correctly
+- Search not working? Check if `ripgrep` is installed
+- More questions? See [docs/en](docs/en/) for complete documentation
 
-**Q: Getting "ANTHROPIC_AUTH_TOKEN environment variable not found" error?**
-
-A: This means you haven't set up your Anthropic API key yet. To fix:
-
-1. Get your API key from [Anthropic Console](https://console.anthropic.com/)
-2. Set the environment variable:
-   ```bash
-   export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
-   ```
-3. Or use the provided setup script:
-   ```bash
-   bash scripts/setup_api_key.sh
-   ```
-
-**Q: What if my API key format is incorrect?**
-
-A: Please ensure you've copied the complete API key without any extra spaces or line breaks. If issues persist, regenerate the key from the Anthropic Console.
-
-### Improved Error Handling
-
-CodeViewX now provides more user-friendly error messages:
-
-- 🔍 **Automatic Detection**: Validates API key presence
-- 📝 **Clear Messages**: Specific error causes and solution steps
-- 🔗 **Direct Links**: Provides direct links to get API keys
-- 🌐 **Bilingual Support**: Error messages in English and Chinese
-- ⚙️ **Setup Script**: Automated API key configuration tool
-
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! See [Contributing Guide](CONTRIBUTING.md) for details.
 
-## License
+## 📄 License
 
 GNU General Public License v3.0 - see [LICENSE](LICENSE) file.
 
-## Acknowledgments
+## 🙏 Acknowledgments
 
 Built with [Anthropic Claude](https://www.anthropic.com/), [DeepAgents](https://github.com/langchain-ai/deepagents), [LangChain](https://www.langchain.com/), and [ripgrep](https://github.com/BurntSushi/ripgrep).
 

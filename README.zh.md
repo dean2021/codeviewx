@@ -11,62 +11,47 @@
 
 CodeViewX 使用 AI（Anthropic Claude + DeepAgents + LangChain）自动分析您的代码库并生成专业的技术文档。
 
-## 功能特性
+## ✨ 核心特性
 
-- 🤖 AI 智能代码分析与文档生成
-- 📝 生成完整文档体系（8个章节：项目概览、快速开始、系统架构、核心机制、数据模型、API参考、开发指南、测试文档）
-- 🌐 多语言支持（中文、英文、日文、韩文、法文、德文、西班牙文、俄文）
-- 🖥️ 内置 Web 服务器用于浏览文档
-- ⚡ 集成 ripgrep 实现快速代码搜索
+- 🤖 **AI 智能分析**：自动理解代码结构和业务逻辑
+- 📝 **完整文档体系**：生成 8 个标准章节（概览、快速开始、架构、核心机制、数据模型、API 参考、开发指南、测试）
+- 🌐 **多语言支持**：支持中文、英文、日文、韩文、法文、德文、西班牙文、俄文
+- 🖥️ **文档浏览器**：内置 Web 服务器，优雅展示文档
+- ⚡ **快速搜索**：集成 ripgrep 实现高速代码搜索
 
-## 安装
+## 📦 快速开始
 
-**从 PyPI 安装（推荐）：**
+### 安装
+
 ```bash
 # 安装 CodeViewX
 pip install codeviewx
 
-# 安装 ripgrep
+# 安装 ripgrep（代码搜索工具）
 brew install ripgrep  # macOS
 # sudo apt install ripgrep  # Ubuntu/Debian
 
 # 配置 API 密钥
 export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
-
-# 可选：配置自定义 API 基础 URL（用于代理或自定义端点）
-export ANTHROPIC_BASE_URL='https://your-custom-api.example.com'
-
-# 或使用提供的设置脚本（推荐）
-bash scripts/setup_api_key.sh
-```
-
-**从源码安装（开发）：**
-```bash
-git clone https://github.com/dean2021/codeviewx.git
-cd codeviewx
-pip install -e .
 ```
 
 获取 API 密钥：访问 [Anthropic Console](https://console.anthropic.com/)
 
-## 使用方法
+### 基本使用
 
-**命令行：**
 ```bash
 # 为当前目录生成文档
 codeviewx
 
-# 指定项目和语言
+# 指定项目路径和语言
 codeviewx -w /path/to/project -l Chinese -o docs
 
-# 使用自定义 API 基础 URL
-codeviewx --base-url https://your-custom-api.example.com
-
-# 浏览文档
+# 启动文档浏览器
 codeviewx --serve -o docs
 ```
 
-**Python API：**
+### Python API
+
 ```python
 from codeviewx import generate_docs, start_document_web_server
 
@@ -77,71 +62,41 @@ generate_docs(
     doc_language="Chinese"
 )
 
-# 使用自定义 API 基础 URL 生成文档
-generate_docs(
-    working_directory="/path/to/project",
-    base_url="https://your-custom-api.example.com"
-)
-
 # 启动 Web 服务器
 start_document_web_server("docs")
 ```
 
-## 开发
+## 📚 文档
 
-```bash
-# 安装开发依赖
-pip install -e ".[dev]"
+完整文档请访问 [docs/zh](docs/zh/) 目录：
 
-# 运行测试
-pytest
+- [📖 项目概览](docs/zh/01-overview.md) - 技术栈、项目结构详解
+- [🚀 快速开始](docs/zh/02-quickstart.md) - 详细安装和配置指南
+- [🏗️ 系统架构](docs/zh/03-architecture.md) - 架构设计和组件说明
+- [⚙️ 核心机制](docs/zh/04-core-mechanisms.md) - 深入理解工作原理
+- [📊 数据模型](docs/zh/05-data-models.md) - 数据结构和流程
+- [🔌 API 参考](docs/zh/06-api-reference.md) - 完整 API 文档
+- [👨‍💻 开发指南](docs/zh/07-development-guide.md) - 开发和贡献指南
+- [🧪 测试文档](docs/zh/08-testing.md) - 测试策略和用例
 
-# 代码质量
-black codeviewx/
-flake8 codeviewx/
-```
+## 🔧 常见问题
 
-## 常见问题
+遇到问题？查看[详细文档](docs/zh/02-quickstart.md#常见问题)获取帮助。
 
-### API 密钥相关错误
+**快速提示：**
+- API 密钥错误？确保正确设置 `ANTHROPIC_AUTH_TOKEN` 环境变量
+- 搜索功能异常？检查是否已安装 `ripgrep`
+- 更多问题？查看 [docs/zh](docs/zh/) 完整文档
 
-**Q: 提示"ANTHROPIC_AUTH_TOKEN environment variable not found"怎么办？**
-
-A: 这表示您还没有设置 Anthropic API 密钥。解决方法：
-
-1. 从 [Anthropic Console](https://console.anthropic.com/) 获取 API 密钥
-2. 设置环境变量：
-   ```bash
-   export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
-   ```
-3. 或使用提供的设置脚本：
-   ```bash
-   bash scripts/setup_api_key.sh
-   ```
-
-**Q: API 密钥格式不正确怎么办？**
-
-A: 请确保您已完整复制 API 密钥，没有多余的空格或换行符。如果问题仍然存在，请在 Anthropic Console 重新生成密钥。
-
-### 改进的错误处理
-
-CodeViewX 现在提供更友好的错误提示：
-
-- 🔍 **自动检测**：自动验证 API 密钥是否存在
-- 📝 **清晰提示**：具体的错误原因和解决步骤
-- 🔗 **直接链接**：提供获取 API 密钥的直接链接
-- 🌐 **双语支持**：中英文错误提示
-- ⚙️ **设置脚本**：自动化的 API 密钥配置工具
-
-## 贡献
+## 🤝 贡献
 
 欢迎贡献！详情请参阅[贡献指南](CONTRIBUTING.zh.md)。
 
-## 许可证
+## 📄 许可证
 
 GNU General Public License v3.0 - 详见 [LICENSE](LICENSE) 文件。
 
-## 致谢
+## 🙏 致谢
 
 基于 [Anthropic Claude](https://www.anthropic.com/)、[DeepAgents](https://github.com/langchain-ai/deepagents)、[LangChain](https://www.langchain.com/) 和 [ripgrep](https://github.com/BurntSushi/ripgrep) 构建。
 
