@@ -1,19 +1,19 @@
 # 开发指南
 
-本指南帮助开发者了解如何为 CodeViewX 项目做贡献，包括开发环境搭建、代码规范、测试流程和发布流程。
+## 概述
+
+本指南旨在帮助开发者参与 CodeViewX 项目的开发，包括环境搭建、代码规范、测试流程、贡献方式等内容。CodeViewX 是一个开源项目，欢迎社区贡献。
 
 ## 开发环境搭建
 
-### 系统要求
+### 1. 系统要求
 
-- **Python 3.8+**：推荐使用 Python 3.9 或 3.10
-- **Git**：版本控制工具
-- **ripgrep (rg)**：代码搜索工具
-- **IDE**：推荐 VS Code 或 PyCharm
+- **Python**: 3.8 或更高版本
+- **Git**: 用于版本控制
+- **ripgrep**: 代码搜索工具
+- **IDE**: 推荐 VS Code 或 PyCharm
 
-### 环境准备
-
-#### 1. 克隆项目
+### 2. 克隆项目
 
 ```bash
 # 克隆仓库
@@ -24,292 +24,138 @@ cd codeviewx
 ls -la
 ```
 
-#### 2. 创建虚拟环境
+### 3. 创建虚拟环境
 
 ```bash
-# 使用 venv 创建虚拟环境
+# 使用 venv
 python -m venv venv
+source venv/bin/activate  # Linux/macOS
+# 或
+venv\Scripts\activate     # Windows
 
-# 激活虚拟环境
-# Linux/macOS
-source venv/bin/activate
-# Windows
-venv\Scripts\activate
+# 使用 conda
+conda create -n codeviewx python=3.9
+conda activate codeviewx
 ```
 
-#### 3. 安装依赖
+### 4. 安装依赖
 
 ```bash
 # 安装开发依赖
-pip install -e ".[dev]"
+pip install -r requirements-dev.txt
 
-# 验证安装
-pip list | grep codeviewx
+# 安装项目（可编辑模式）
+pip install -e .
 ```
 
-#### 4. 安装 ripgrep
+### 5. 安装 ripgrep
 
 ```bash
 # macOS
 brew install ripgrep
 
 # Ubuntu/Debian
-sudo apt install ripgrep
+sudo apt-get install ripgrep
 
 # Windows
-choco install ripgrep
+scoop install ripgrep  # 或 choco install ripgrep
 ```
 
-### 开发工具配置
+### 6. 配置开发环境
 
-#### VS Code 配置
+#### 配置 API 密钥
 
-推荐安装以下扩展：
+```bash
+# 设置测试用的 API 密钥
+export ANTHROPIC_AUTH_TOKEN='your-test-api-key'
+
+# 或创建 .env 文件
+echo 'ANTHROPIC_AUTH_TOKEN=your-test-api-key' > .env
+```
+
+#### IDE 配置
+
+**VS Code 配置** (`.vscode/settings.json`):
 
 ```json
-// .vscode/extensions.json
 {
-  "recommendations": [
-    "ms-python.python",
-    "ms-python.black-formatter",
-    "ms-python.flake8",
-    "ms-python.mypy-type-checker",
-    "ms-vscode.vscode-json",
-    "redhat.vscode-yaml"
-  ]
+    "python.defaultInterpreterPath": "./venv/bin/python",
+    "python.linting.enabled": true,
+    "python.linting.flake8Enabled": true,
+    "python.formatting.provider": "black",
+    "python.linting.mypyEnabled": true,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true
+    }
 }
 ```
 
-VS Code 设置：
-
-```json
-// .vscode/settings.json
-{
-  "python.defaultInterpreterPath": "./venv/bin/python",
-  "python.formatting.provider": "black",
-  "python.linting.enabled": true,
-  "python.linting.flake8Enabled": true,
-  "python.linting.mypyEnabled": true,
-  "python.testing.pytestEnabled": true,
-  "python.testing.pytestArgs": ["tests/"],
-  "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.organizeImports": true
-  }
-}
-```
-
-#### PyCharm 配置
-
-1. **解释器设置**：
-   - File → Settings → Project → Python Interpreter
-   - 选择项目虚拟环境中的 Python
-
-2. **代码格式化**：
-   - File → Settings → Tools → External Tools
-   - 添加 Black 配置
-
-3. **代码检查**：
-   - File → Settings → Tools → External Tools
-   - 添加 Flake8 和 MyPy 配置
+**PyCharm 配置**:
+- 设置 Python 解释器为项目虚拟环境
+- 启用 Black 代码格式化
+- 启用 flake8 代码检查
+- 启用 mypy 类型检查
 
 ## 项目结构详解
 
-### 目录组织
-
 ```
 codeviewx/
-├── codeviewx/                    # 主包目录
-│   ├── __init__.py              # 包初始化，导出 API
-│   ├── __version__.py           # 版本信息
+├── codeviewx/                    # 主要源代码包
+│   ├── __init__.py              # 包初始化，导出公共 API
+│   ├── __version__.py           # 版本号定义
 │   ├── cli.py                   # 命令行接口
-│   ├── core.py                  # 核心 API 模块
-│   ├── generator.py             # 文档生成器
-│   ├── server.py                # Web 服务器
-│   ├── prompt.py                # 提示词管理
+│   ├── core.py                  # 核心模块，公共 API 入口
+│   ├── generator.py             # 文档生成器核心逻辑
 │   ├── i18n.py                  # 国际化支持
 │   ├── language.py              # 语言检测
-│   ├── tools/                   # 工具模块
+│   ├── prompt.py                # 提示词管理
+│   ├── server.py                # Web 服务器
+│   ├── tools/                   # 工具模块包
 │   │   ├── __init__.py          # 工具导出
-│   │   ├── command.py           # 系统命令执行
-│   │   ├── filesystem.py        # 文件系统操作
-│   │   └── search.py            # 代码搜索
-│   ├── prompts/                 # 提示词模板
-│   │   ├── __init__.py
-│   │   ├── document_engineer.md      # 英文提示词
-│   │   └── document_engineer_zh.md   # 中文提示词
-│   ├── tpl/                     # HTML 模板
-│   │   └── doc_detail.html      # 文档展示页面
-│   └── static/                  # 静态资源
-│       ├── css/                 # 样式文件
-│       ├── js/                  # JavaScript 文件
-│       └── images/              # 图片资源
+│   │   ├── command.py           # 系统命令执行工具
+│   │   ├── filesystem.py        # 文件系统操作工具
+│   │   └── search.py            # 代码搜索工具
+│   ├── prompts/                 # AI 提示词模板
+│   │   ├── document_engineer.md # 英文提示词
+│   │   └── document_engineer_zh.md # 中文提示词
+│   ├── static/                  # Web 静态资源
+│   │   ├── css/                 # 样式文件
+│   │   └── js/                  # JavaScript 文件
+│   └── tpl/                     # HTML 模板
+│       └── doc_detail.html      # 文档展示模板
 ├── tests/                       # 测试文件
-│   ├── __init__.py
-│   ├── test_core.py             # 核心功能测试
-│   ├── test_language.py         # 语言检测测试
-│   ├── test_progress.py         # 进度跟踪测试
-│   └── test_tools.py            # 工具模块测试
-├── examples/                    # 示例代码
-├── docs/                        # 文档输出目录
-├── pyproject.toml               # 项目配置文件
-├── requirements.txt             # 生产依赖
-├── requirements-dev.txt         # 开发依赖
-├── README.md                    # 项目说明（英文）
-├── README.zh.md                 # 项目说明（中文）
-├── LICENSE                      # 许可证文件
-├── MANIFEST.in                  # 包含文件清单
-├── .gitignore                   # Git 忽略文件
-├── .github/                     # GitHub 配置
-│   └── workflows/               # CI/CD 工作流
-│       └── test.yml             # 测试工作流
-└── .vscode/                     # VS Code 配置
-    ├── extensions.json          # 推荐扩展
-    └── settings.json            # 编辑器设置
+├── docs/                        # 项目文档
+├── examples/                    # 示例项目
+├── pyproject.toml              # 项目配置
+├── requirements.txt            # 生产依赖
+├── requirements-dev.txt        # 开发依赖
+└── README.md                   # 项目说明
 ```
-
-### 模块职责
-
-#### 核心模块
-
-1. **cli.py**：
-   - 命令行参数解析
-   - 用户交互逻辑
-   - 错误处理和用户友好提示
-
-2. **core.py**：
-   - 公共 API 导出
-   - 模块间协调
-   - 版本管理
-
-3. **generator.py**：
-   - AI 代理创建和管理
-   - 文档生成工作流
-   - 进度跟踪和状态管理
-
-4. **server.py**：
-   - Flask Web 服务器
-   - Markdown 渲染
-   - 文档浏览界面
-
-#### 工具模块
-
-1. **tools/filesystem.py**：
-   - 文件读写操作
-   - 目录遍历
-   - 路径安全验证
-
-2. **tools/search.py**：
-   - ripgrep 集成
-   - 代码搜索功能
-   - 结果处理和格式化
-
-3. **tools/command.py**：
-   - 系统命令执行
-   - 进程管理
-   - 输出处理
-
-#### 支持模块
-
-1. **i18n.py**：
-   - 多语言支持
-   - 消息翻译
-   - 语言检测
-
-2. **prompt.py**：
-   - 提示词模板管理
-   - 动态内容注入
-   - 模板渲染
-
-3. **language.py**：
-   - 系统语言检测
-   - 项目语言分析
-   - 语言映射
 
 ## 代码规范
 
-### Python 代码风格
+### 1. Python 代码规范
 
-#### 1. 代码格式化
+项目使用以下工具确保代码质量：
 
-使用 Black 进行代码格式化：
+- **Black**: 代码格式化
+- **flake8**: 代码风格检查
+- **mypy**: 静态类型检查
+- **isort**: 导入语句排序
 
-```bash
-# 格式化所有代码
-black codeviewx/
+#### 配置文件
 
-# 检查格式（不修改文件）
-black --check codeviewx/
-
-# 格式化特定文件
-black codeviewx/cli.py codeviewx/generator.py
-```
-
-Black 配置（pyproject.toml）：
-
+**pyproject.toml**:
 ```toml
 [tool.black]
 line-length = 100
 target-version = ['py38', 'py39', 'py310', 'py311']
-exclude = '''
-/(
-    \.git
-  | \.venv
-  | build
-  | dist
-)/
-'''
-```
 
-#### 2. 代码质量检查
+[tool.isort]
+profile = "black"
+line_length = 100
 
-使用 Flake8 进行代码检查：
-
-```bash
-# 检查代码质量
-flake8 codeviewx/
-
-# 检查特定文件
-flake8 codeviewx/cli.py
-
-# 显示详细错误信息
-flake8 --verbose codeviewx/
-```
-
-Flake8 配置（setup.cfg 或 pyproject.toml）：
-
-```toml
-[tool.flake8]
-max-line-length = 100
-extend-ignore = ["E203", "W503"]
-exclude = [
-    ".git",
-    "__pycache__",
-    "build",
-    "dist",
-    ".venv",
-    ".pytest_cache"
-]
-```
-
-#### 3. 类型检查
-
-使用 MyPy 进行类型检查：
-
-```bash
-# 类型检查
-mypy codeviewx/
-
-# 检查特定模块
-mypy codeviewx/cli.py
-
-# 显示详细错误
-mypy --show-error-codes codeviewx/
-```
-
-MyPy 配置（pyproject.toml）：
-
-```toml
 [tool.mypy]
 python_version = "3.8"
 warn_return_any = true
@@ -317,804 +163,498 @@ warn_unused_configs = true
 disallow_untyped_defs = false
 ```
 
-#### 4. 导入排序
+#### 代码风格指南
 
-使用 isort 进行导入排序：
-
-```bash
-# 排序导入
-isort codeviewx/
-
-# 检查导入（不修改文件）
-isort --check-only codeviewx/
-
-# 配置文件检查
-isort --diff codeviewx/
-```
-
-isort 配置（pyproject.toml）：
-
-```toml
-[tool.isort]
-profile = "black"
-line_length = 100
-```
-
-### 命名规范
-
-#### 1. 变量和函数
+1. **行长度**: 最多 100 个字符
+2. **缩进**: 4 个空格
+3. **引号**: 优先使用双引号
+4. **导入**: 按标准库、第三方库、本地模块的顺序导入
 
 ```python
-# 使用 snake_case
-working_directory = "/path/to/project"
-def generate_docs():
-    pass
+# 正确的导入顺序
+import os
+import sys
+from typing import Optional, Dict, List
 
-def ripgrep_search(pattern: str, path: str = "."):
-    pass
+from langchain_anthropic import ChatAnthropic
+from deepagents import create_deep_agent
+
+from .tools import execute_command, ripgrep_search
+from .i18n import t
 ```
 
-#### 2. 类名
+### 2. 文档字符串规范
 
-```python
-# 使用 PascalCase
-class DocumentGenerator:
-    pass
-
-class AIProxy:
-    pass
-```
-
-#### 3. 常量
-
-```python
-# 使用 UPPER_CASE
-DEFAULT_RECURSION_LIMIT = 1000
-SUPPORTED_LANGUAGES = ["Chinese", "English", "Japanese"]
-```
-
-#### 4. 私有成员
-
-```python
-class MyClass:
-    def __init__(self):
-        self._private_var = "private"  # 受保护成员
-        self.__very_private = "very"   # 私有成员
-    
-    def _private_method(self):
-        pass  # 私有方法
-```
-
-### 文档字符串规范
-
-#### 1. 模块文档
-
-```python
-"""
-CodeViewX Core Module
-
-This module provides the core functionality for generating documentation
-from source code using AI agents.
-
-Main functions:
-- generate_docs: Generate documentation for a project
-- start_document_web_server: Start web server for browsing docs
-"""
-```
-
-#### 2. 函数文档
+使用 Google 风格的文档字符串：
 
 ```python
 def generate_docs(
     working_directory: Optional[str] = None,
     output_directory: str = "docs",
     doc_language: Optional[str] = None,
-    ui_language: Optional[str] = None,
-    recursion_limit: int = 1000,
     verbose: bool = False
 ) -> None:
-    """
-    Generate project documentation using AI
+    """生成项目技术文档
     
     Args:
-        working_directory: Project working directory (default: current directory)
-        output_directory: Documentation output directory (default: docs)
-        doc_language: Documentation language (default: auto-detect system language)
-        ui_language: User interface language (default: auto-detect)
-        recursion_limit: Agent recursion limit (default: 1000)
-        verbose: Show detailed logs (default: False)
-    
+        working_directory: 项目工作目录，默认为当前目录
+        output_directory: 文档输出目录，默认为 'docs'
+        doc_language: 文档语言，支持中文、英文等
+        verbose: 是否显示详细日志
+        
     Raises:
-        FileNotFoundError: If working directory doesn't exist
-        PermissionError: If no write permission for output directory
-        RuntimeError: If AI service is unavailable
-    
+        ValueError: 当 API 密钥未配置时
+        FileNotFoundError: 当工作目录不存在时
+        
     Examples:
         >>> generate_docs()
-        
-        >>> generate_docs(
-        ...     working_directory="/path/to/project",
-        ...     output_directory="docs",
-        ...     doc_language="English"
-        ... )
+        >>> generate_docs(working_directory="/path/to/project", doc_language="English")
     """
 ```
 
-#### 3. 类文档
+### 3. 类型提示规范
+
+所有公共 API 都应包含类型提示：
 
 ```python
-class I18n:
-    """
-    Internationalization manager
-    
-    Supports multiple languages with automatic detection and manual override.
-    
-    Attributes:
-        locale: Current language code
-    
-    Examples:
-        >>> i18n = I18n('en')
-        >>> i18n.t('starting')
-        '🚀 Starting CodeViewX Documentation Generator'
-        
-        >>> i18n.set_locale('zh')
-        >>> i18n.t('starting')
-        '🚀 启动 CodeViewX 文档生成器'
-    """
-```
+from typing import Optional, Dict, List, Union
 
-### 错误处理规范
-
-#### 1. 异常类型
-
-```python
-# 自定义异常
-class CodeViewXError(Exception):
-    """Base exception for CodeViewX"""
-    pass
-
-class ConfigurationError(CodeViewXError):
-    """Configuration related errors"""
-    pass
-
-class AIServiceError(CodeViewXError):
-    """AI service related errors"""
-    pass
-
-class FileSystemError(CodeViewXError):
-    """File system related errors"""
+def process_files(
+    file_paths: List[str],
+    options: Optional[Dict[str, Union[str, bool]]] = None
+) -> Dict[str, str]:
+    """处理文件列表"""
     pass
 ```
 
-#### 2. 异常处理
+## 开发流程
 
-```python
-def safe_file_operation(file_path: str) -> Optional[str]:
-    """安全的文件操作"""
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            return f.read()
-    except FileNotFoundError:
-        logger.error(f"File not found: {file_path}")
-        return None
-    except PermissionError:
-        logger.error(f"Permission denied: {file_path}")
-        return None
-    except UnicodeDecodeError:
-        logger.error(f"Encoding error: {file_path}")
-        return None
-    except Exception as e:
-        logger.error(f"Unexpected error reading {file_path}: {e}")
-        return None
+### 1. 分支管理
+
+```bash
+# 创建功能分支
+git checkout -b feature/new-feature
+
+# 创建修复分支
+git checkout -b fix/bug-fix
+
+# 创建文档分支
+git checkout -b docs/update-docs
+```
+
+### 2. 开发步骤
+
+1. **需求分析**: 明确要实现的功能或修复的问题
+2. **设计讨论**: 在 Issues 中讨论设计方案
+3. **编码实现**: 按照代码规范实现功能
+4. **测试验证**: 编写和运行测试
+5. **文档更新**: 更新相关文档
+6. **代码审查**: 提交 Pull Request
+
+### 3. 提交规范
+
+使用 [Conventional Commits](https://www.conventionalcommits.org/) 规范：
+
+```bash
+# 功能提交
+git commit -m "feat: 添加新的文档格式支持"
+
+# 修复提交
+git commit -m "fix: 修复 API 密钥验证问题"
+
+# 文档提交
+git commit -m "docs: 更新 API 参考文档"
+
+# 样式提交
+git commit -m "style: 代码格式化"
+
+# 重构提交
+git commit -m "refactor: 重构工具模块结构"
+
+# 测试提交
+git commit -m "test: 添加工具模块单元测试"
+
+# 构建提交
+git commit -m "build: 更新依赖版本"
+```
+
+### 4. 代码质量检查
+
+提交前运行质量检查：
+
+```bash
+# 代码格式化
+black codeviewx/
+
+# 导入排序
+isort codeviewx/
+
+# 代码风格检查
+flake8 codeviewx/
+
+# 类型检查
+mypy codeviewx/
+
+# 运行测试
+pytest tests/ -v
+
+# 生成覆盖率报告
+pytest tests/ --cov=codeviewx --cov-report=html
 ```
 
 ## 测试指南
 
-### 测试结构
+### 1. 测试结构
 
 ```
 tests/
 ├── __init__.py
-├── conftest.py                    # pytest 配置
-├── test_core.py                   # 核心功能测试
-├── test_language.py               # 语言检测测试
-├── test_progress.py               # 进度跟踪测试
-├── test_tools.py                  # 工具模块测试
-├── test_cli.py                    # CLI 测试
-├── test_generator.py              # 生成器测试
-├── test_server.py                 # 服务器测试
-├── test_i18n.py                   # 国际化测试
-└── integration/                   # 集成测试
-    ├── test_full_workflow.py      # 完整工作流测试
-    └── test_web_interface.py      # Web 界面测试
+├── test_cli.py              # CLI 测试
+├── test_generator.py        # 生成器测试
+├── test_tools.py            # 工具模块测试
+├── test_i18n.py             # 国际化测试
+├── test_server.py           # Web 服务器测试
+├── test_integration.py      # 集成测试
+└── fixtures/                # 测试数据
+    ├── sample_project/      # 示例项目
+    └── expected_docs/       # 期望的文档输出
 ```
 
-### 运行测试
+### 2. 单元测试
 
-#### 1. 基本测试
+使用 pytest 框架编写单元测试：
+
+```python
+# tests/test_tools.py
+import pytest
+from codeviewx.tools import read_real_file, write_real_file, list_real_directory
+
+class TestFileSystemTools:
+    """文件系统工具测试"""
+    
+    def test_read_real_file_success(self, tmp_path):
+        """测试成功读取文件"""
+        # 创建测试文件
+        test_file = tmp_path / "test.txt"
+        test_file.write_text("Hello, World!")
+        
+        # 测试读取
+        result = read_real_file(str(test_file))
+        assert "Hello, World!" in result
+        assert "1 lines" in result
+    
+    def test_read_real_file_not_found(self):
+        """测试文件不存在的情况"""
+        result = read_real_file("nonexistent.txt")
+        assert "does not exist" in result
+    
+    def test_write_real_file_success(self, tmp_path):
+        """测试成功写入文件"""
+        test_file = tmp_path / "output.txt"
+        content = "Test content"
+        
+        result = write_real_file(str(test_file), content)
+        assert "Successfully wrote file" in result
+        assert test_file.read_text() == content
+```
+
+### 3. 集成测试
+
+```python
+# tests/test_integration.py
+import pytest
+import tempfile
+import os
+from codeviewx import generate_docs
+
+class TestIntegration:
+    """集成测试"""
+    
+    def test_full_documentation_generation(self, tmp_path):
+        """测试完整的文档生成流程"""
+        # 创建测试项目
+        project_dir = tmp_path / "test_project"
+        project_dir.mkdir()
+        
+        # 创建测试文件
+        (project_dir / "README.md").write_text("# Test Project")
+        (project_dir / "main.py").write_text("""
+def main():
+    print("Hello, World!")
+
+if __name__ == "__main__":
+    main()
+        """)
+        
+        # 生成文档
+        output_dir = tmp_path / "docs"
+        
+        # 注意：集成测试需要真实的 API 密钥
+        # 在 CI/CD 中应该使用模拟或跳过
+        if os.getenv("ANTHROPIC_AUTH_TOKEN"):
+            generate_docs(
+                working_directory=str(project_dir),
+                output_directory=str(output_dir),
+                doc_language="English"
+            )
+            
+            # 验证生成的文件
+            assert (output_dir / "README.md").exists()
+            assert (output_dir / "01-overview.md").exists()
+```
+
+### 4. 测试配置
+
+**pytest.ini**:
+```ini
+[tool:pytest]
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+addopts = 
+    -v
+    --strict-markers
+    --disable-warnings
+    --cov=codeviewx
+    --cov-report=term-missing
+    --cov-report=html
+    --cov-fail-under=80
+markers =
+    unit: Unit tests
+    integration: Integration tests
+    slow: Slow tests
+```
+
+### 5. 运行测试
 
 ```bash
 # 运行所有测试
 pytest
 
 # 运行特定测试文件
-pytest tests/test_core.py
+pytest tests/test_tools.py
 
-# 运行特定测试函数
-pytest tests/test_core.py::test_generate_docs
+# 运行特定测试类
+pytest tests/test_tools.py::TestFileSystemTools
 
-# 显示详细输出
-pytest -v
+# 运行特定测试方法
+pytest tests/test_tools.py::TestFileSystemTools::test_read_real_file_success
 
-# 显示测试覆盖率
+# 运行带标记的测试
+pytest -m unit
+pytest -m "not slow"
+
+# 生成覆盖率报告
 pytest --cov=codeviewx --cov-report=html
+
+# 并行运行测试
+pytest -n auto
 ```
 
-#### 2. 测试配置
+## 调试指南
 
-pytest 配置（pyproject.toml）：
-
-```toml
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = "-v --tb=short"
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests"
-]
-```
-
-### 编写测试
-
-#### 1. 单元测试示例
+### 1. 日志配置
 
 ```python
-# tests/test_language.py
-import pytest
-from codeviewx.language import detect_system_language
+import logging
 
-class TestLanguageDetection:
-    """语言检测功能测试"""
-    
-    def test_detect_chinese_locale(self, monkeypatch):
-        """测试中文环境检测"""
-        monkeypatch.setattr("locale.getdefaultlocale", lambda: ("zh_CN", "UTF-8"))
-        result = detect_system_language()
-        assert result == "Chinese"
-    
-    def test_detect_english_locale(self, monkeypatch):
-        """测试英文环境检测"""
-        monkeypatch.setattr("locale.getdefaultlocale", lambda: ("en_US", "UTF-8"))
-        result = detect_system_language()
-        assert result == "English"
-    
-    def test_detect_unknown_locale(self, monkeypatch):
-        """测试未知语言环境"""
-        monkeypatch.setattr("locale.getdefaultlocale", lambda: (None, None))
-        result = detect_system_language()
-        assert result == "English"  # 默认值
-    
-    def test_detect_locale_exception(self, monkeypatch):
-        """测试异常情况"""
-        monkeypatch.setattr("locale.getdefaultlocale", side_effect=Exception("Error"))
-        result = detect_system_language()
-        assert result == "English"  # 默认值
+# 配置详细日志
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%H:%M:%S'
+)
+
+# 启用特定模块的详细日志
+logging.getLogger("langchain").setLevel(logging.DEBUG)
+logging.getLogger("langgraph").setLevel(logging.DEBUG)
 ```
 
-#### 2. 工具测试示例
+### 2. 调试模式
+
+使用 `--verbose` 参数启用详细输出：
+
+```bash
+codeviewx --verbose -w ./test-project
+```
+
+### 3. 常见问题调试
+
+#### API 调用问题
 
 ```python
-# tests/test_tools.py
-import pytest
-import tempfile
 import os
-from codeviewx.tools import read_real_file, write_real_file, list_real_directory
+from codeviewx.generator import validate_api_key
 
-class TestFileSystemTools:
-    """文件系统工具测试"""
-    
-    @pytest.fixture
-    def temp_dir(self):
-        """临时目录 fixture"""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            yield temp_dir
-    
-    def test_write_and_read_file(self, temp_dir):
-        """测试文件写入和读取"""
-        file_path = os.path.join(temp_dir, "test.txt")
-        content = "Hello, World!"
-        
-        # 写入文件
-        result = write_real_file(file_path, content)
-        assert "Successfully wrote file" in result
-        
-        # 读取文件
-        result = read_real_file(file_path)
-        assert content in result
-        assert "test.txt" in result
-    
-    def test_read_nonexistent_file(self):
-        """测试读取不存在的文件"""
-        result = read_real_file("/nonexistent/file.txt")
-        assert "does not exist" in result
-    
-    def test_list_directory(self, temp_dir):
-        """测试目录列表"""
-        # 创建测试文件
-        test_files = ["file1.txt", "file2.py", "subdir"]
-        for name in test_files[:-1]:
-            with open(os.path.join(temp_dir, name), 'w') as f:
-                f.write("test")
-        os.makedirs(os.path.join(temp_dir, test_files[-1]))
-        
-        result = list_real_directory(temp_dir)
-        for name in test_files:
-            assert name in result
+# 验证 API 密钥
+try:
+    validate_api_key()
+    print("API 密钥配置正确")
+except ValueError as e:
+    print(f"API 密钥错误: {e}")
+    print(f"当前密钥: {os.getenv('ANTHROPIC_AUTH_TOKEN', '未设置')}")
 ```
 
-#### 3. 集成测试示例
+#### 工具调用问题
 
 ```python
-# tests/integration/test_full_workflow.py
-import pytest
-import tempfile
-import os
-from codeviewx import generate_docs
+from codeviewx.tools import read_real_file, ripgrep_search
 
-class TestFullWorkflow:
-    """完整工作流集成测试"""
-    
-    @pytest.fixture
-    def sample_project(self):
-        """示例项目 fixture"""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # 创建项目结构
-            project_dir = os.path.join(temp_dir, "sample_project")
-            os.makedirs(project_dir)
-            
-            # 创建示例文件
-            files = {
-                "README.md": "# Sample Project\nThis is a test project.",
-                "main.py": """def main():
-    print("Hello, World!")
+# 测试文件读取
+result = read_real_file("/path/to/file")
+print(result)
 
-if __name__ == "__main__":
-    main()
-""",
-                "requirements.txt": "flask==2.0.0\nrequests==2.25.0",
-                "pyproject.toml": """
-[project]
-name = "sample-project"
-version = "0.2.0"
-description = "A sample project"
-"""
-            }
-            
-            for filename, content in files.items():
-                with open(os.path.join(project_dir, filename), 'w') as f:
-                    f.write(content)
-            
-            yield project_dir
-    
-    @pytest.mark.slow
-    @pytest.mark.integration
-    def test_complete_documentation_generation(self, sample_project):
-        """测试完整文档生成流程"""
-        output_dir = tempfile.mkdtemp()
-        
-        try:
-            # 生成文档
-            generate_docs(
-                working_directory=sample_project,
-                output_directory=output_dir,
-                doc_language="English",
-                recursion_limit=100  # 限制递归深度
-            )
-            
-            # 验证生成的文档
-            assert os.path.exists(os.path.join(output_dir, "README.md"))
-            assert os.path.exists(os.path.join(output_dir, "01-overview.md"))
-            
-            # 检查文档内容
-            with open(os.path.join(output_dir, "README.md"), 'r') as f:
-                content = f.read()
-                assert "Sample Project" in content
-                
-        except Exception as e:
-            pytest.skip(f"Integration test failed: {e}")
+# 测试搜索功能
+result = ripgrep_search("def main", "/path/to/project", "py")
+print(result)
 ```
 
-### 测试最佳实践
+## 贡献指南
 
-#### 1. 测试命名
+### 1. 报告问题
 
-```python
-class TestClassName:
-    def test_method_name_scenario(self):
-        """测试方法名_场景描述"""
-        pass
-    
-    def test_should_raise_error_when_invalid_input(self):
-        """应该抛出错误_当输入无效时"""
-        pass
-    
-    def test_returns_expected_result_for_valid_input(self):
-        """返回预期结果_对于有效输入"""
-        pass
-```
+- 使用 [GitHub Issues](https://github.com/dean2021/codeviewx/issues) 报告问题
+- 提供详细的错误信息和复现步骤
+- 包含系统环境信息（Python 版本、操作系统等）
 
-#### 2. 测试数据管理
+### 2. 功能请求
 
-```python
-# 使用 fixture 管理测试数据
-@pytest.fixture
-def sample_config():
-    return {
-        "working_directory": "/tmp/test",
-        "output_directory": "docs",
-        "doc_language": "English"
-    }
+- 在 Issues 中描述期望的功能
+- 说明使用场景和预期行为
+- 讨论实现方案
 
-# 使用参数化测试
-@pytest.mark.parametrize("language,expected", [
-    ("zh_CN", "Chinese"),
-    ("en_US", "English"),
-    ("ja_JP", "Japanese"),
-    (None, "English")  # 默认值
-])
-def test_language_detection(language, expected, monkeypatch):
-    if language:
-        monkeypatch.setattr("locale.getdefaultlocale", lambda: (language, "UTF-8"))
-    else:
-        monkeypatch.setattr("locale.getdefaultlocale", lambda: (None, None))
-    
-    result = detect_system_language()
-    assert result == expected
-```
+### 3. 提交代码
 
-#### 3. Mock 和 Patch
+1. **Fork 项目**: 在 GitHub 上 Fork 项目到个人账户
+2. **创建分支**: 基于主分支创建功能分支
+3. **开发测试**: 实现功能并编写测试
+4. **提交 PR**: 提交 Pull Request 到主分支
 
-```python
-from unittest.mock import patch, MagicMock
+### 4. 代码审查
 
-def test_with_mock():
-    """使用 mock 测试"""
-    with patch('codeviewx.generator.create_deep_agent') as mock_agent:
-        mock_agent.return_value = MagicMock()
-        
-        generate_docs(working_directory="/tmp/test")
-        
-        mock_agent.assert_called_once()
-```
+Pull Request 需要通过以下检查：
 
-## 贡献流程
+- [ ] 所有测试通过
+- [ ] 代码覆盖率达标
+- [ ] 代码风格检查通过
+- [ ] 类型检查通过
+- [ ] 文档已更新
+- [ ] 提交信息符合规范
 
-### 开发流程
+### 5. 文档贡献
 
-#### 1. 创建功能分支
-
-```bash
-# 同步主分支
-git checkout main
-git pull origin main
-
-# 创建功能分支
-git checkout -b feature/new-feature
-
-# 或修复分支
-git checkout -b fix/issue-description
-```
-
-#### 2. 开发和测试
-
-```bash
-# 安装开发依赖
-pip install -e ".[dev]"
-
-# 运行测试
-pytest
-
-# 代码格式化
-black codeviewx/
-isort codeviewx/
-
-# 代码检查
-flake8 codeviewx/
-mypy codeviewx/
-
-# 运行特定测试
-pytest tests/test_new_feature.py
-```
-
-#### 3. 提交代码
-
-```bash
-# 添加文件
-git add .
-
-# 提交代码
-git commit -m "feat: add new feature for XYZ"
-
-# 推送到远程分支
-git push origin feature/new-feature
-```
-
-#### 4. 创建 Pull Request
-
-1. 在 GitHub 上创建 Pull Request
-2. 填写 PR 模板
-3. 等待代码审查
-4. 根据反馈修改代码
-5. 合并到主分支
-
-### 提交信息规范
-
-使用 Conventional Commits 格式：
-
-```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-#### 类型说明
-
-- `feat`: 新功能
-- `fix`: 修复 bug
-- `docs`: 文档更新
-- `style`: 代码格式化（不影响功能）
-- `refactor`: 代码重构
-- `test`: 添加或修改测试
-- `chore`: 构建过程或辅助工具的变动
-
-#### 示例
-
-```bash
-# 新功能
-git commit -m "feat(generator): add support for custom prompts"
-
-# 修复 bug
-git commit -m "fix(cli): resolve argument parsing issue with paths containing spaces"
-
-# 文档更新
-git commit -m "docs(readme): update installation instructions"
-
-# 代码重构
-git commit -m "refactor(tools): simplify file system operations"
-```
-
-### 代码审查
-
-#### 审查要点
-
-1. **功能正确性**：
-   - 功能是否按预期工作
-   - 边界条件是否处理
-   - 错误处理是否完善
-
-2. **代码质量**：
-   - 代码风格是否符合规范
-   - 是否有重复代码
-   - 是否有技术债务
-
-3. **测试覆盖**：
-   - 是否有足够的测试
-   - 测试用例是否覆盖边界情况
-   - 测试是否有意义
-
-4. **文档**：
-   - 是否有必要的文档字符串
-   - API 文档是否准确
-   - 用户文档是否更新
-
-#### 审查流程
-
-1. **自动检查**：
-   - CI/CD 运行测试
-   - 代码质量检查
-   - 类型检查
-
-2. **人工审查**：
-   - 至少一个审查者批准
-   - 讨论改进建议
-   - 请求必要的修改
-
-3. **合并检查**：
-   - 解决冲突
-   - 确认测试通过
-   - 合并到主分支
+- 修复文档错误
+- 改进文档说明
+- 添加使用示例
+- 翻译文档内容
 
 ## 发布流程
 
-### 版本管理
+### 1. 版本管理
 
-#### 语义化版本
+使用语义化版本控制：
 
-使用 SemVer 版本格式：`MAJOR.MINOR.PATCH`
+- **主版本号**: 不兼容的 API 修改
+- **次版本号**: 向下兼容的功能性新增
+- **修订号**: 向下兼容的问题修正
 
-- **MAJOR**: 不兼容的 API 变更
-- **MINOR**: 向后兼容的功能新增
-- **PATCH**: 向后兼容的问题修正
-
-#### 版本号更新
-
-```python
-# codeviewx/__version__.py
-__version__ = "0.2.0"
-__author__ = "CodeViewX Team"
-__description__ = "AI-powered code documentation generator"
-```
-
-### 发布步骤
-
-#### 1. 准备发布
+### 2. 发布步骤
 
 ```bash
-# 确保主分支最新
-git checkout main
-git pull origin main
+# 1. 更新版本号
+vim codeviewx/__version__.py
 
-# 运行完整测试
-pytest --cov=codeviewx
+# 2. 更新 CHANGELOG
+vim CHANGELOG.md
 
-# 检查代码质量
-black --check codeviewx/
+# 3. 运行完整测试
+pytest
 flake8 codeviewx/
 mypy codeviewx/
 
-# 构建包
+# 4. 构建包
 python -m build
-```
 
-#### 2. 更新版本
-
-```bash
-# 更新版本号
-bump2version patch  # 或 minor, major
-
-# 或手动更新
-# 编辑 __version__.py
-# 编辑 pyproject.toml
-
-# 提交版本更新
-git add codeviewx/__version__.py pyproject.toml
-git commit -m "chore: bump version to 0.1.1"
-```
-
-#### 3. 创建标签
-
-```bash
-# 创建 Git 标签
-git tag -a v0.1.1 -m "Release version 0.1.1"
-
-# 推送标签
-git push origin v0.1.1
-```
-
-#### 4. 发布到 PyPI
-
-```bash
-# 上传到测试 PyPI
+# 5. 上传到 PyPI（测试环境）
 python -m twine upload --repository testpypi dist/*
 
-# 测试安装
-pip install --index-url https://test.pypi.org/simple/ codeviewx
-
-# 上传到正式 PyPI
+# 6. 上传到 PyPI（生产环境）
 python -m twine upload dist/*
+
+# 7. 创建 Git 标签
+git tag v0.2.5
+git push origin v0.2.5
 ```
 
-#### 5. 更新文档
+### 3. 发布检查清单
 
-```bash
-# 生成最新文档
-codeviewx -w . -o docs
-
-# 更新 GitHub Pages
-git add docs/
-git commit -m "docs: update documentation for v0.1.1"
-git push origin main
-```
-
-### 发布后任务
-
-1. **GitHub Release**：
-   - 在 GitHub 创建 Release
-   - 添加发布说明
-   - 关联相关 Issues
-
-2. **通知用户**：
-   - 更新 README.md
-   - 发送社区通知
-   - 更新 ChangeLog
-
-3. **监控反馈**：
-   - 监控 Issue 报告
-   - 收集用户反馈
-   - 准备下个版本
+- [ ] 版本号已更新
+- [ ] CHANGELOG 已更新
+- [ ] 所有测试通过
+- [ ] 文档已更新
+- [ ] 包构建成功
+- [ ] 测试发布验证
+- [ ] Git 标签已创建
 
 ## 性能优化
 
-### 代码优化
+### 1. 代码优化
 
-#### 1. 算法优化
+- **避免重复计算**: 缓存计算结果
+- **使用合适的数据结构**: 选择最优的数据结构
+- **减少 I/O 操作**: 批量处理文件操作
 
-```python
-# 避免重复计算
-def optimized_function(items):
-    cache = {}
-    result = []
-    for item in items:
-        if item not in cache:
-            cache[item] = expensive_computation(item)
-        result.append(cache[item])
-    return result
-```
+### 2. 内存优化
 
-#### 2. 内存优化
+- **流式处理**: 处理大文件时使用流式读取
+- **及时释放**: 不再需要的对象及时释放
+- **监控内存**: 使用工具监控内存使用
+
+### 3. 性能测试
 
 ```python
-# 使用生成器减少内存使用
-def process_large_file(file_path):
-    with open(file_path, 'r') as f:
-        for line in f:  # 逐行处理，不加载整个文件
-            yield process_line(line)
+import time
+import psutil
+from codeviewx import generate_docs
+
+def performance_test():
+    """性能测试"""
+    start_time = time.time()
+    start_memory = psutil.Process().memory_info().rss
+    
+    generate_docs(working_directory="./test-project")
+    
+    end_time = time.time()
+    end_memory = psutil.Process().memory_info().rss
+    
+    print(f"执行时间: {end_time - start_time:.2f} 秒")
+    print(f"内存使用: {(end_memory - start_memory) / 1024 / 1024:.2f} MB")
 ```
 
-#### 3. 并发优化
+## 社区参与
 
-```python
-import concurrent.futures
+### 1. 讨论渠道
 
-def parallel_processing(items):
-    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-        results = list(executor.map(process_item, items))
-    return results
-```
+- **GitHub Issues**: 问题报告和功能讨论
+- **GitHub Discussions**: 一般讨论和问答
+- **Wiki**: 详细文档和教程
 
-### 性能监控
+### 2. 行为准则
 
-#### 1. 性能分析
+- 尊重所有参与者
+- 保持友好和专业
+- 接受建设性的反馈
+- 专注于对社区最有利的事情
 
-```python
-import cProfile
-import pstats
+### 3. 认可贡献者
 
-def profile_function():
-    profiler = cProfile.Profile()
-    profiler.enable()
-    
-    # 执行需要分析的代码
-    generate_docs()
-    
-    profiler.disable()
-    stats = pstats.Stats(profiler)
-    stats.sort_stats('cumulative')
-    stats.print_stats()
-```
+所有贡献者都会在项目中得到认可：
 
-#### 2. 内存监控
+- **AUTHORS**: 贡献者列表
+- **CHANGELOG**: 版本更新中的贡献说明
+- **GitHub**: 贡献统计和展示
 
-```python
-import tracemalloc
+---
 
-def monitor_memory():
-    tracemalloc.start()
-    
-    # 执行代码
-    generate_docs()
-    
-    current, peak = tracemalloc.get_traced_memory()
-    print(f"Current memory usage: {current / 1024 / 1024:.1f} MB")
-    print(f"Peak memory usage: {peak / 1024 / 1024:.1f} MB")
-    
-    tracemalloc.stop()
-```
-
-这个开发指南提供了完整的开发流程和最佳实践，帮助开发者有效地为 CodeViewX 项目做贡献。
+💡 **感谢**: 感谢所有为 CodeViewX 项目做出贡献的开发者！每一个 Issue、Pull Request 和建议都让这个项目变得更好。

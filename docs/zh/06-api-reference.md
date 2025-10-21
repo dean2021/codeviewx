@@ -1,123 +1,18 @@
 # API 参考文档
 
-本文档提供 CodeViewX 的完整 API 参考，包括命令行接口、Python API、和 Web API 的详细说明。
+## 概述
 
-## 命令行接口 (CLI)
+CodeViewX 提供了完整的 Python API 和命令行接口，支持灵活的文档生成和配置。本文档详细介绍了所有可用的 API 函数、参数和用法示例。
 
-### 基本语法
+## 核心 API
 
-```bash
-codeviewx [选项] [参数]
-```
+### 1. 文档生成 API
 
-### 主要选项
+#### `generate_docs()`
 
-| 选项 | 简写 | 类型 | 默认值 | 说明 |
-|------|------|------|--------|------|
-| `--working-dir` | `-w` | 字符串 | 当前目录 | 指定要分析的项目目录 |
-| `--output-dir` | `-o` | 字符串 | `docs` | 指定文档输出目录 |
-| `--language` | `-l` | 字符串 | 自动检测 | 指定文档语言 |
-| `--ui-lang` | - | 字符串 | 自动检测 | 指定界面语言 |
-| `--serve` | - | 布尔值 | `False` | 启动 Web 服务器 |
-| `--verbose` | - | 布尔值 | `False` | 显示详细日志 |
-| `--recursion-limit` | - | 整数 | `1000` | AI 代理递归限制 |
-| `--version` | `-v` | - | - | 显示版本信息 |
-| `--help` | `-h` | - | - | 显示帮助信息 |
+**功能**: 生成项目技术文档
 
-### 支持的语言
-
-#### 文档语言 (`--language`)
-- `Chinese` - 中文（简体）
-- `English` - 英文
-- `Japanese` - 日文
-- `Korean` - 韩文
-- `French` - 法文
-- `German` - 德文
-- `Spanish` - 西班牙文
-- `Russian` - 俄文
-
-#### 界面语言 (`--ui-lang`)
-- `en` - 英文界面
-- `zh` - 中文界面
-
-### 使用示例
-
-#### 基本使用
-```bash
-# 分析当前目录，自动检测语言
-codeviewx
-
-# 分析指定项目
-codeviewx -w /path/to/project
-
-# 生成英文文档
-codeviewx -l English
-
-# 输出到指定目录
-codeviewx -o /path/to/output
-```
-
-#### 高级配置
-```bash
-# 完整配置示例
-codeviewx \
-  --working-dir /path/to/project \
-  --output-dir docs \
-  --language Chinese \
-  --ui-lang zh \
-  --verbose \
-  --recursion-limit 500
-
-# 启动文档服务器
-codeviewx --serve -o docs
-
-# 调试模式
-codeviewx --verbose --recursion-limit 100
-```
-
-### 环境变量
-
-| 变量名 | 说明 | 示例 |
-|--------|------|------|
-| `ANTHROPIC_AUTH_TOKEN` | Anthropic API 密钥 | `sk-ant-api...` |
-| `OPENAI_API_KEY` | OpenAI API 密钥 | `sk-...` |
-| `PYTHONPATH` | Python 路径 | `/path/to/codeviewx` |
-| `LANG` | 系统语言 | `zh_CN.UTF-8` |
-
-## Python API
-
-### 核心模块导入
-
-```python
-from codeviewx import (
-    generate_docs,
-    start_document_web_server,
-    load_prompt,
-    detect_system_language
-)
-
-from codeviewx.i18n import (
-    get_i18n,
-    t,
-    set_locale,
-    detect_ui_language
-)
-
-from codeviewx.tools import (
-    execute_command,
-    ripgrep_search,
-    write_real_file,
-    read_real_file,
-    list_real_directory
-)
-```
-
-### 主要函数
-
-#### generate_docs()
-
-生成项目文档的核心函数。
-
+**签名**:
 ```python
 def generate_docs(
     working_directory: Optional[str] = None,
@@ -125,21 +20,29 @@ def generate_docs(
     doc_language: Optional[str] = None,
     ui_language: Optional[str] = None,
     recursion_limit: int = 1000,
-    verbose: bool = False
+    verbose: bool = False,
+    base_url: Optional[str] = None
 ) -> None
 ```
 
-**参数**:
-- `working_directory`: 项目工作目录，默认为当前目录
-- `output_directory`: 文档输出目录，默认为 "docs"
-- `doc_language`: 文档语言，默认自动检测
-- `ui_language`: 界面语言，默认自动检测
-- `recursion_limit`: AI 代理递归限制，默认 1000
-- `verbose`: 是否显示详细日志，默认 False
+**参数说明**:
 
-**示例**:
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `working_directory` | `Optional[str]` | `None` | 项目工作目录，默认为当前目录 |
+| `output_directory` | `str` | `"docs"` | 文档输出目录 |
+| `doc_language` | `Optional[str]` | `None` | 文档语言，支持：`Chinese`, `English`, `Japanese`, `Korean`, `French`, `German`, `Spanish`, `Russian` |
+| `ui_language` | `Optional[str]` | `None` | 界面语言，支持：`en`, `zh` |
+| `recursion_limit` | `int` | `1000` | Agent 递归限制，控制最大执行步骤 |
+| `verbose` | `bool` | `False` | 是否显示详细日志 |
+| `base_url` | `Optional[str]` | `None` | 自定义 Anthropic API 基础 URL |
+
+**使用示例**:
+
 ```python
-# 基本使用
+from codeviewx import generate_docs
+
+# 基本用法
 generate_docs()
 
 # 完整配置
@@ -148,481 +51,599 @@ generate_docs(
     output_directory="docs",
     doc_language="Chinese",
     ui_language="zh",
-    recursion_limit=500,
+    recursion_limit=1500,
+    verbose=True,
+    base_url="https://api.anthropic.com/v1"
+)
+
+# 生成英文文档
+generate_docs(
+    working_directory="./my-project",
+    doc_language="English",
     verbose=True
 )
 ```
 
-#### start_document_web_server()
+**异常处理**:
+```python
+try:
+    generate_docs(working_directory="/path/to/project")
+except ValueError as e:
+    print(f"配置错误: {e}")
+except Exception as e:
+    print(f"生成失败: {e}")
+```
 
-启动文档浏览 Web 服务器。
+### 2. Web 服务器 API
 
+#### `start_document_web_server()`
+
+**功能**: 启动文档浏览 Web 服务器
+
+**签名**:
 ```python
 def start_document_web_server(output_directory: str) -> None
 ```
 
-**参数**:
-- `output_directory`: 文档目录路径
+**参数说明**:
 
-**示例**:
+| 参数 | 类型 | 描述 |
+|------|------|------|
+| `output_directory` | `str` | 文档目录路径 |
+
+**使用示例**:
+
 ```python
+from codeviewx import start_document_web_server
+
 # 启动服务器
 start_document_web_server("docs")
 
-# 在生成文档后启动服务器
-generate_docs(output_directory="docs")
-start_document_web_server("docs")
+# 服务器将在 http://127.0.0.1:5000 启动
 ```
 
-#### detect_system_language()
+**特性**:
+- **自动路由**: 支持 `/` 和 `/<filename>` 路由
+- **Markdown 渲染**: 自动渲染 Markdown 文件
+- **文件树导航**: 生成文档导航树
+- **目录支持**: 自动生成 TOC（目录）
 
-自动检测系统语言。
+### 3. 语言检测 API
 
+#### `detect_system_language()`
+
+**功能**: 自动检测系统语言
+
+**签名**:
 ```python
 def detect_system_language() -> str
 ```
 
-**返回值**: 语言名称字符串
+**返回值**:
+- `str`: 检测到的语言代码（`Chinese`, `English`, `Japanese`, `Korean`, `French`, `German`, `Spanish`, `Russian`）
 
-**示例**:
-```python
-lang = detect_system_language()
-print(f"Detected language: {lang}")  # 输出: Detected language: Chinese
-```
-
-### 国际化 API
-
-#### get_i18n()
-
-获取国际化管理器实例。
+**使用示例**:
 
 ```python
-def get_i18n() -> I18n
+from codeviewx import detect_system_language
+
+language = detect_system_language()
+print(f"检测到的系统语言: {language}")
 ```
 
-**返回值**: I18n 实例
+### 4. 提示词加载 API
 
-**示例**:
+#### `load_prompt()`
+
+**功能**: 加载和处理提示词模板
+
+**签名**:
 ```python
-i18n = get_i18n()
-i18n.set_locale('zh')
-message = i18n.t('starting')
+def load_prompt(name: str, **kwargs) -> str
 ```
 
-#### t()
+**参数说明**:
 
-翻译消息的快捷函数。
+| 参数 | 类型 | 描述 |
+|------|------|------|
+| `name` | `str` | 提示词名称（如：`"document_engineer"`） |
+| `**kwargs` | `dict` | 模板变量 |
 
-```python
-def t(key: str, **kwargs) -> str
-```
-
-**参数**:
-- `key`: 消息键
-- `**kwargs`: 格式化参数
-
-**示例**:
-```python
-# 基本翻译
-message = t('starting')
-
-# 带参数的翻译
-message = t('generated_files', count=5)
-```
-
-#### set_locale()
-
-设置界面语言。
+**使用示例**:
 
 ```python
-def set_locale(locale: str) -> None
+from codeviewx import load_prompt
+
+# 加载英文提示词
+prompt = load_prompt(
+    "document_engineer",
+    working_directory="/path/to/project",
+    output_directory="docs",
+    doc_language="English"
+)
+
+# 加载中文提示词
+prompt_zh = load_prompt(
+    "document_engineer",
+    working_directory="/path/to/project", 
+    output_directory="docs",
+    doc_language="Chinese"
+)
 ```
 
-**参数**:
-- `locale`: 语言代码 ('en' 或 'zh')
+## 工具 API
 
-**示例**:
+### 1. 文件系统工具
+
+#### `write_real_file()`
+
+**功能**: 写入文件到文件系统
+
+**签名**:
 ```python
-set_locale('zh')
-message = t('starting')  # 输出中文消息
+def write_real_file(file_path: str, content: str) -> str
 ```
 
-### 工具函数 API
+**参数说明**:
 
-#### execute_command()
+| 参数 | 类型 | 描述 |
+|------|------|------|
+| `file_path` | `str` | 文件路径（支持相对和绝对路径） |
+| `content` | `str` | 文件内容 |
 
-执行系统命令。
+**返回值**:
+- `str`: 操作结果消息
+
+**使用示例**:
 
 ```python
-def execute_command(command: str, working_dir: str = None) -> str
+from codeviewx.tools import write_real_file
+
+# 写入文档
+result = write_real_file(
+    "docs/README.md",
+    "# 项目文档\n\n这是一个示例文档。"
+)
+print(result)  # ✅ Successfully wrote file: docs/README.md (X.XX KB)
 ```
 
-**参数**:
-- `command`: 要执行的命令
-- `working_dir`: 工作目录，可选
+#### `read_real_file()`
 
-**示例**:
+**功能**: 从文件系统读取文件
+
+**签名**:
 ```python
-# 列出文件
-result = execute_command("ls -la")
-
-# 在指定目录执行命令
-result = execute_command("git status", working_dir="/path/to/repo")
+def read_real_file(file_path: str) -> str
 ```
 
-#### ripgrep_search()
+**参数说明**:
 
-使用 ripgrep 搜索代码。
+| 参数 | 类型 | 描述 |
+|------|------|------|
+| `file_path` | `str` | 文件路径 |
 
+**返回值**:
+- `str`: 文件内容和元信息
+
+**使用示例**:
+
+```python
+from codeviewx.tools import read_real_file
+
+# 读取文件
+content = read_real_file("README.md")
+print(content)  # 包含文件大小和行数的头部信息
+```
+
+#### `list_real_directory()`
+
+**功能**: 列出目录内容
+
+**签名**:
+```python
+def list_real_directory(directory: str = ".") -> str
+```
+
+**参数说明**:
+
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `directory` | `str` | `"."` | 目录路径 |
+
+**返回值**:
+- `str`: 目录内容列表
+
+**使用示例**:
+
+```python
+from codeviewx.tools import list_real_directory
+
+# 列出当前目录
+content = list_real_directory(".")
+print(content)
+
+# 列出指定目录
+content = list_real_directory("/path/to/project")
+print(content)
+```
+
+### 2. 代码搜索工具
+
+#### `ripgrep_search()`
+
+**功能**: 高性能代码搜索
+
+**签名**:
 ```python
 def ripgrep_search(
     pattern: str,
     path: str = ".",
-    file_type: str = None,
+    file_type: Optional[str] = None,
     ignore_case: bool = False,
     max_count: int = 100
 ) -> str
 ```
 
-**参数**:
-- `pattern`: 搜索模式（正则表达式）
-- `path`: 搜索路径，默认当前目录
-- `file_type`: 文件类型过滤，如 'py', 'js'
-- `ignore_case`: 是否忽略大小写，默认 False
-- `max_count`: 最大结果数，默认 100
+**参数说明**:
 
-**示例**:
-```python
-# 搜索 Python 类定义
-result = ripgrep_search("class \w+", ".", "py")
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `pattern` | `str` | - | 搜索模式（支持正则表达式） |
+| `path` | `str` | `"."` | 搜索路径 |
+| `file_type` | `Optional[str]` | `None` | 文件类型过滤（如：`"py"`, `"js"`） |
+| `ignore_case` | `bool` | `False` | 是否忽略大小写 |
+| `max_count` | `int` | `100` | 最大结果数量 |
 
-# 忽略大小写搜索
-result = ripgrep_search("TODO", ".", ignore_case=True)
-
-# 搜索特定文件类型
-result = ripgrep_search("import.*flask", ".", "py", max_count=50)
-```
-
-#### read_real_file()
-
-读取文件内容。
+**使用示例**:
 
 ```python
-def read_real_file(file_path: str) -> str
+from codeviewx.tools import ripgrep_search
+
+# 搜索函数定义
+results = ripgrep_search("def main", ".", "py")
+
+# 搜索类定义（忽略大小写）
+results = ripgrep_search("class.*controller", "./src", "py", ignore_case=True)
+
+# 搜索导入语句
+results = ripgrep_search("^import|^from.*import", ".", "py")
+
+# 搜索路由定义
+results = ripgrep_search("@app\.route|@GetMapping", ".", "py")
 ```
 
-**参数**:
-- `file_path`: 文件路径
-
-**示例**:
-```python
-# 读取文件内容
-content = read_real_file("README.md")
-
-# 读取配置文件
-config = read_real_file("pyproject.toml")
-```
-
-#### write_real_file()
-
-写入文件内容。
+**高级搜索模式**:
 
 ```python
-def write_real_file(file_path: str, content: str) -> str
+# 搜索入口点
+entry_points = ripgrep_search("if __name__|def main|@SpringBootApplication", ".")
+
+# 搜索数据库模型
+models = ripgrep_search("class.*Model|@Entity|@Table", ".", "py")
+
+# 搜索 API 端点
+api_endpoints = ripgrep_search("@app\.(get|post|put|delete)|router\.", ".", "py")
+
+# 搜索配置文件
+configs = ripgrep_search("config|settings|environment", ".", "yml")
 ```
 
-**参数**:
-- `file_path`: 文件路径
-- `content`: 文件内容
+### 3. 命令执行工具
 
-**示例**:
+#### `execute_command()`
+
+**功能**: 执行系统命令
+
+**签名**:
 ```python
-# 写入文档
-result = write_real_file("docs/README.md", "# Documentation")
-
-# 写入配置文件
-config_content = "[tool.black]\nline-length = 100\n"
-result = write_real_file("pyproject.toml", config_content)
+def execute_command(command: str, working_dir: Optional[str] = None) -> str
 ```
 
-#### list_real_directory()
+**参数说明**:
 
-列出目录内容。
+| 参数 | 类型 | 默认值 | 描述 |
+|------|------|--------|------|
+| `command` | `str` | - | 要执行的命令 |
+| `working_dir` | `Optional[str]` | `None` | 工作目录 |
+
+**返回值**:
+- `str`: 命令执行结果
+
+**使用示例**:
 
 ```python
-def list_real_directory(directory: str = ".") -> str
+from codeviewx.tools import execute_command
+
+# 列出文件
+result = execute_command("ls -la")
+
+# 获取项目统计信息
+result = execute_command("find . -name '*.py' | wc -l")
+
+# 检查 Git 状态
+result = execute_command("git status")
+
+# 在指定目录执行命令
+result = execute_command("npm list", working_dir="/path/to/frontend")
 ```
 
-**参数**:
-- `directory`: 目录路径，默认当前目录
+## 国际化 API
 
-**示例**:
+### 1. 翻译函数
+
+#### `t()`
+
+**功能**: 翻译消息
+
+**签名**:
 ```python
-# 列出当前目录
-result = list_real_directory()
-
-# 列出指定目录
-result = list_real_directory("/path/to/project")
+def t(key: str, **kwargs) -> str
 ```
 
-### 高级用法
+**参数说明**:
 
-#### 批量处理多个项目
+| 参数 | 类型 | 描述 |
+|------|------|------|
+| `key` | `str` | 消息键 |
+| `**kwargs` | `dict` | 格式化变量 |
+
+**使用示例**:
+
+```python
+from codeviewx.i18n import t
+
+# 基本翻译
+message = t('starting')  # 🚀 启动 CodeViewX 文档生成器
+
+# 带变量的翻译
+message = t('generated_files', count=5)  # ✅ 共生成 5 个文档文件
+
+# 多变量翻译
+message = t('cli_server_address')  # 🔗 服务器地址: http://127.0.0.1:5000
+```
+
+### 2. 语言设置
+
+#### `set_locale()`
+
+**功能**: 设置当前语言
+
+**签名**:
+```python
+def set_locale(locale: str) -> None
+```
+
+**使用示例**:
+
+```python
+from codeviewx.i18n import set_locale
+
+# 设置为中文
+set_locale('zh')
+
+# 设置为英文
+set_locale('en')
+```
+
+#### `detect_ui_language()`
+
+**功能**: 自动检测界面语言
+
+**签名**:
+```python
+def detect_ui_language() -> str
+```
+
+**使用示例**:
+
+```python
+from codeviewx.i18n import detect_ui_language, set_locale
+
+# 自动检测并设置语言
+ui_lang = detect_ui_language()
+set_locale(ui_lang)
+print(f"界面语言设置为: {ui_lang}")
+```
+
+## 配置 API
+
+### 1. 环境变量
+
+CodeViewX 支持通过环境变量进行配置：
+
+| 变量名 | 描述 | 默认值 |
+|--------|------|--------|
+| `ANTHROPIC_AUTH_TOKEN` | Anthropic API 密钥 | 必需 |
+| `ANTHROPIC_BASE_URL` | API 基础 URL | `https://api.anthropic.com/v1` |
+| `CODEVIEWX_LANGUAGE` | 默认文档语言 | 自动检测 |
+
+**使用示例**:
 
 ```python
 import os
 from codeviewx import generate_docs
 
-def batch_analyze_projects(projects_dir, output_base_dir):
-    """批量分析多个项目"""
-    for project_name in os.listdir(projects_dir):
-        project_path = os.path.join(projects_dir, project_name)
-        if os.path.isdir(project_path):
-            output_dir = os.path.join(output_base_dir, project_name)
-            
-            print(f"Analyzing {project_name}...")
-            generate_docs(
-                working_directory=project_path,
-                output_directory=output_dir,
-                doc_language="Chinese",
-                verbose=True
-            )
-            print(f"Completed {project_name}")
+# 设置环境变量
+os.environ['ANTHROPIC_AUTH_TOKEN'] = 'your-api-key-here'
+os.environ['ANTHROPIC_BASE_URL'] = 'https://api.anthropic.com/v1'
+os.environ['CODEVIEWX_LANGUAGE'] = 'Chinese'
 
-# 使用示例
-batch_analyze_projects("/path/to/projects", "/path/to/docs")
+# 使用环境变量配置
+generate_docs()
 ```
 
-#### 自定义文档生成
+### 2. 配置验证
+
+#### `validate_api_key()`
+
+**功能**: 验证 API 密钥配置
+
+**签名**:
+```python
+def validate_api_key() -> None
+```
+
+**异常**:
+- `ValueError`: API 密钥未配置或无效
+
+**使用示例**:
 
 ```python
-from codeviewx import generate_docs
-from codeviewx.i18n import set_locale, t
+from codeviewx.generator import validate_api_key
 
-def custom_documentation_generator():
-    """自定义文档生成流程"""
-    
-    # 设置中文界面
-    set_locale('zh')
-    
-    # 项目配置
-    projects = [
-        {
-            'path': '/path/to/frontend',
-            'output': 'docs/frontend',
-            'language': 'Chinese'
-        },
-        {
-            'path': '/path/to/backend',
-            'output': 'docs/backend',
-            'language': 'English'
-        }
-    ]
-    
-    # 生成文档
-    for project in projects:
-        print(t('starting'))
-        generate_docs(
-            working_directory=project['path'],
-            output_directory=project['output'],
-            doc_language=project['language'],
-            verbose=True
-        )
-        print(t('completed'))
-
-custom_documentation_generator()
-```
-
-## Web API
-
-### HTTP 服务器
-
-CodeViewX 的 Web 服务器基于 Flask，提供文档浏览功能。
-
-#### 默认配置
-
-```python
-# 服务器配置
-DEFAULT_HOST = '127.0.0.1'
-DEFAULT_PORT = 5000
-DEBUG_MODE = True
-```
-
-#### 路由结构
-
-| 路径 | 方法 | 说明 |
-|------|------|------|
-| `/` | GET | 显示主页（README.md） |
-| `/<filename>` | GET | 显示指定文档文件 |
-| `/static/<path>` | GET | 静态资源服务 |
-
-#### 请求示例
-
-```bash
-# 访问主页
-curl http://127.0.0.1:5000/
-
-# 访问特定文档
-curl http://127.0.0.1:5000/01-overview.md
-
-# 访问静态资源
-curl http://127.0.0.1:5000/static/css/style.css
-```
-
-### 响应格式
-
-#### 成功响应
-```http
-HTTP/1.1 200 OK
-Content-Type: text/html; charset=utf-8
-```
-
-#### 文件不存在
-```http
-HTTP/1.1 404 Not Found
-Content-Type: text/plain; charset=utf-8
-
-File not found: /path/to/file.md
+try:
+    validate_api_key()
+    print("API 密钥配置正确")
+except ValueError as e:
+    print(f"API 密钥配置错误: {e}")
 ```
 
 ## 错误处理
 
-### 常见错误类型
+### 常见异常类型
 
-#### 1. 配置错误
+| 异常类型 | 描述 | 解决方法 |
+|----------|------|----------|
+| `ValueError` | 配置错误（如 API 密钥缺失） | 检查环境变量设置 |
+| `FileNotFoundError` | 文件或目录不存在 | 确认路径正确 |
+| `PermissionError` | 权限不足 | 检查文件/目录权限 |
+| `UnicodeDecodeError` | 文件编码问题 | 确保文件为 UTF-8 编码 |
+| `ConnectionError` | 网络连接问题 | 检查网络和 API 配置 |
 
-```python
-# 文件路径错误
-try:
-    generate_docs(working_directory="/nonexistent/path")
-except FileNotFoundError as e:
-    print(f"Directory not found: {e}")
-
-# 权限错误
-try:
-    generate_docs(output_directory="/protected/path")
-except PermissionError as e:
-    print(f"Permission denied: {e}")
-```
-
-#### 2. API 错误
+### 错误处理示例
 
 ```python
-# API 密钥未设置
-if not os.getenv('ANTHROPIC_AUTH_TOKEN'):
-    raise ValueError("ANTHROPIC_AUTH_TOKEN environment variable is required")
-
-# ripgrep 未安装
-try:
-    result = ripgrep_search("pattern", ".")
-except RuntimeError as e:
-    if "ripgrep" in str(e):
-        print("Please install ripgrep: brew install ripgrep")
-```
-
-#### 3. 生成错误
-
-```python
-# 递归限制错误
-try:
-    generate_docs(recursion_limit=10)  # 太小的限制
-except RuntimeError as e:
-    if "recursion limit" in str(e):
-        print("Consider increasing recursion limit")
-```
-
-### 错误恢复策略
-
-```python
-import time
 from codeviewx import generate_docs
+import logging
 
-def robust_generate_docs(config, max_retries=3):
-    """带重试机制的文档生成"""
-    for attempt in range(max_retries):
-        try:
-            generate_docs(**config)
-            return True
-        except Exception as e:
-            print(f"Attempt {attempt + 1} failed: {e}")
-            if attempt < max_retries - 1:
-                time.sleep(2 ** attempt)  # 指数退避
-            else:
-                raise
-    return False
+# 配置日志
+logging.basicConfig(level=logging.INFO)
+
+def safe_generate_docs(working_dir, output_dir):
+    try:
+        generate_docs(
+            working_directory=working_dir,
+            output_directory=output_dir,
+            doc_language="Chinese",
+            verbose=True
+        )
+        print("文档生成成功！")
+    except ValueError as e:
+        if "ANTHROPIC_AUTH_TOKEN" in str(e):
+            print("❌ API 密钥未配置，请设置环境变量 ANTHROPIC_AUTH_TOKEN")
+        else:
+            print(f"❌ 配置错误: {e}")
+    except FileNotFoundError as e:
+        print(f"❌ 文件或目录不存在: {e}")
+    except PermissionError as e:
+        print(f"❌ 权限不足: {e}")
+    except Exception as e:
+        print(f"❌ 未知错误: {e}")
+        logging.exception("详细错误信息:")
 
 # 使用示例
-config = {
-    'working_directory': '/path/to/project',
-    'output_directory': 'docs',
-    'verbose': True
-}
-
-robust_generate_docs(config)
+safe_generate_docs("/path/to/project", "docs")
 ```
 
-## 性能优化
+## 使用模式
 
-### 缓存配置
-
-```python
-# 启用详细日志进行性能监控
-generate_docs(verbose=True)
-
-# 限制递归深度避免性能问题
-generate_docs(recursion_limit=500)
-
-# 分批处理大型项目
-def process_large_project(project_path, output_path):
-    # 先分析主要文件
-    generate_docs(
-        working_directory=project_path,
-        output_directory=output_path,
-        recursion_limit=300
-    )
-```
-
-### 内存优化
+### 1. 基本文档生成
 
 ```python
-import gc
 from codeviewx import generate_docs
 
-def memory_efficient_generation():
-    """内存友好的文档生成"""
-    try:
-        generate_docs(verbose=False)  # 减少日志输出
-    finally:
-        gc.collect()  # 强制垃圾回收
-
-memory_efficient_generation()
+# 最简单的用法
+generate_docs()
 ```
 
-## 扩展和插件
-
-### 自定义工具
+### 2. 高级配置
 
 ```python
-from codeviewx.tools import register_tool
+from codeviewx import generate_docs
+import os
 
-@register_tool
-def custom_analyzer(file_path: str) -> str:
-    """自定义分析工具"""
-    # 实现自定义分析逻辑
-    return f"Analysis result for {file_path}"
-```
+# 环境配置
+os.environ['ANTHROPIC_AUTH_TOKEN'] = 'your-api-key'
 
-### 自定义模板
-
-```python
-from codeviewx.prompt import load_prompt
-
-# 使用自定义提示词模板
-custom_prompt = load_prompt(
-    "custom_template",
-    working_directory="/path/to/project",
-    doc_language="Chinese"
+# 高级配置
+generate_docs(
+    working_directory="/path/to/large-project",
+    output_directory="/path/to/output",
+    doc_language="English",
+    recursion_limit=2000,  # 大项目需要更多步骤
+    verbose=True,          # 显示详细日志
+    base_url="https://custom-api.example.com"  # 自定义 API
 )
 ```
 
-这个 API 参考文档提供了 CodeViewX 所有可用接口的详细说明，帮助开发者充分利用系统功能。
+### 3. 批量处理
+
+```python
+from codeviewx import generate_docs
+import os
+
+projects = [
+    {"path": "/path/to/project1", "lang": "Chinese"},
+    {"path": "/path/to/project2", "lang": "English"},
+    {"path": "/path/to/project3", "lang": "Japanese"}
+]
+
+for project in projects:
+    print(f"正在处理项目: {project['path']}")
+    try:
+        generate_docs(
+            working_directory=project['path'],
+            output_directory=f"docs-{project['path'].split('/')[-1]}",
+            doc_language=project['lang'],
+            verbose=False
+        )
+        print(f"✅ {project['path']} 处理完成")
+    except Exception as e:
+        print(f"❌ {project['path']} 处理失败: {e}")
+```
+
+### 4. 集成到工作流
+
+```python
+from codeviewx import generate_docs, start_document_web_server
+import time
+import webbrowser
+
+def docs_workflow(project_path):
+    """完整的文档生成和浏览工作流"""
+    
+    # 1. 生成文档
+    print("🚀 开始生成文档...")
+    generate_docs(
+        working_directory=project_path,
+        doc_language="Chinese",
+        verbose=True
+    )
+    print("✅ 文档生成完成")
+    
+    # 2. 启动服务器
+    print("🌐 启动文档服务器...")
+    import threading
+    
+    def start_server():
+        start_document_web_server("docs")
+    
+    server_thread = threading.Thread(target=start_server, daemon=True)
+    server_thread.start()
+    
+    # 等待服务器启动
+    time.sleep(2)
+    
+    # 3. 打开浏览器
+    print("🔗 打开文档页面...")
+    webbrowser.open("http://127.0.0.1:5000")
+    
+    print("📚 文档已准备就绪！访问 http://127.0.0.1:5000 查看文档")
+
+# 使用示例
+docs_workflow("/path/to/your/project")
+```
+
+---
+
+💡 **提示**: 更多使用示例和最佳实践，请参考 [开发指南](07-development-guide.md)。如果遇到问题，请查看 [快速开始指南](02-quickstart.md) 中的常见问题解决部分。

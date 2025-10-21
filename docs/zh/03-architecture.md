@@ -1,8 +1,8 @@
-# 系统架构设计
+# 系统架构
 
-## 整体架构概览
+## 架构概览
 
-CodeViewX 采用模块化的分层架构设计，结合了现代 AI 技术和传统软件工程最佳实践。系统主要分为以下几个层次：
+CodeViewX 采用分层架构设计，将复杂的文档生成流程分解为多个独立的层次和模块。整个系统基于 AI Agent 模式，结合 LangChain 和 DeepAgents 框架，实现了智能化的代码分析和文档生成。
 
 ```mermaid
 graph TB
@@ -11,633 +11,547 @@ graph TB
         WEB[Web 服务器]
     end
     
-    subgraph "核心业务层"
+    subgraph "核心引擎层"
         GEN[文档生成器]
-        CORE[核心 API]
-        PROMPT[提示词管理]
-    end
-    
-    subgraph "AI 代理层"
-        AGENT[DeepAgents]
-        LANGCHAIN[LangChain]
-        LLM[大语言模型]
+        AGENT[AI Agent]
+        PROMPT[提示词引擎]
     end
     
     subgraph "工具层"
         FS[文件系统工具]
-        SEARCH[搜索工具]
-        CMD[命令工具]
-        I18N[国际化工具]
+        SEARCH[代码搜索工具]
+        CMD[命令执行工具]
     end
     
-    subgraph "基础设施层"
-        RIPGREP[ripgrep]
-        FLASK[Flask]
-        PYTHON[Python Runtime]
+    subgraph "外部服务层"
+        ANTHROPIC[Anthropic Claude API]
+        RG[Ripgrep 搜索引擎]
     end
     
-    CLI --> CORE
-    WEB --> CORE
-    CORE --> GEN
-    GEN --> PROMPT
+    subgraph "支持层"
+        I18N[国际化]
+        LANG[语言检测]
+        CONFIG[配置管理]
+    end
+    
+    CLI --> GEN
+    WEB --> GEN
     GEN --> AGENT
-    AGENT --> LANGCHAIN
-    LANGCHAIN --> LLM
+    AGENT --> PROMPT
     AGENT --> FS
     AGENT --> SEARCH
     AGENT --> CMD
-    FS --> RIPGREP
-    SEARCH --> RIPGREP
-    CMD --> PYTHON
-    WEB --> FLASK
-    I18N --> CORE
+    SEARCH --> RG
+    AGENT --> ANTHROPIC
+    GEN --> I18N
+    GEN --> LANG
+    GEN --> CONFIG
 ```
 
-## 核心组件架构
+## 分层架构详解
 
-### 1. CLI 模块架构
+### 1. 用户接口层 (User Interface Layer)
 
-**文件位置**：`codeviewx/cli.py`
+#### 1.1 命令行接口 (CLI)
 
-**设计模式**：命令模式 + 策略模式
+**文件**: `cli.py` (166行)
 
+**职责**: 
+- 命令行参数解析和验证
+- 用户交互和错误处理
+- 多语言界面支持
+
+**核心组件**:
+```python
+def main():
+    """命令行入口点"""
+    ui_lang = detect_ui_language()
+    get_i18n().set_locale(ui_lang)
+    
+    parser = argparse.ArgumentParser(...)
+    # 参数解析逻辑
+    
+    if args.serve:
+        start_document_web_server(args.output_directory)
+    else:
+        generate_docs(...)
+```
+
+**设计特点**:
+- 支持多语言界面 (`--ui-lang`)
+- 完善的错误处理和用户友好提示
+- 灵活的参数配置
+
+#### 1.2 Web 服务器 (Web Server)
+
+**文件**: `server.py` (190行)
+
+**职责**:
+- 文档展示和导航
+- Markdown 渲染
+- 文件树生成
+
+**核心功能**:
+```python
+@app.route("/")
+def home():
+    return index("README.md")
+
+@app.route("/<path:filename>")
+def index(filename):
+    # Markdown 渲染逻辑
+    # 文件树生成
+    # TOC 处理
+    return render_template('doc_detail.html', ...)
+```
+
+### 2. 核心引擎层 (Core Engine Layer)
+
+#### 2.1 文档生成器 (Document Generator)
+
+**文件**: `generator.py` (376行)
+
+**职责**:
+- AI Agent 创建和管理
+- 文档生成流程控制
+- 工具调度和状态管理
+
+**核心架构**:
+```python
+def generate_docs(
+    working_directory: Optional[str] = None,
+    output_directory: str = "docs",
+    doc_language: Optional[str] = None,
+    # ... 其他参数
+) -> None:
+    # 1. 环境配置和验证
+    validate_api_key()
+    
+    # 2. AI Agent 创建
+    agent = create_deep_agent(tools, prompt)
+    
+    # 3. 流式文档生成
+    for chunk in agent.stream(...):
+        # 进度跟踪和状态更新
+        process_chunk(chunk)
+```
+
+**设计亮点**:
+- **流式处理**: 实时反馈生成进度
+- **错误恢复**: 完善的异常处理机制
+- **进度可视化**: 任务状态跟踪和展示
+
+#### 2.2 AI Agent 引擎
+
+**技术栈**: DeepAgents + LangChain
+
+**架构设计**:
 ```mermaid
 graph LR
-    subgraph "CLI 模块"
-        ARG[参数解析器] --> CTRL[控制器]
-        CTRL --> GEN[生成器调用]
-        CTRL --> SRV[服务器调用]
-        I18N[国际化] --> CTRL
+    subgraph "AI Agent 架构"
+        INPUT[用户输入] --> LLM[Claude LLM]
+        LLM --> TOOL[工具调度]
+        TOOL --> MEMORY[状态管理]
+        MEMORY --> LLM
+        LLM --> OUTPUT[文档输出]
     end
     
-    subgraph "参数处理"
-        WORKING[工作目录]
-        OUTPUT[输出目录]
-        LANG[语言设置]
-        SERVE[服务模式]
+    subgraph "工具生态"
+        TOOL --> FS[文件系统]
+        TOOL --> SEARCH[代码搜索]
+        TOOL --> CMD[命令执行]
     end
-    
-    ARG --> WORKING
-    ARG --> OUTPUT
-    ARG --> LANG
-    ARG --> SERVE
 ```
 
-**核心功能**：
-- **参数解析**：使用 `argparse` 处理命令行参数
-- **模式选择**：根据参数选择生成文档或启动服务器
-- **错误处理**：统一的异常处理和用户友好的错误信息
-- **国际化**：支持多语言界面
+**核心特性**:
+- **工具集成**: 无缝集成文件系统、搜索、命令执行工具
+- **状态管理**: 基于 LangGraph 的状态持久化
+- **流式输出**: 实时生成和反馈
 
-### 2. 文档生成器架构
+### 3. 工具层 (Tools Layer)
 
-**文件位置**：`codeviewx/generator.py`
+#### 3.1 文件系统工具
 
-**设计模式**：工厂模式 + 观察者模式
+**文件**: `tools/filesystem.py` (120行)
 
-```mermaid
-sequenceDiagram
-    participant CLI as CLI 调用
-    participant GEN as 生成器
-    participant PROMPT as 提示词管理
-    participant AGENT as AI 代理
-    participant TOOLS as 工具集
-    participant FS as 文件系统
+**核心工具**:
+```python
+@tool
+def write_real_file(file_path: str, content: str) -> str:
+    """写入文件到真实文件系统"""
     
-    CLI->>GEN: generate_docs()
-    GEN->>PROMPT: load_prompt()
-    PROMPT-->>GEN: 返回提示词模板
-    GEN->>AGENT: create_deep_agent()
-    AGENT->>TOOLS: 注册工具
-    GEN->>AGENT: 开始分析任务
-    loop 分析循环
-        AGENT->>TOOLS: 调用工具
-        TOOLS->>FS: 文件操作
-        FS-->>TOOLS: 返回结果
-        TOOLS-->>AGENT: 工具结果
-    end
-    AGENT->>GEN: 生成完成
-    GEN->>FS: 写入文档文件
+@tool  
+def read_real_file(file_path: str) -> str:
+    """从文件系统读取文件内容"""
+    
+@tool
+def list_real_directory(directory: str = ".") -> str:
+    """列出目录内容"""
 ```
 
-**核心流程**：
-1. **初始化阶段**：加载配置、设置日志、检测语言
-2. **代理创建阶段**：创建 DeepAgents 实例并注册工具
-3. **分析执行阶段**：AI 代理执行分析任务
-4. **文档生成阶段**：生成并保存文档文件
+**设计特点**:
+- **原子操作**: 确保文件操作的原子性
+- **错误处理**: 完善的异常处理和错误反馈
+- **路径规范化**: 支持相对路径和绝对路径
 
-### 3. AI 代理架构
+#### 3.2 代码搜索工具
 
-**设计模式**：代理模式 + 策略模式
+**文件**: `tools/search.py`
 
+**核心实现**:
+```python
+@tool
+def ripgrep_search(pattern: str, path: str = ".", ...) -> str:
+    """基于 ripgrep 的高性能代码搜索"""
+    # 使用 ripgrepy 封装 ripgrep 功能
+    # 支持正则表达式和文件类型过滤
+```
+
+**性能优势**:
+- **高速搜索**: 基于 Rust 的 ripgrep 引擎
+- **正则支持**: 完整的正则表达式功能
+- **文件过滤**: 按文件类型和路径过滤
+
+#### 3.3 命令执行工具
+
+**文件**: `tools/command.py`
+
+**核心功能**:
+```python
+@tool
+def execute_command(command: str, working_dir: str = None) -> str:
+    """执行系统命令"""
+    # 安全的命令执行
+    # 工作目录控制
+    # 输出捕获和格式化
+```
+
+### 4. 提示词引擎 (Prompt Engine)
+
+#### 4.1 提示词模板系统
+
+**文件**: `prompts/document_engineer_zh.md` (9.9KB)
+
+**架构设计**:
 ```mermaid
 graph TD
-    subgraph "AI 代理层"
-        AGENT[DeepAgents 核心代理]
-        WORKFLOW[工作流引擎]
-        CHECKPOINT[检查点管理]
+    TEMPLATE[提示词模板] --> VARIABLES[变量注入]
+    VARIABLES --> CONTEXT[上下文构建]
+    CONTEXT --> INSTRUCTIONS[指令生成]
+    INSTRUCTIONS --> AGENT[AI Agent]
+    
+    subgraph "模板变量"
+        WORKING_DIR[工作目录]
+        OUTPUT_DIR[输出目录] 
+        LANGUAGE[文档语言]
+        SCOPE[分析范围]
     end
-    
-    subgraph "工具注册表"
-        FS_TOOL[文件系统工具]
-        SEARCH_TOOL[搜索工具]
-        CMD_TOOL[命令工具]
-    end
-    
-    subgraph "外部服务"
-        ANTHROPIC[Anthropic API]
-        RIPGREP[ripgrep 服务]
-        FILESYSTEM[文件系统]
-    end
-    
-    AGENT --> WORKFLOW
-    WORKFLOW --> CHECKPOINT
-    AGENT --> FS_TOOL
-    AGENT --> SEARCH_TOOL
-    AGENT --> CMD_TOOL
-    
-    FS_TOOL --> FILESYSTEM
-    SEARCH_TOOL --> RIPGREP
-    CMD_TOOL --> FILESYSTEM
-    
-    WORKFLOW --> ANTHROPIC
 ```
 
-**代理能力**：
-- **工具调用**：动态调用各种分析工具
-- **工作流编排**：管理复杂的分析流程
-- **状态管理**：维护分析过程中的状态信息
-- **错误恢复**：通过检查点机制实现错误恢复
+**核心特性**:
+- **多语言支持**: 中文和英文提示词模板
+- **变量注入**: 动态参数替换
+- **结构化指令**: 清晰的工作流程定义
 
-### 4. 工具系统架构
+#### 4.2 提示词管理
 
-**文件位置**：`codeviewx/tools/`
+**文件**: `prompt.py`
 
-**设计模式**：适配器模式 + 装饰器模式
-
-```mermaid
-graph LR
-    subgraph "工具抽象层"
-        INTERFACE[工具接口]
-        BASE[基础工具类]
-    end
-    
-    subgraph "具体工具实现"
-        FS[文件系统工具]
-        SEARCH[搜索工具]
-        CMD[命令工具]
-    end
-    
-    subgraph "外部依赖"
-        RIPGREP_LIB[ripgrepy]
-        OS_MODULE[os 模块]
-        SUBPROCESS[subprocess]
-    end
-    
-    INTERFACE --> BASE
-    BASE --> FS
-    BASE --> SEARCH
-    BASE --> CMD
-    
-    FS --> OS_MODULE
-    SEARCH --> RIPGREP_LIB
-    CMD --> SUBPROCESS
+```python
+def load_prompt(name: str, **kwargs) -> str:
+    """加载并处理提示词模板"""
+    # 1. 读取模板文件
+    # 2. 变量替换
+    # 3. 格式验证
+    # 4. 返回处理后的提示词
 ```
 
-**工具特性**：
-- **统一接口**：所有工具实现相同的调用接口
-- **错误处理**：统一的错误处理和结果格式化
-- **性能优化**：针对不同操作类型的性能优化
-- **安全性**：路径验证和权限检查
+### 5. 支持服务层 (Support Services Layer)
+
+#### 5.1 国际化系统
+
+**文件**: `i18n.py` (394行)
+
+**架构设计**:
+```python
+class I18n:
+    def __init__(self, locale: str = 'en'):
+        self.locale = locale if locale in MESSAGES else 'en'
+    
+    def t(self, key: str, **kwargs) -> str:
+        """翻译消息并支持变量替换"""
+        msg = MESSAGES.get(self.locale, {}).get(key, key)
+        return msg.format(**kwargs) if kwargs else msg
+```
+
+**支持语言**:
+- **英文 (`en`)**: 默认语言
+- **中文 (`zh`)**: 完整中文支持
+- **自动检测**: 基于系统语言自动选择
+
+#### 5.2 语言检测
+
+**文件**: `language.py`
+
+```python
+def detect_system_language() -> str:
+    """自动检测系统语言"""
+    # 1. 获取系统语言环境
+    # 2. 映射到支持的语言
+    # 3. 返回最佳匹配
+```
 
 ## 数据流架构
 
 ### 文档生成数据流
 
 ```mermaid
-flowchart TD
-    START([开始]) --> CONFIG[读取配置]
-    CONFIG --> DETECT[检测语言]
-    DETECT --> PROMPT[加载提示词]
-    PROMPT --> CREATE[创建代理]
-    CREATE --> ANALYZE[分析项目]
+sequenceDiagram
+    participant User as 用户
+    participant CLI as CLI接口
+    participant Generator as 文档生成器
+    participant Agent as AI Agent
+    participant Tools as 工具集
+    participant API as Claude API
+    participant FS as 文件系统
     
-    subgraph "分析循环"
-        ANALYZE --> READ[读取文件]
-        READ --> SEARCH[搜索代码]
-        SEARCH --> STRUCTURE[分析结构]
-        STRUCTURE --> CHECK{检查完成?}
-        CHECK -->|否| READ
+    User->>CLI: codeviewx -w ./project
+    CLI->>Generator: generate_docs()
+    Generator->>Generator: validate_api_key()
+    Generator->>Agent: create_deep_agent()
+    Generator->>Agent: stream(task_instruction)
+    
+    loop 文档生成流程
+        Agent->>API: 分析请求
+        API-->>Agent: 分析结果
+        Agent->>Tools: 执行工具调用
+        Tools->>FS: 文件操作
+        FS-->>Tools: 操作结果
+        Tools-->>Agent: 工具结果
+        Agent->>FS: write_real_file()
+        FS-->>Agent: 写入确认
+        Agent-->>Generator: 进度更新
+        Generator-->>CLI: 状态反馈
+        CLI-->>User: 进度显示
     end
     
-    CHECK -->|是| GENERATE[生成文档]
-    GENERATE --> WRITE[写入文件]
-    WRITE --> END([结束])
-    
-    style ANALYZE fill:#e1f5fe
-    style GENERATE fill:#f3e5f5
-    style WRITE fill:#e8f5e8
+    Generator-->>CLI: 生成完成
+    CLI-->>User: 文档就绪
 ```
 
-### 工具调用数据流
+### Web 服务数据流
 
 ```mermaid
-graph LR
-    subgraph "AI 代理"
-        AGENT[代理核心]
-        TOOL_CALL[工具调用器]
-        RESULT_PROC[结果处理器]
-    end
+sequenceDiagram
+    participant Browser as 浏览器
+    participant Server as Flask服务器
+    participant FS as 文件系统
+    participant MD as Markdown引擎
+    participant Template as 模板引擎
     
-    subgraph "工具层"
-        FS_TOOL[文件工具]
-        SEARCH_TOOL[搜索工具]
-        CMD_TOOL[命令工具]
-    end
-    
-    subgraph "数据层"
-        FILES[文件系统]
-        CODE[代码库]
-        SYSTEM[系统命令]
-    end
-    
-    AGENT --> TOOL_CALL
-    TOOL_CALL --> FS_TOOL
-    TOOL_CALL --> SEARCH_TOOL
-    TOOL_CALL --> CMD_TOOL
-    
-    FS_TOOL --> FILES
-    SEARCH_TOOL --> CODE
-    CMD_TOOL --> SYSTEM
-    
-    FILES --> RESULT_PROC
-    CODE --> RESULT_PROC
-    SYSTEM --> RESULT_PROC
-    
-    RESULT_PROC --> AGENT
+    Browser->>Server: GET /README.md
+    Server->>FS: read_real_file()
+    FS-->>Server: Markdown内容
+    Server->>MD: markdown.markdown()
+    MD-->>Server: HTML内容
+    Server->>FS: generate_file_tree()
+    FS-->>Server: 文件树数据
+    Server->>Template: render_template()
+    Template-->>Server: 完整HTML
+    Server-->>Browser: 渲染页面
 ```
 
-## 模块依赖关系
+## 核心设计模式
 
-### 依赖层次图
+### 1. Agent 模式 (Agent Pattern)
 
-```mermaid
-graph TD
-    subgraph "应用层"
-        CLI[cli.py]
-        WEB[server.py]
-    end
-    
-    subgraph "业务层"
-        CORE[core.py]
-        GEN[generator.py]
-    end
-    
-    subgraph "服务层"
-        PROMPT[prompt.py]
-        LANG[language.py]
-        I18N[i18n.py]
-    end
-    
-    subgraph "工具层"
-        TOOLS[tools/]
-        STATIC[static/]
-        TPL[tpl/]
-    end
-    
-    subgraph "外部依赖"
-        LANGCHAIN[LangChain]
-        DEEPAGENTS[DeepAgents]
-        FLASK[Flask]
-        RIPGREP[ripgrep]
-    end
-    
-    CLI --> CORE
-    WEB --> CORE
-    CORE --> GEN
-    GEN --> PROMPT
-    GEN --> LANG
-    GEN --> I18N
-    GEN --> TOOLS
-    
-    TOOLS --> RIPGREP
-    WEB --> FLASK
-    WEB --> TPL
-    WEB --> STATIC
-    GEN --> LANGCHAIN
-    GEN --> DEEPAGENTS
+**实现**: 基于 DeepAgents 框架
+
+**特点**:
+- **自主性**: Agent 自主决定工具调用顺序
+- **感知性**: 能够感知环境和状态变化
+- **协作性**: 多个工具协同工作
+
+```python
+# Agent 工具集成示例
+tools = [
+    execute_command,
+    ripgrep_search, 
+    write_real_file,
+    read_real_file,
+    list_real_directory,
+]
+
+agent = create_deep_agent(tools, prompt)
 ```
 
-### 模块耦合度分析
+### 2. 工具模式 (Tool Pattern)
 
-| 模块 | 耦合度 | 依赖模块 | 说明 |
-|------|--------|----------|------|
-| `cli.py` | 低 | `core.py`, `i18n.py` | 仅依赖核心功能，耦合度低 |
-| `generator.py` | 中 | `tools/`, `prompt.py`, `i18n.py` | 依赖多个工具模块 |
-| `server.py` | 低 | `i18n.py`, `tpl/`, `static/` | 独立的 Web 服务模块 |
-| `tools/` | 低 | 外部系统 | 工具模块间相互独立 |
-| `i18n.py` | 无 | 无 | 完全独立的模块 |
+**设计**: LangChain Tool 规范
 
-## 配置管理架构
-
-### 配置层次结构
-
-```mermaid
-graph TD
-    subgraph "配置源"
-        CLI_ARGS[命令行参数]
-        ENV_VARS[环境变量]
-        CONFIG_FILES[配置文件]
-        DEFAULTS[默认值]
-    end
-    
-    subgraph "配置处理器"
-        PARSER[参数解析器]
-        VALIDATOR[配置验证器]
-        MERGER[配置合并器]
-    end
-    
-    subgraph "配置使用"
-        GENERATOR[生成器配置]
-        SERVER[服务器配置]
-        I18N_CONFIG[国际化配置]
-    end
-    
-    CLI_ARGS --> PARSER
-    ENV_VARS --> PARSER
-    CONFIG_FILES --> PARSER
-    DEFAULTS --> PARSER
-    
-    PARSER --> VALIDATOR
-    VALIDATOR --> MERGER
-    
-    MERGER --> GENERATOR
-    MERGER --> SERVER
-    MERGER --> I18N_CONFIG
+**实现**:
+```python
+@tool
+def read_real_file(file_path: str) -> str:
+    """工具装饰器模式实现"""
+    # 工具逻辑实现
 ```
 
-### 配置优先级
+**优势**:
+- **标准化**: 统一的工具接口
+- **可扩展**: 易于添加新工具
+- **类型安全**: 完整的类型提示
 
-1. **命令行参数**（最高优先级）
-2. **环境变量**
-3. **配置文件**（`pyproject.toml`）
-4. **默认值**（最低优先级）
+### 3. 流式处理模式 (Stream Pattern)
+
+**实现**: 基于 LangGraph 的流式处理
+
+**特点**:
+- **实时反馈**: 实时显示处理进度
+- **中断恢复**: 支持处理中断和恢复
+- **内存优化**: 避免大量数据堆积
+
+```python
+for chunk in agent.stream(
+    {"messages": [{"role": "user", "content": task}]},
+    stream_mode="values",
+    config={"recursion_limit": recursion_limit}
+):
+    process_chunk(chunk)
+```
+
+### 4. 模板方法模式 (Template Method Pattern)
+
+**实现**: 提示词模板系统
+
+**结构**:
+```python
+def load_prompt(name: str, **kwargs) -> str:
+    # 1. 模板读取 (固定步骤)
+    # 2. 变量替换 (可变步骤)  
+    # 3. 格式验证 (固定步骤)
+    # 4. 返回结果
+```
+
+## 性能优化策略
+
+### 1. 缓存策略
+
+- **文件缓存**: 避免重复读取相同文件
+- **搜索缓存**: 缓存 ripgrep 搜索结果
+- **API 缓存**: 缓存常见分析模式
+
+### 2. 并发处理
+
+- **工具并行**: 支持多个工具并行执行
+- **文件批处理**: 批量处理文件操作
+- **搜索优化**: 并行搜索多个模式
+
+### 3. 内存管理
+
+- **流式处理**: 避免大量数据在内存中堆积
+- **垃圾回收**: 及时释放不需要的对象
+- **分块处理**: 大文件分块读取和处理
 
 ## 扩展性设计
 
-### 插件架构
+### 1. 工具扩展
 
-CodeViewX 设计了可扩展的插件架构，支持：
+添加新工具的步骤：
+```python
+# 1. 创建新工具
+@tool
+def custom_tool(param: str) -> str:
+    """自定义工具实现"""
+    pass
 
-```mermaid
-graph TB
-    subgraph "核心系统"
-        CORE[核心引擎]
-        REGISTRY[插件注册表]
-        LOADER[插件加载器]
-    end
-    
-    subgraph "插件接口"
-        ANALYZER[分析器接口]
-        GENERATOR[生成器接口]
-        TOOL[工具接口]
-    end
-    
-    subgraph "内置插件"
-        PYTHON_ANALYZER[Python 分析器]
-        JS_ANALYZER[JavaScript 分析器]
-        DOC_GENERATOR[文档生成器]
-    end
-    
-    subgraph "第三方插件"
-        CUSTOM_ANALYZER[自定义分析器]
-        CUSTOM_TOOL[自定义工具]
-    end
-    
-    CORE --> REGISTRY
-    REGISTRY --> LOADER
-    LOADER --> ANALYZER
-    LOADER --> GENERATOR
-    LOADER --> TOOL
-    
-    ANALYZER --> PYTHON_ANALYZER
-    ANALYZER --> JS_ANALYZER
-    ANALYZER --> CUSTOM_ANALYZER
-    
-    GENERATOR --> DOC_GENERATOR
-    TOOL --> CUSTOM_TOOL
+# 2. 注册工具
+tools.append(custom_tool)
+
+# 3. 更新提示词模板
+# 在 prompts/ 目录中更新相关模板
 ```
 
-### 扩展点设计
+### 2. 语言扩展
 
-1. **分析器扩展**：支持新的编程语言和框架
-2. **生成器扩展**：支持新的文档格式和模板
-3. **工具扩展**：支持新的文件操作和搜索工具
-4. **模板扩展**：支持自定义文档模板
+添加新语言支持：
+```python
+# 1. 添加翻译
+MESSAGES['new_lang'] = {
+    'starting': 'New language message',
+    # ... 其他翻译
+}
 
-## 性能优化架构
-
-### 缓存策略
-
-```mermaid
-graph LR
-    subgraph "缓存层"
-        FILE_CACHE[文件缓存]
-        RESULT_CACHE[结果缓存]
-        CONFIG_CACHE[配置缓存]
-    end
-    
-    subgraph "缓存策略"
-        LRU[LRU 淘汰]
-        TTL[过期时间]
-        SIZE_LIMIT[大小限制]
-    end
-    
-    subgraph "缓存操作"
-        GET[获取缓存]
-        SET[设置缓存]
-        INVALIDATE[失效缓存]
-    end
-    
-    FILE_CACHE --> LRU
-    RESULT_CACHE --> TTL
-    CONFIG_CACHE --> SIZE_LIMIT
-    
-    GET --> FILE_CACHE
-    SET --> RESULT_CACHE
-    INVALIDATE --> CONFIG_CACHE
+# 2. 更新语言检测
+def detect_system_language():
+    # 添加新语言检测逻辑
+    pass
 ```
 
-### 并发处理
+### 3. 输出格式扩展
 
-```mermaid
-graph TD
-    subgraph "并发控制"
-        QUEUE[任务队列]
-        WORKER[工作线程]
-        POOL[线程池]
-    end
-    
-    subgraph "任务类型"
-        IO_TASK[IO 密集型任务]
-        CPU_TASK[CPU 密集型任务]
-        NETWORK_TASK[网络请求任务]
-    end
-    
-    QUEUE --> WORKER
-    WORKER --> POOL
-    
-    POOL --> IO_TASK
-    POOL --> CPU_TASK
-    POOL --> NETWORK_TASK
+支持新的文档格式：
+```python
+# 1. 添加格式处理器
+class FormatProcessor:
+    def process(self, content: str) -> str:
+        # 格式转换逻辑
+        pass
+
+# 2. 集成到生成器
+def generate_docs(format: str = 'markdown'):
+    processor = get_processor(format)
+    # ... 处理逻辑
 ```
 
-## 安全架构
+## 安全性设计
 
-### 安全防护机制
+### 1. API 密钥安全
 
-```mermaid
-graph TB
-    subgraph "安全层"
-        AUTH[权限验证]
-        SANITIZE[输入净化]
-        VALIDATE[路径验证]
-    end
-    
-    subgraph "保护措施"
-        SANDBOX[沙箱执行]
-        RESOURCE_LIMIT[资源限制]
-        AUDIT[审计日志]
-    end
-    
-    subgraph "威胁防护"
-        PATH_TRAVERSAL[路径遍历防护]
-        CODE_INJECTION[代码注入防护]
-        RESOURCE_EXHAUSTION[资源耗尽防护]
-    end
-    
-    AUTH --> SANITIZE
-    SANITIZE --> VALIDATE
-    
-    VALIDATE --> SANDBOX
-    SANDBOX --> RESOURCE_LIMIT
-    RESOURCE_LIMIT --> AUDIT
-    
-    SANDBOX --> PATH_TRAVERSAL
-    SANDBOX --> CODE_INJECTION
-    RESOURCE_LIMIT --> RESOURCE_EXHAUSTION
+- **环境变量**: 通过环境变量管理密钥
+- **密钥验证**: 启动前验证密钥有效性
+- **错误处理**: 避免密钥泄露到日志中
+
+### 2. 文件系统安全
+
+- **路径验证**: 防止路径遍历攻击
+- **权限检查**: 验证文件访问权限
+- **沙箱执行**: 限制命令执行范围
+
+### 3. 网络安全
+
+- **HTTPS**: 强制使用 HTTPS 连接
+- **超时控制**: 设置合理的网络超时
+- **重试机制**: 实现指数退避重试
+
+## 监控和日志
+
+### 1. 日志系统
+
+```python
+# 配置日志级别
+logging.basicConfig(
+    level=log_level,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+# 分类日志记录
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger("langchain").setLevel(logging.DEBUG)
 ```
 
-### 安全策略
+### 2. 性能监控
 
-1. **路径验证**：防止路径遍历攻击
-2. **资源限制**：防止资源耗尽攻击
-3. **输入净化**：防止代码注入攻击
-4. **权限控制**：最小权限原则
-5. **审计日志**：完整的操作审计
+- **执行时间**: 记录每个步骤的执行时间
+- **内存使用**: 监控内存使用情况
+- **API 调用**: 统计 API 调用次数和成本
 
-## 监控与日志架构
+### 3. 错误追踪
 
-### 日志系统
+- **异常捕获**: 完整的异常捕获和记录
+- **错误分类**: 按错误类型分类处理
+- **恢复机制**: 自动错误恢复和重试
 
-```mermaid
-graph LR
-    subgraph "日志源"
-        APP_LOG[应用日志]
-        ERROR_LOG[错误日志]
-        PERF_LOG[性能日志]
-        DEBUG_LOG[调试日志]
-    end
-    
-    subgraph "日志处理"
-        COLLECTOR[日志收集器]
-        FORMATTER[格式化器]
-        FILTER[过滤器]
-    end
-    
-    subgraph "日志输出"
-        CONSOLE[控制台输出]
-        FILE[文件输出]
-        REMOTE[远程日志]
-    end
-    
-    APP_LOG --> COLLECTOR
-    ERROR_LOG --> COLLECTOR
-    PERF_LOG --> COLLECTOR
-    DEBUG_LOG --> COLLECTOR
-    
-    COLLECTOR --> FORMATTER
-    FORMATTER --> FILTER
-    FILTER --> CONSOLE
-    FILTER --> FILE
-    FILTER --> REMOTE
-```
+---
 
-### 监控指标
-
-1. **性能指标**：响应时间、吞吐量、资源使用率
-2. **错误指标**：错误率、异常类型、错误分布
-3. **业务指标**：文档生成数量、用户活跃度
-4. **系统指标**：内存使用、CPU 使用、磁盘 IO
-
-## 部署架构
-
-### 部署模式
-
-```mermaid
-graph TB
-    subgraph "本地部署"
-        STANDALONE[独立部署]
-        VENV[虚拟环境]
-        DOCKER[Docker 容器]
-    end
-    
-    subgraph "云端部署"
-        CLOUD_NATIVE[云原生部署]
-        K8S[Kubernetes]
-        SERVERLESS[无服务器]
-    end
-    
-    subgraph "混合部署"
-        HYBRID[混合模式]
-        EDGE[边缘部署]
-        CDN[CDN 加速]
-    end
-    
-    STANDALONE --> VENV
-    VENV --> DOCKER
-    DOCKER --> CLOUD_NATIVE
-    CLOUD_NATIVE --> K8S
-    K8S --> SERVERLESS
-    
-    SERVERLESS --> HYBRID
-    HYBRID --> EDGE
-    EDGE --> CDN
-```
-
-### 容器化架构
-
-```dockerfile
-# 基础镜像
-FROM python:3.9-slim
-
-# 依赖安装
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-# 应用部署
-COPY . /app
-WORKDIR /app
-
-# 运行配置
-EXPOSE 5000
-CMD ["python", "-m", "codeviewx.cli", "--serve"]
-```
-
-这种架构设计确保了 CodeViewX 的：
-
-- **可扩展性**：模块化设计支持功能扩展
-- **可维护性**：清晰的分层架构便于维护
-- **性能**：优化的数据流和缓存策略
-- **安全性**：多层安全防护机制
-- **可靠性**：完善的错误处理和监控
+💡 **架构优势**: CodeViewX 的分层架构设计确保了系统的可扩展性、可维护性和高性能。通过合理的职责分离和模块化设计，每个层次都可以独立演进和优化。
