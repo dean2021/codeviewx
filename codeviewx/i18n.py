@@ -91,9 +91,7 @@ Environment variables:
 3. Or add it to your shell profile (~/.bashrc, ~/.zshrc, etc.)
 4. Restart your terminal or run: source ~/.bashrc''',
         'error_api_key_invalid': 'ANTHROPIC_AUTH_TOKEN appears to be invalid (too short)',
-        'error_api_key_check': 'Please check that your API key is correct and starts with \'sk-ant-api\'',
-        'error_api_key_format': 'ANTHROPIC_AUTH_TOKEN format appears incorrect',
-        'error_api_key_format_expected': 'Expected format: sk-ant-api...',
+        'error_api_key_check': 'Please check that your API key is correct',
         'api_help_header': '🔗 Need help?',
         'api_help_get_key': '• Get your API key: https://console.anthropic.com',
         'api_help_docs': '• View documentation: https://docs.anthropic.com',
@@ -207,9 +205,7 @@ Environment variables:
 3. 或将其添加到 Shell 配置文件 (~/.bashrc, ~/.zshrc 等)
 4. 重启终端或运行: source ~/.bashrc''',
         'error_api_key_invalid': 'ANTHROPIC_AUTH_TOKEN 似乎无效（太短）',
-        'error_api_key_check': '请检查您的 API 密钥是否正确，且以 \'sk-ant-api\' 开头',
-        'error_api_key_format': 'ANTHROPIC_AUTH_TOKEN 格式似乎不正确',
-        'error_api_key_format_expected': '预期格式: sk-ant-api...',
+        'error_api_key_check': '请检查您的 API 密钥是否正确',
         'api_help_header': '🔗 需要帮助？',
         'api_help_get_key': '• 获取 API 密钥: https://console.anthropic.com',
         'api_help_docs': '• 查看文档: https://docs.anthropic.com',

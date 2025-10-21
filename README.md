@@ -121,13 +121,13 @@ A: This means you haven't set up your Anthropic API key yet. To fix:
 
 **Q: What if my API key format is incorrect?**
 
-A: Ensure your API key starts with `sk-ant-api` and you've copied it completely. If issues persist, regenerate the key.
+A: Please ensure you've copied the complete API key without any extra spaces or line breaks. If issues persist, regenerate the key from the Anthropic Console.
 
 ### Improved Error Handling
 
 CodeViewX now provides more user-friendly error messages:
 
-- 🔍 **Automatic Detection**: Validates API key format and validity
+- 🔍 **Automatic Detection**: Validates API key presence
 - 📝 **Clear Messages**: Specific error causes and solution steps
 - 🔗 **Direct Links**: Provides direct links to get API keys
 - 🌐 **Bilingual Support**: Error messages in English and Chinese
