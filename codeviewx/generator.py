@@ -67,7 +67,8 @@ def generate_docs(
     doc_language: Optional[str] = None,
     ui_language: Optional[str] = None,
     recursion_limit: int = 1000,
-    verbose: bool = False
+    verbose: bool = False,
+    base_url: Optional[str] = None
 ) -> None:
     """
     Generate project documentation using AI
@@ -80,6 +81,7 @@ def generate_docs(
         ui_language: User interface language (default: auto-detect, options: 'en', 'zh')
         recursion_limit: Agent recursion limit (default: 1000)
         verbose: Show detailed logs (default: False)
+        base_url: Custom Anthropic API base URL (default: None, uses https://api.anthropic.com)
     
     Examples:
         generate_docs()
@@ -92,6 +94,8 @@ def generate_docs(
         )
         
         generate_docs(doc_language="Chinese", ui_language="zh", verbose=True)
+        
+        generate_docs(base_url="https://custom-api.example.com")
     """
     if ui_language is None:
         ui_language = detect_ui_language()
@@ -117,6 +121,13 @@ def generate_docs(
     
     if working_directory is None:
         working_directory = os.getcwd()
+
+    # Set custom base URL if provided
+    if base_url:
+        os.environ['ANTHROPIC_BASE_URL'] = base_url
+    
+    # Get current base URL (from parameter or environment variable)
+    current_base_url = os.getenv('ANTHROPIC_BASE_URL')
 
     # Validate API key before proceeding
     try:
@@ -144,6 +155,8 @@ def generate_docs(
     print(f"{t('output_dir')}: {output_directory}")
     print(f"{t('doc_language')}: {doc_language} ({doc_language_source})")
     print(f"{t('ui_language')}: {ui_language} ({ui_language_source})")
+    if current_base_url:
+        print(f"{t('api_base_url')}: {current_base_url}")
     
     prompt = load_prompt(
         "document_engineer",

@@ -33,6 +33,9 @@ brew install ripgrep  # macOS
 # 配置 API 密钥
 export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
 
+# 可选：配置自定义 API 基础 URL（用于代理或自定义端点）
+export ANTHROPIC_BASE_URL='https://your-custom-api.example.com'
+
 # 或使用提供的设置脚本（推荐）
 bash scripts/setup_api_key.sh
 ```
@@ -56,6 +59,9 @@ codeviewx
 # 指定项目和语言
 codeviewx -w /path/to/project -l Chinese -o docs
 
+# 使用自定义 API 基础 URL
+codeviewx --base-url https://your-custom-api.example.com
+
 # 浏览文档
 codeviewx --serve -o docs
 ```
@@ -69,6 +75,12 @@ generate_docs(
     working_directory="/path/to/project",
     output_directory="docs",
     doc_language="Chinese"
+)
+
+# 使用自定义 API 基础 URL 生成文档
+generate_docs(
+    working_directory="/path/to/project",
+    base_url="https://your-custom-api.example.com"
 )
 
 # 启动 Web 服务器

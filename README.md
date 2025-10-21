@@ -33,6 +33,9 @@ brew install ripgrep  # macOS
 # Configure API Key
 export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
 
+# Optional: Configure custom API base URL (for proxy or custom endpoints)
+export ANTHROPIC_BASE_URL='https://your-custom-api.example.com'
+
 # Or use the provided setup script (recommended)
 bash scripts/setup_api_key.sh
 ```
@@ -56,6 +59,9 @@ codeviewx
 # Specify project and language
 codeviewx -w /path/to/project -l English -o docs
 
+# Use custom API base URL
+codeviewx --base-url https://your-custom-api.example.com
+
 # Browse documentation
 codeviewx --serve -o docs
 ```
@@ -69,6 +75,12 @@ generate_docs(
     working_directory="/path/to/project",
     output_directory="docs",
     doc_language="English"
+)
+
+# Generate documentation with custom API base URL
+generate_docs(
+    working_directory="/path/to/project",
+    base_url="https://your-custom-api.example.com"
 )
 
 # Start web server

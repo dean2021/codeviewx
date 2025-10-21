@@ -77,6 +77,13 @@ def main():
     )
     
     parser.add_argument(
+        "--base-url",
+        dest="base_url",
+        default=None,
+        help=t('cli_base_url_help')
+    )
+    
+    parser.add_argument(
         "--serve",
         action="store_true",
         help=t('cli_serve_help')
@@ -114,7 +121,8 @@ def main():
                 doc_language=args.doc_language,
                 ui_language=getattr(args, 'ui_language', None),
                 recursion_limit=args.recursion_limit,
-                verbose=args.verbose
+                verbose=args.verbose,
+                base_url=getattr(args, 'base_url', None)
             )
         
     except KeyboardInterrupt:
