@@ -31,8 +31,9 @@ pip install codeviewx
 brew install ripgrep  # macOS
 # sudo apt install ripgrep  # Ubuntu/Debian
 
-# Configure API Key
+# Configure API Key and base url
 export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
+export ANTHROPIC_BASE_URL='https://api.anthropic.com/v1'
 ```
 
 Get your API key at [Anthropic Console](https://console.anthropic.com/)

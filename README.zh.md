@@ -33,6 +33,7 @@ brew install ripgrep  # macOS
 
 # 配置 API 密钥
 export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
+export ANTHROPIC_BASE_URL='https://api.anthropic.com/v1'
 ```
 
 获取 API 密钥：访问 [Anthropic Console](https://console.anthropic.com/)
