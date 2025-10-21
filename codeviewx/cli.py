@@ -121,10 +121,34 @@ def main():
         print("\n\n⚠️  User interrupted", file=sys.stderr)
         sys.exit(130)
     except Exception as e:
-        print(f"\n❌ Error: {e}", file=sys.stderr)
-        if args.verbose:
-            import traceback
-            traceback.print_exc()
+        error_msg = str(e)
+
+        # Handle common authentication errors with better messages
+        if any(auth_error in error_msg.lower() for auth_error in [
+            "could not resolve authentication method",
+            "expected either api_key or auth_token to be set",
+            "x-api-key",
+            "authorization header",
+            "401",
+            "unauthorized",
+            "authentication"
+        ]):
+            print(f"\n❌ {t('error_authentication_failed', default='Authentication Failed')}", file=sys.stderr)
+            print(f"\n{t('error_auth_cause', default='This error occurs when your Anthropic API key is not properly configured.')}", file=sys.stderr)
+            print(f"\n🔧 {t('error_auth_solution', default='Quick Fix:')}", file=sys.stderr)
+            print(f"   export ANTHROPIC_API_KEY='your-api-key-here'", file=sys.stderr)
+            print(f"\n📚 {t('error_auth_help', default='For detailed help, visit:')} https://console.anthropic.com", file=sys.stderr)
+
+            if args.verbose:
+                print(f"\n🔍 {t('error_details', default='Technical Details:')} {error_msg}", file=sys.stderr)
+                import traceback
+                traceback.print_exc()
+        else:
+            print(f"\n❌ Error: {e}", file=sys.stderr)
+            if args.verbose:
+                import traceback
+                traceback.print_exc()
+
         sys.exit(1)
 
 

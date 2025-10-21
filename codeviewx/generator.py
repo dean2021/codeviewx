@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Optional
 
 from deepagents import create_deep_agent
+from langchain_anthropic import ChatAnthropic
 
 from .tools import (
     execute_command,
@@ -19,6 +20,45 @@ from .tools import (
 from .language import detect_system_language
 from .prompt import load_prompt
 from .i18n import get_i18n, t, detect_ui_language
+
+
+def validate_api_key():
+    """
+    Validate that the Anthropic API key is properly configured.
+
+    Returns:
+        None
+
+    Raises:
+        ValueError: If API key is not found or invalid
+    """
+    api_key = os.getenv('ANTHROPIC_API_KEY')
+
+    if not api_key:
+        raise ValueError(
+            "❌ " + t('error_api_key_missing', default="ANTHROPIC_API_KEY environment variable not found") + "\n\n" +
+            t('error_api_key_solution', default=
+                "To fix this issue:\n"
+                "1. Get your API key from https://console.anthropic.com\n"
+                "2. Set the environment variable:\n"
+                "   export ANTHROPIC_API_KEY='your-api-key-here'\n"
+                "3. Or add it to your shell profile (~/.bashrc, ~/.zshrc, etc.)\n"
+                "4. Restart your terminal or run: source ~/.bashrc")
+        )
+
+    if len(api_key) < 10:
+        raise ValueError(
+            "❌ " + t('error_api_key_invalid', default="ANTHROPIC_API_KEY appears to be invalid (too short)") + "\n\n" +
+            t('error_api_key_check', default="Please check that your API key is correct and starts with 'sk-ant-api'")
+        )
+
+    # Validate API key format
+    if not api_key.startswith('sk-ant-api'):
+        raise ValueError(
+            "⚠️  " + t('error_api_key_format', default="ANTHROPIC_API_KEY format appears incorrect") + "\n\n" +
+            t('error_api_key_format_expected', default="Expected format: sk-ant-api...") + "\n" +
+            f"Current format: {api_key[:20]}..."
+        )
 
 
 def generate_docs(
@@ -77,7 +117,20 @@ def generate_docs(
     
     if working_directory is None:
         working_directory = os.getcwd()
-    
+
+    # Validate API key before proceeding
+    try:
+        validate_api_key()
+    except ValueError as api_error:
+        print(f"\n{api_error}")
+        print("\n" + "=" * 80)
+        print(t('api_help_header', default="🔗 Need help?"))
+        print("=" * 80)
+        print(t('api_help_get_key', default="• Get your API key: https://console.anthropic.com"))
+        print(t('api_help_docs', default="• View documentation: https://docs.anthropic.com"))
+        print("=" * 80)
+        raise ValueError(f"API key validation failed: {api_error}")
+
     if doc_language is None:
         doc_language = detect_system_language()
         doc_language_source = t('auto_detected')

@@ -32,6 +32,9 @@ brew install ripgrep  # macOS
 
 # 配置 API 密钥
 export ANTHROPIC_API_KEY='your-api-key-here'
+
+# 或使用提供的设置脚本（推荐）
+bash scripts/setup_api_key.sh
 ```
 
 **从源码安装（开发）：**
@@ -85,6 +88,38 @@ pytest
 black codeviewx/
 flake8 codeviewx/
 ```
+
+## 常见问题
+
+### API 密钥相关错误
+
+**Q: 提示"ANTHROPIC_API_KEY environment variable not found"怎么办？**
+
+A: 这表示您还没有设置 Anthropic API 密钥。解决方法：
+
+1. 从 [Anthropic Console](https://console.anthropic.com/) 获取 API 密钥
+2. 设置环境变量：
+   ```bash
+   export ANTHROPIC_API_KEY='your-api-key-here'
+   ```
+3. 或使用提供的设置脚本：
+   ```bash
+   bash scripts/setup_api_key.sh
+   ```
+
+**Q: API 密钥格式不正确怎么办？**
+
+A: 确保您的 API 密钥以 `sk-ant-api` 开头，并且完整复制。如果问题仍然存在，请重新生成密钥。
+
+### 改进的错误处理
+
+CodeViewX 现在提供更友好的错误提示：
+
+- 🔍 **自动检测**：自动验证 API 密钥格式和有效性
+- 📝 **清晰提示**：具体的错误原因和解决步骤
+- 🔗 **直接链接**：提供获取 API 密钥的直接链接
+- 🌐 **双语支持**：中英文错误提示
+- ⚙️ **设置脚本**：自动化的 API 密钥配置工具
 
 ## 贡献
 

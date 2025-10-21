@@ -32,6 +32,9 @@ brew install ripgrep  # macOS
 
 # Configure API Key
 export ANTHROPIC_API_KEY='your-api-key-here'
+
+# Or use the provided setup script (recommended)
+bash scripts/setup_api_key.sh
 ```
 
 **From Source (Development):**
@@ -85,6 +88,38 @@ pytest
 black codeviewx/
 flake8 codeviewx/
 ```
+
+## Troubleshooting
+
+### API Key Related Errors
+
+**Q: Getting "ANTHROPIC_API_KEY environment variable not found" error?**
+
+A: This means you haven't set up your Anthropic API key yet. To fix:
+
+1. Get your API key from [Anthropic Console](https://console.anthropic.com/)
+2. Set the environment variable:
+   ```bash
+   export ANTHROPIC_API_KEY='your-api-key-here'
+   ```
+3. Or use the provided setup script:
+   ```bash
+   bash scripts/setup_api_key.sh
+   ```
+
+**Q: What if my API key format is incorrect?**
+
+A: Ensure your API key starts with `sk-ant-api` and you've copied it completely. If issues persist, regenerate the key.
+
+### Improved Error Handling
+
+CodeViewX now provides more user-friendly error messages:
+
+- 🔍 **Automatic Detection**: Validates API key format and validity
+- 📝 **Clear Messages**: Specific error causes and solution steps
+- 🔗 **Direct Links**: Provides direct links to get API keys
+- 🌐 **Bilingual Support**: Error messages in English and Chinese
+- ⚙️ **Setup Script**: Automated API key configuration tool
 
 ## Contributing
 

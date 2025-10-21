@@ -79,6 +79,27 @@ Environment variables:
         'error_file_not_found': 'Error: Prompt file not found: {filename}',
         'error_template_variable': 'Error: Template requires variable {variable} but not provided in parameters',
         'error_directory_not_exist': 'Error: Directory does not exist: {path}',
+
+        # API key and authentication errors
+        'error_api_key_missing': 'ANTHROPIC_API_KEY environment variable not found',
+        'error_api_key_solution': '''To fix this issue:
+1. Get your API key from https://console.anthropic.com
+2. Set the environment variable:
+   export ANTHROPIC_API_KEY='your-api-key-here'
+3. Or add it to your shell profile (~/.bashrc, ~/.zshrc, etc.)
+4. Restart your terminal or run: source ~/.bashrc''',
+        'error_api_key_invalid': 'ANTHROPIC_API_KEY appears to be invalid (too short)',
+        'error_api_key_check': 'Please check that your API key is correct and starts with \'sk-ant-api\'',
+        'error_api_key_format': 'ANTHROPIC_API_KEY format appears incorrect',
+        'error_api_key_format_expected': 'Expected format: sk-ant-api...',
+        'api_help_header': '🔗 Need help?',
+        'api_help_get_key': '• Get your API key: https://console.anthropic.com',
+        'api_help_docs': '• View documentation: https://docs.anthropic.com',
+        'error_authentication_failed': 'Authentication Failed',
+        'error_auth_cause': 'This error occurs when your Anthropic API key is not properly configured.',
+        'error_auth_solution': 'Quick Fix:',
+        'error_auth_help': 'For detailed help, visit:',
+        'error_details': 'Technical Details:',
         
         # Server messages
         'server_debug_accessing': '[DEBUG] Accessing file: {filename}',
@@ -172,6 +193,27 @@ Environment variables:
         'error_file_not_found': '错误: 找不到提示词文件: {filename}',
         'error_template_variable': '错误: 模板需要变量 {variable}，但未在参数中提供',
         'error_directory_not_exist': '错误: 目录不存在: {path}',
+
+        # API key and authentication errors
+        'error_api_key_missing': '找不到环境变量 ANTHROPIC_API_KEY',
+        'error_api_key_solution': '''解决方案:
+1. 从 https://console.anthropic.com 获取您的 API 密钥
+2. 设置环境变量:
+   export ANTHROPIC_API_KEY='your-api-key-here'
+3. 或将其添加到 Shell 配置文件 (~/.bashrc, ~/.zshrc 等)
+4. 重启终端或运行: source ~/.bashrc''',
+        'error_api_key_invalid': 'ANTHROPIC_API_KEY 似乎无效（太短）',
+        'error_api_key_check': '请检查您的 API 密钥是否正确，且以 \'sk-ant-api\' 开头',
+        'error_api_key_format': 'ANTHROPIC_API_KEY 格式似乎不正确',
+        'error_api_key_format_expected': '预期格式: sk-ant-api...',
+        'api_help_header': '🔗 需要帮助？',
+        'api_help_get_key': '• 获取 API 密钥: https://console.anthropic.com',
+        'api_help_docs': '• 查看文档: https://docs.anthropic.com',
+        'error_authentication_failed': '认证失败',
+        'error_auth_cause': '此错误表明您的 Anthropic API 密钥未正确配置。',
+        'error_auth_solution': '快速修复:',
+        'error_auth_help': '详细帮助，请访问:',
+        'error_details': '技术详情:',
         
         # Server messages
         'server_debug_accessing': '[调试] 访问文件: {filename}',
