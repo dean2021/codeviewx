@@ -15,13 +15,13 @@ def test_api_key_errors():
     print("=" * 50)
 
     # Save original API key if it exists
-    original_key = os.getenv('ANTHROPIC_API_KEY')
+    original_key = os.getenv('ANTHROPIC_AUTH_TOKEN')
 
     try:
         # Test 1: Missing API key
         print("\n1️⃣ Testing missing API key...")
-        if 'ANTHROPIC_API_KEY' in os.environ:
-            del os.environ['ANTHROPIC_API_KEY']
+        if 'ANTHROPIC_AUTH_TOKEN' in os.environ:
+            del os.environ['ANTHROPIC_AUTH_TOKEN']
 
         result = subprocess.run([
             sys.executable, '-m', 'codeviewx.cli', '--help'
@@ -40,11 +40,11 @@ def test_api_key_errors():
         ], capture_output=True, text=True)
 
         if result.returncode != 0:
-            if "ANTHROPIC_API_KEY" in result.stderr:
+            if "ANTHROPIC_AUTH_TOKEN" in result.stderr:
                 print("   ✅ Correctly shows API key error")
                 if "https://console.anthropic.com" in result.stderr:
                     print("   ✅ Provides helpful link to get API key")
-                if "export ANTHROPIC_API_KEY" in result.stderr:
+                if "export ANTHROPIC_AUTH_TOKEN" in result.stderr:
                     print("   ✅ Shows how to set environment variable")
             else:
                 print("   ❌ Error doesn't mention API key:")
@@ -54,7 +54,7 @@ def test_api_key_errors():
 
         # Test 3: Invalid API key format
         print("\n3️⃣ Testing invalid API key format...")
-        os.environ['ANTHROPIC_API_KEY'] = 'invalid-key-123'
+        os.environ['ANTHROPIC_AUTH_TOKEN'] = 'invalid-key-123'
 
         result = subprocess.run([
             sys.executable, '-m', 'codeviewx.cli', '-w', '.', '-o', '/tmp/test_docs'
@@ -71,7 +71,7 @@ def test_api_key_errors():
 
         # Test 4: Short API key
         print("\n4️⃣ Testing short API key...")
-        os.environ['ANTHROPIC_API_KEY'] = 'sk-ant'
+        os.environ['ANTHROPIC_AUTH_TOKEN'] = 'sk-ant'
 
         result = subprocess.run([
             sys.executable, '-m', 'codeviewx.cli', '-w', '.', '-o', '/tmp/test_docs'
@@ -98,9 +98,9 @@ def test_api_key_errors():
     finally:
         # Restore original API key
         if original_key:
-            os.environ['ANTHROPIC_API_KEY'] = original_key
-        elif 'ANTHROPIC_API_KEY' in os.environ:
-            del os.environ['ANTHROPIC_API_KEY']
+            os.environ['ANTHROPIC_AUTH_TOKEN'] = original_key
+        elif 'ANTHROPIC_AUTH_TOKEN' in os.environ:
+            del os.environ['ANTHROPIC_AUTH_TOKEN']
 
 if __name__ == '__main__':
     test_api_key_errors()

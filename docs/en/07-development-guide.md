@@ -49,7 +49,7 @@ codeviewx --version
 codeviewx --help
 
 # Test AI functionality (requires API key)
-export ANTHROPIC_API_KEY="your-api-key"
+export ANTHROPIC_AUTH_TOKEN="your-api-key"
 codeviewx --working-dir . --output-dir test_docs --verbose
 ```
 

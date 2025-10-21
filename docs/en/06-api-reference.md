@@ -544,13 +544,13 @@ print(__description__)   # "AI-Driven Code Documentation Generator"
 
 CodeViewX responds to several environment variables:
 
-- `ANTHROPIC_API_KEY`: Anthropic API key for Claude access
+- `ANTHROPIC_AUTH_TOKEN`: Anthropic API key for Claude access
 - `PYTHONPATH`: Python path for module resolution
 - `LANG`: System locale for language detection
 
 **Example Setup**:
 ```bash
-export ANTHROPIC_API_KEY="your-api-key-here"
+export ANTHROPIC_AUTH_TOKEN="your-api-key-here"
 export LANG="en_US.UTF-8"
 ```
 

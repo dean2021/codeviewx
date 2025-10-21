@@ -72,7 +72,7 @@ pip install -e ".[dev]"
 **Set Environment Variable (Linux/macOS)**:
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
-export ANTHROPIC_API_KEY='your-api-key-here'
+export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
 
 # Apply changes immediately
 source ~/.bashrc  # or ~/.zshrc
@@ -81,10 +81,10 @@ source ~/.bashrc  # or ~/.zshrc
 **Set Environment Variable (Windows)**:
 ```powershell
 # Command Prompt
-set ANTHROPIC_API_KEY="your-api-key-here"
+set ANTHROPIC_AUTH_TOKEN="your-api-key-here"
 
 # PowerShell
-$env:ANTHROPIC_API_KEY="your-api-key-here"
+$env:ANTHROPIC_AUTH_TOKEN="your-api-key-here"
 ```
 
 **Get Your API Key**: Visit [Anthropic Console](https://console.anthropic.com/) to create an account and obtain your API key.
@@ -280,12 +280,12 @@ sudo apt install python3.9
 **Problem**: Invalid Anthropic API key
 ```bash
 # Verify API key is set
-echo $ANTHROPIC_API_KEY
+echo $ANTHROPIC_AUTH_TOKEN
 
 # Test API key (using curl)
 curl -X POST https://api.anthropic.com/v1/messages \
   -H "Content-Type: application/json" \
-  -H "x-api-key: $ANTHROPIC_API_KEY" \
+  -H "x-api-key: $ANTHROPIC_AUTH_TOKEN" \
   -d '{"model": "claude-3-haiku-20240307", "max_tokens": 10, "messages": [{"role": "user", "content": "Hi"}]}'
 ```
 

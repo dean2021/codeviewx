@@ -91,23 +91,23 @@ rg --version
 ##### 临时设置（当前会话）
 ```bash
 # Linux/macOS
-export ANTHROPIC_API_KEY='your-api-key-here'
+export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
 
 # Windows (PowerShell)
-$env:ANTHROPIC_API_KEY='your-api-key-here'
+$env:ANTHROPIC_AUTH_TOKEN='your-api-key-here'
 
 # Windows (CMD)
-set ANTHROPIC_API_KEY=your-api-key-here
+set ANTHROPIC_AUTH_TOKEN=your-api-key-here
 ```
 
 ##### 永久设置
 ```bash
 # 添加到 ~/.bashrc 或 ~/.zshrc (Linux/macOS)
-echo 'export ANTHROPIC_API_KEY="your-api-key-here"' >> ~/.zshrc
+echo 'export ANTHROPIC_AUTH_TOKEN="your-api-key-here"' >> ~/.zshrc
 source ~/.zshrc
 
 # 或添加到环境变量文件
-echo 'ANTHROPIC_API_KEY=your-api-key-here' >> ~/.environment
+echo 'ANTHROPIC_AUTH_TOKEN=your-api-key-here' >> ~/.environment
 ```
 
 ## 基本使用
@@ -308,15 +308,15 @@ choco install ripgrep
 ```
 
 #### 2. API Key 未设置
-**错误信息**：`ANTHROPIC_API_KEY not found`
+**错误信息**：`ANTHROPIC_AUTH_TOKEN not found`
 
 **解决方案**：
 ```bash
 # 设置环境变量
-export ANTHROPIC_API_KEY='your-api-key-here'
+export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
 
 # 验证设置
-echo $ANTHROPIC_API_KEY
+echo $ANTHROPIC_AUTH_TOKEN
 ```
 
 #### 3. Python 版本不兼容

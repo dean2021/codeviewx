@@ -79,7 +79,7 @@ codeviewx --verbose --recursion-limit 100
 
 | 变量名 | 说明 | 示例 |
 |--------|------|------|
-| `ANTHROPIC_API_KEY` | Anthropic API 密钥 | `sk-ant-api...` |
+| `ANTHROPIC_AUTH_TOKEN` | Anthropic API 密钥 | `sk-ant-api...` |
 | `OPENAI_API_KEY` | OpenAI API 密钥 | `sk-...` |
 | `PYTHONPATH` | Python 路径 | `/path/to/codeviewx` |
 | `LANG` | 系统语言 | `zh_CN.UTF-8` |
@@ -509,8 +509,8 @@ except PermissionError as e:
 
 ```python
 # API 密钥未设置
-if not os.getenv('ANTHROPIC_API_KEY'):
-    raise ValueError("ANTHROPIC_API_KEY environment variable is required")
+if not os.getenv('ANTHROPIC_AUTH_TOKEN'):
+    raise ValueError("ANTHROPIC_AUTH_TOKEN environment variable is required")
 
 # ripgrep 未安装
 try:

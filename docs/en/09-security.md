@@ -242,7 +242,7 @@ from .security.api_keys import SecureAPIKeyManager
 api_manager = SecureAPIKeyManager()
 anthropic_key = api_manager.get_api_key("anthropic")
 if not anthropic_key:
-    raise ValueError("Anthropic API key not found. Please set ANTHROPIC_API_KEY environment variable.")
+    raise ValueError("Anthropic API key not found. Please set ANTHROPIC_AUTH_TOKEN environment variable.")
 ```
 
 ### 3. Network Security
@@ -417,7 +417,7 @@ class SecureFileSystem:
 1. **API Key Security**:
    ```bash
    # Use environment variables, not command line arguments
-   export ANTHROPIC_API_KEY="your-key-here"
+   export ANTHROPIC_AUTH_TOKEN="your-key-here"
    codeviewx --working-dir ./project
    
    # Never include API keys in git repositories

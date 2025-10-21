@@ -7,7 +7,7 @@ This document provides comprehensive troubleshooting guidance for common issues 
 | Issue Category | Common Symptoms | Quick Fix |
 |----------------|----------------|-----------|
 | **Installation** | Module not found, permission errors | Use `pip install -e .` or virtual environment |
-| **API Issues** | Invalid API key, rate limits | Check ANTHROPIC_API_KEY environment variable |
+| **API Issues** | Invalid API key, rate limits | Check ANTHROPIC_AUTH_TOKEN environment variable |
 | **Performance** | Slow processing, memory issues | Increase recursion limit, use parallel processing |
 | **File System** | Permission denied, file not found | Check file permissions and paths |
 | **Network** | Connection timeouts, SSL errors | Verify internet connection and proxy settings |
@@ -141,14 +141,14 @@ Error: Invalid API key
 #### 1. Set Environment Variable
 ```bash
 # Set API key
-export ANTHROPIC_API_KEY="your-api-key-here"
+export ANTHROPIC_AUTH_TOKEN="your-api-key-here"
 
 # Add to shell profile for persistence
-echo 'export ANTHROPIC_API_KEY="your-api-key-here"' >> ~/.bashrc
+echo 'export ANTHROPIC_AUTH_TOKEN="your-api-key-here"' >> ~/.bashrc
 source ~/.bashrc
 
 # Verify
-echo $ANTHROPIC_API_KEY
+echo $ANTHROPIC_AUTH_TOKEN
 ```
 
 #### 2. Check API Key Validity
@@ -156,7 +156,7 @@ echo $ANTHROPIC_API_KEY
 # Test API key with curl
 curl -X POST https://api.anthropic.com/v1/messages \
   -H "Content-Type: application/json" \
-  -H "x-api-key: $ANTHROPIC_API_KEY" \
+  -H "x-api-key: $ANTHROPIC_AUTH_TOKEN" \
   -d '{
     "model": "claude-3-haiku-20240307",
     "max_tokens": 10,
@@ -850,7 +850,7 @@ pip list | grep codeviewx
 rg --version
 
 # CodeViewX configuration
-echo $ANTHROPIC_API_KEY | head -c 10  # Show first 10 chars only
+echo $ANTHROPIC_AUTH_TOKEN | head -c 10  # Show first 10 chars only
 codeviewx --version
 
 # Error reproduction

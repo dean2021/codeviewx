@@ -92,10 +92,10 @@ choco install ripgrep
 #### 2. Configuration
 ```bash
 # Set API key
-export ANTHROPIC_API_KEY="your-api-key-here"
+export ANTHROPIC_AUTH_TOKEN="your-api-key-here"
 
 # Add to shell profile for persistence
-echo 'export ANTHROPIC_API_KEY="your-api-key-here"' >> ~/.bashrc
+echo 'export ANTHROPIC_AUTH_TOKEN="your-api-key-here"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
@@ -126,7 +126,7 @@ User=codeviewx
 Group=codeviewx
 WorkingDirectory=/opt/codeviewx
 Environment=PATH=/opt/codeviewx/.venv/bin
-Environment=ANTHROPIC_API_KEY=your-api-key
+Environment=ANTHROPIC_AUTH_TOKEN=your-api-key
 ExecStart=/opt/codeviewx/.venv/bin/python -m codeviewx.server
 Restart=always
 RestartSec=10
@@ -159,7 +159,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ANTHROPIC_AUTH_TOKEN=${ANTHROPIC_AUTH_TOKEN}
       - PYTHONUNBUFFERED=1
     volumes:
       - ./data:/app/data
@@ -186,7 +186,7 @@ services:
 
 ```bash
 # Create environment file
-echo "ANTHROPIC_API_KEY=your-api-key" > .env
+echo "ANTHROPIC_AUTH_TOKEN=your-api-key" > .env
 
 # Start services
 docker-compose up -d
@@ -258,7 +258,7 @@ docker build -t codeviewx:latest .
 docker run -d \
   --name codeviewx \
   -p 5000:5000 \
-  -e ANTHROPIC_API_KEY="your-api-key" \
+  -e ANTHROPIC_AUTH_TOKEN="your-api-key" \
   -v $(pwd)/data:/app/data \
   -v $(pwd)/output:/app/output \
   codeviewx:latest
@@ -392,7 +392,7 @@ spec:
         ports:
         - containerPort: 5000
         env:
-        - name: ANTHROPIC_API_KEY
+        - name: ANTHROPIC_AUTH_TOKEN
           valueFrom:
             secretKeyRef:
               name: codeviewx-secrets
@@ -573,7 +573,7 @@ kubectl set image deployment/codeviewx codeviewx=codeviewx:v1.1.0 -n codeviewx
       ],
       "secrets": [
         {
-          "name": "ANTHROPIC_API_KEY",
+          "name": "ANTHROPIC_AUTH_TOKEN",
           "valueFrom": "arn:aws:secretsmanager:region:account:secret:codeviewx/api-key"
         }
       ],
@@ -681,7 +681,7 @@ steps:
     - '--cpu=1'
     - '--max-instances=10'
     - '--set-env-vars=PYTHONUNBUFFERED=1'
-    - '--set-secrets=ANTHROPIC_API_KEY=codeviewx-api-key:latest'
+    - '--set-secrets=ANTHROPIC_AUTH_TOKEN=codeviewx-api-key:latest'
 
 substitutions:
   _SERVICE_NAME: 'codeviewx'
@@ -714,7 +714,7 @@ spec:
         ports:
         - containerPort: 5000
         env:
-        - name: ANTHROPIC_API_KEY
+        - name: ANTHROPIC_AUTH_TOKEN
           valueFrom:
             secretKeyRef:
               name: codeviewx-secrets

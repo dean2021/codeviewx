@@ -49,12 +49,12 @@ Error: "Could not resolve authentication method. Expected either api_key or auth
 
 ### 现在的错误提示
 ```
-❌ ANTHROPIC_API_KEY environment variable not found
+❌ ANTHROPIC_AUTH_TOKEN environment variable not found
 
 To fix this issue:
 1. Get your API key from https://console.anthropic.com
 2. Set the environment variable:
-   export ANTHROPIC_API_KEY='your-api-key-here'
+   export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
 3. Or add it to your shell profile (~/.bashrc, ~/.zshrc, etc.)
 4. Restart your terminal or run: source ~/.bashrc
 
@@ -88,7 +88,7 @@ bash scripts/setup_api_key.sh
 
 ### 手动设置
 ```bash
-export ANTHROPIC_API_KEY='your-api-key-here'
+export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
 ```
 
 ### 验证设置

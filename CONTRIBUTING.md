@@ -136,7 +136,7 @@ Unsure where to begin? Look for issues labeled:
 
 5. **Configure Environment**
    ```bash
-   export ANTHROPIC_API_KEY="your-api-key-here"
+   export ANTHROPIC_AUTH_TOKEN="your-api-key-here"
    ```
 
 6. **Verify Setup**

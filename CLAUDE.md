@@ -40,7 +40,7 @@ sudo apt install ripgrep      # Ubuntu/Debian
 choco install ripgrep         # Windows
 
 # Set up API key
-export ANTHROPIC_API_KEY='your-api-key-here'
+export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
 ```
 
 ### Code Quality and Testing
@@ -187,5 +187,5 @@ When adding new tools for the AI agent:
 
 ## Environment Variables
 
-- `ANTHROPIC_API_KEY`: Required for Claude API access
+- `ANTHROPIC_AUTH_TOKEN`: Required for Claude API access
 - No other environment variables required for basic operation

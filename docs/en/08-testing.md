@@ -492,8 +492,8 @@ class TestAPIIntegration:
         import os
         
         # Skip if no API key
-        if not os.getenv('ANTHROPIC_API_KEY'):
-            pytest.skip("No ANTHROPIC_API_KEY available")
+        if not os.getenv('ANTHROPIC_AUTH_TOKEN'):
+            pytest.skip("No ANTHROPIC_AUTH_TOKEN available")
         
         # Create simple test project
         with tempfile.TemporaryDirectory() as temp_dir:

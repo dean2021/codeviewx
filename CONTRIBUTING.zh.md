@@ -136,7 +136,7 @@
 
 5. **配置环境**
    ```bash
-   export ANTHROPIC_API_KEY="your-api-key-here"
+   export ANTHROPIC_AUTH_TOKEN="your-api-key-here"
    ```
 
 6. **验证设置**
