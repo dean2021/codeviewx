@@ -1,15 +1,11 @@
 # Development and testing dependencies
-pytest>=7.0.0
-pytest-cov>=4.0.0
-black>=23.0.0
-flake8>=6.0.0
-mypy>=1.0.0
-isort>=5.0.0
+pytest>=7.0
+pytest-cov>=4.0
+black>=23.0
+flake8>=6.0
+mypy>=1.0
+isort>=5.0
 
 # Build and release tools
 build>=0.10.0
 twine>=4.0.0
-
-Flask==3.0.0
-markdown==3.5.1
-pymdown-extensions==10.5
