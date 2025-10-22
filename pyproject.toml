@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "codeviewx"
-version = "0.2.6"
+version = "0.2.7"
 description = "AI-powered code documentation generator based on DeepAgents and LangChain"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -51,6 +51,7 @@ dependencies = [
     "ripgrepy>=2.0.0",
     "flask>=2.0.0",
     "markdown>=3.4.0",
+    "pymdown-extensions>=10.5",
 ]
 
 [project.optional-dependencies]
@@ -61,6 +62,8 @@ dev = [
     "flake8>=6.0",
     "mypy>=1.0",
     "isort>=5.0",
+    "build>=0.10.0",
+    "twine>=4.0.0",
 ]
 
 [project.urls]
