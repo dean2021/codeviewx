@@ -38,17 +38,22 @@ classifiers = [
 ]
 
 dependencies = [
-    "langchain>=0.3.27",
-    "langchain-anthropic>=0.3.22",
-    "langchain-core>=0.3.79",
-    "langchain-text-splitters>=0.3.11",
-    "langgraph>=0.6.10",
-    "langgraph-checkpoint>=2.1.2",
-    "langgraph-prebuilt>=0.6.4",
-    "langgraph-sdk>=0.2.9",
-    "langsmith>=0.4.34",
-    "deepagents>=0.0.5",
-    "ripgrepy>=2.0.0",
+    "anthropic==0.70.0",
+    "deepagents==0.0.5",
+    "langchain==0.3.27",
+    "langchain-anthropic==0.3.22",
+    "langchain-core==0.3.79",
+    "langchain-text-splitters==0.3.11",
+    "langgraph==0.6.10",
+    "langgraph-checkpoint==2.1.2",
+    "langgraph-prebuilt==0.6.4",
+    "langgraph-sdk==0.2.9",
+    "langsmith==0.4.34",
+    "Pygments==2.19.2",
+    "PyYAML==6.0.3",
+    "requests==2.32.5",
+    "requests-toolbelt==1.0.0",
+    "ripgrepy==2.2.0",
     "flask>=2.0.0",
     "markdown>=3.4.0",
     "pymdown-extensions>=10.5",
@@ -56,7 +61,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.0",
+    "pytest==8.4.2",
     "pytest-cov>=4.0",
     "black>=23.0",
     "flake8>=6.0",
