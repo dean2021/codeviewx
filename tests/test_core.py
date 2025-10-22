@@ -7,7 +7,7 @@ from codeviewx.__version__ import __version__
 
 def test_version():
     """Test version number"""
-    assert __version__ == "0.2.5"
+    assert __version__ == "0.2.8"
     assert isinstance(__version__, str)
 
 

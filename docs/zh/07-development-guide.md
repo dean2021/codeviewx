@@ -583,8 +583,8 @@ python -m twine upload --repository testpypi dist/*
 python -m twine upload dist/*
 
 # 7. 创建 Git 标签
-git tag v0.2.5
-git push origin v0.2.5
+git tag v0.2.8
+git push origin v0.2.8
 ```
 
 ### 3. 发布检查清单

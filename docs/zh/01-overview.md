@@ -186,7 +186,7 @@ addopts = "-v"
 ### 包信息
 
 - **包名**: `codeviewx`
-- **版本**: `0.2.5`
+- **版本**: `0.2.8`
 - **Python 版本要求**: `>=3.8`
 - **许可证**: `GPL-3.0-or-later`
 - **命令行入口**: `codeviewx = "codeviewx.cli:main"`
