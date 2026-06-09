@@ -65,8 +65,9 @@ def test_load_prompt_multiple_variables():
     assert "docs" in prompt
     assert "Chinese" in prompt
     
-    assert prompt.count("/my/project") > 5
-    assert prompt.count("docs") > 5
+    assert "{working_directory}" not in prompt
+    assert "{output_directory}" not in prompt
+    assert "{doc_language}" not in prompt
 
 
 def test_prompt_content_structure():

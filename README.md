@@ -17,7 +17,7 @@ CodeViewX automatically analyzes your codebase and generates professional techni
 - 📝 **Complete Documentation**: Generates 8 standard chapters (overview, quick start, architecture, core mechanisms, data models, API reference, development guide, testing)
 - 🌐 **Multi-Language**: Supports Chinese, English, Japanese, Korean, French, German, Spanish, Russian
 - 🖥️ **Documentation Browser**: Built-in web server for elegant documentation display
-- ⚡ **Fast Search**: Integrated ripgrep for high-speed code search
+- ⚡ **Fast Search**: Uses DeepAgents' built-in code search tools
 
 ## 📦 Quick Start
 
@@ -26,10 +26,6 @@ CodeViewX automatically analyzes your codebase and generates professional techni
 ```bash
 # Install CodeViewX
 pip install codeviewx
-
-# Install ripgrep (code search tool)
-brew install ripgrep  # macOS
-# sudo apt install ripgrep  # Ubuntu/Debian
 
 # Configure API Key and base url
 export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
@@ -89,7 +85,7 @@ Having issues? Check the [detailed documentation](docs/en/12-troubleshooting.md)
 
 **Quick Tips:**
 - API key error? Ensure `ANTHROPIC_AUTH_TOKEN` environment variable is set correctly
-- Search not working? Check if `ripgrep` is installed
+- Search not working? Upgrade `deepagents` and reinstall CodeViewX dependencies
 - More questions? See [docs/en](docs/en/) for complete documentation
 
 ## 🤝 Contributing
@@ -102,7 +98,7 @@ GNU General Public License v3.0 - see [LICENSE](LICENSE) file.
 
 ## 🙏 Acknowledgments
 
-Built with [Anthropic Claude](https://www.anthropic.com/), [DeepAgents](https://github.com/langchain-ai/deepagents), [LangChain](https://www.langchain.com/), and [ripgrep](https://github.com/BurntSushi/ripgrep).
+Built with [Anthropic Claude](https://www.anthropic.com/), [DeepAgents](https://github.com/langchain-ai/deepagents), and [LangChain](https://www.langchain.com/).
 
 ---
 

@@ -17,7 +17,7 @@ CodeViewX 使用 AI（Anthropic Claude + DeepAgents + LangChain）自动分析�
 - 📝 **完整文档体系**：生成 8 个标准章节（概览、快速开始、架构、核心机制、数据模型、API 参考、开发指南、测试）
 - 🌐 **多语言支持**：支持中文、英文、日文、韩文、法文、德文、西班牙文、俄文
 - 🖥️ **文档浏览器**：内置 Web 服务器，优雅展示文档
-- ⚡ **快速搜索**：集成 ripgrep 实现高速代码搜索
+- ⚡ **快速搜索**：使用 DeepAgents 内置代码搜索工具
 
 ## 📦 快速开始
 
@@ -26,10 +26,6 @@ CodeViewX 使用 AI（Anthropic Claude + DeepAgents + LangChain）自动分析�
 ```bash
 # 安装 CodeViewX
 pip install codeviewx
-
-# 安装 ripgrep（代码搜索工具）
-brew install ripgrep  # macOS
-# sudo apt install ripgrep  # Ubuntu/Debian
 
 # 配置 API 密钥
 export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
@@ -86,7 +82,7 @@ start_document_web_server("docs")
 
 **快速提示：**
 - API 密钥错误？确保正确设置 `ANTHROPIC_AUTH_TOKEN` 环境变量
-- 搜索功能异常？检查是否已安装 `ripgrep`
+- 搜索功能异常？升级 `deepagents` 并重新安装 CodeViewX 依赖
 - 更多问题？查看 [docs/zh](docs/zh/) 完整文档
 
 ## 🤝 贡献
@@ -99,7 +95,7 @@ GNU General Public License v3.0 - 详见 [LICENSE](LICENSE) 文件。
 
 ## 🙏 致谢
 
-基于 [Anthropic Claude](https://www.anthropic.com/)、[DeepAgents](https://github.com/langchain-ai/deepagents)、[LangChain](https://www.langchain.com/) 和 [ripgrep](https://github.com/BurntSushi/ripgrep) 构建。
+基于 [Anthropic Claude](https://www.anthropic.com/)、[DeepAgents](https://github.com/langchain-ai/deepagents) 和 [LangChain](https://www.langchain.com/) 构建。
 
 ---
 

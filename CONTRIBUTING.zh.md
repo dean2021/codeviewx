@@ -122,24 +122,12 @@
    pip install -e ".[dev]"
    ```
 
-4. **安装 ripgrep**
-   ```bash
-   # macOS
-   brew install ripgrep
-   
-   # Ubuntu/Debian
-   sudo apt install ripgrep
-   
-   # Windows
-   choco install ripgrep
-   ```
-
-5. **配置环境**
+4. **配置环境**
    ```bash
    export ANTHROPIC_AUTH_TOKEN="your-api-key-here"
    ```
 
-6. **验证设置**
+5. **验证设置**
    ```bash
    codeviewx --version
    pytest
@@ -217,9 +205,8 @@ Closes #(issue 编号)
 
 ### 必需工具
 
-- Python 3.8+
+- Python 3.11+
 - Git
-- ripgrep (rg)
 - 代码编辑器（推荐 VS Code 或 PyCharm）
 
 ### 推荐的 VS Code 扩展
@@ -554,4 +541,3 @@ python -m http.server --directory docs/_build/html
 ---
 
 感谢您为 CodeViewX 做贡献！🎉
-

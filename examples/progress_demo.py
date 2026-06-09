@@ -45,7 +45,7 @@ def demo_verbose_progress():
     print("  🔧 Called 3 tools:")
     print("     - list_real_directory")
     print("     - read_real_file")
-    print("     - ripgrep_search")
+    print("     - grep")
     print("  📍 Step 3 - ToolMessage")
     print("  ...")
     print()
@@ -103,7 +103,7 @@ Output when running `codeviewx` in standard mode:
 🌍 Document Language: Chinese (Auto-detected)
 ✓ Loaded system prompt (injected working directory, output directory, and document language)
 ✓ Created AI Agent
-✓ Registered 5 custom tools: execute_command, ripgrep_search, write_real_file, read_real_file, list_real_directory
+✓ Registered tools: execute_command, write_real_file, read_real_file, list_real_directory, grep
 ================================================================================
 
 📝 Analyzing project and generating documentation...
@@ -141,4 +141,3 @@ if __name__ == "__main__":
     print("  codeviewx              # Standard mode (concise progress)")
     print("  codeviewx --verbose    # Verbose mode (full logging)")
     print()
-

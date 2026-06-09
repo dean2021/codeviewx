@@ -14,14 +14,14 @@ CodeViewX is an AI-powered code documentation generator that uses Anthropic Clau
 - **Generator** (`codeviewx/generator.py`): Main document generation logic using DeepAgents
 - **CLI Interface** (`codeviewx/cli.py`): Command-line interface with argument parsing and internationalization
 - **Web Server** (`codeviewx/server.py`): Flask-based documentation browser
-- **Tools** (`codeviewx/tools/`): File system, search, and command execution tools for AI agents
+- **Tools** (`codeviewx/tools/`): File system and command execution tools for AI agents
 - **Prompts** (`codeviewx/prompts/`): AI prompt templates for documentation generation
 - **i18n** (`codeviewx/i18n.py`): Internationalization support for UI and documentation
 
 ### AI Agent Integration
 
 The project uses DeepAgents with LangChain to create AI agents that have access to specialized tools:
-- `ripgrep_search`: Fast code search using ripgrep
+- `grep`: DeepAgents built-in code search
 - `execute_command`: Command execution for project analysis
 - `read_real_file`/`write_real_file`: File operations
 - `list_real_directory`: Directory traversal
@@ -33,11 +33,6 @@ The project uses DeepAgents with LangChain to create AI agents that have access 
 ```bash
 # Install from source (development)
 pip install -e ".[dev]"
-
-# Install ripgrep (required dependency)
-brew install ripgrep          # macOS
-sudo apt install ripgrep      # Ubuntu/Debian
-choco install ripgrep         # Windows
 
 # Set up API key
 export ANTHROPIC_AUTH_TOKEN='your-api-key-here'
@@ -132,7 +127,7 @@ When adding new tools for the AI agent:
 
 ### pyproject.toml Configuration
 
-- **Black**: Line length 100, Python 3.8+ targets
+- **Black**: Line length 100, Python 3.11 target
 - **isort**: Black profile compatibility
 - **pytest**: Verbose output by default
 - **mypy**: Non-strict type checking (allow untyped defs)
@@ -173,7 +168,6 @@ When adding new tools for the AI agent:
 - **langchain**: AI/LLM integration framework
 - **langchain-anthropic**: Anthropic Claude integration
 - **deepagents**: AI agent framework
-- **ripgrepy**: Python bindings for ripgrep
 - **flask**: Web server for documentation browser
 - **markdown**: Markdown processing with extensions
 

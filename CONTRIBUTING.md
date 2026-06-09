@@ -122,24 +122,12 @@ Unsure where to begin? Look for issues labeled:
    pip install -e ".[dev]"
    ```
 
-4. **Install ripgrep**
-   ```bash
-   # macOS
-   brew install ripgrep
-   
-   # Ubuntu/Debian
-   sudo apt install ripgrep
-   
-   # Windows
-   choco install ripgrep
-   ```
-
-5. **Configure Environment**
+4. **Configure Environment**
    ```bash
    export ANTHROPIC_AUTH_TOKEN="your-api-key-here"
    ```
 
-6. **Verify Setup**
+5. **Verify Setup**
    ```bash
    codeviewx --version
    pytest
@@ -217,9 +205,8 @@ Closes #(issue number)
 
 ### Required Tools
 
-- Python 3.8+
+- Python 3.11+
 - Git
-- ripgrep (rg)
 - Code editor (VS Code, PyCharm recommended)
 
 ### Recommended VS Code Extensions
@@ -554,4 +541,3 @@ By contributing to CodeViewX, you agree that your contributions will be licensed
 ---
 
 Thank you for contributing to CodeViewX! 🎉
-

@@ -7,6 +7,11 @@ from langchain_core.prompts import PromptTemplate
 from .i18n import t
 
 
+PROMPT_ALIASES = {
+    "DocumentEngineer": "document_engineer",
+}
+
+
 def load_prompt(name: str, **kwargs) -> str:
     """
     Load AI documentation generation system prompt
@@ -34,19 +39,21 @@ def load_prompt(name: str, **kwargs) -> str:
         - If kwargs are not provided, the original template text is returned
         - Uses LangChain PromptTemplate's default format ({variable})
     """
+    prompt_name = PROMPT_ALIASES.get(name, name)
+
     try:
         try:
             from importlib.resources import files
-            prompt_file = files("codeviewx.prompts").joinpath(f"{name}.md")
+            prompt_file = files("codeviewx.prompts").joinpath(f"{prompt_name}.md")
             with prompt_file.open("r", encoding="utf-8") as f:
                 template_text = f.read()
         except (ImportError, AttributeError):
             from importlib.resources import open_text
-            with open_text("codeviewx.prompts", f"{name}.md", encoding="utf-8") as f:
+            with open_text("codeviewx.prompts", f"{prompt_name}.md", encoding="utf-8") as f:
                 template_text = f.read()
     except (FileNotFoundError, ModuleNotFoundError):
         package_dir = Path(__file__).parent
-        prompt_path = package_dir / "prompts" / f"{name}.md"
+        prompt_path = package_dir / "prompts" / f"{prompt_name}.md"
         if not prompt_path.exists():
             raise FileNotFoundError(t('error_file_not_found', filename=f"{name}.md"))
         with open(prompt_path, "r", encoding="utf-8") as f:
@@ -60,4 +67,3 @@ def load_prompt(name: str, **kwargs) -> str:
             raise ValueError(t('error_template_variable', variable=str(e))) from e
     
     return template_text
-

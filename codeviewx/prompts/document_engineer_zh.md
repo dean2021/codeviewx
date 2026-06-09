@@ -34,14 +34,14 @@
 - **`execute_command`**: 执行系统命令（`ls`, `cat`, `tree` 等）
   - 示例：`execute_command(command="ls -la")`
 - **`read_real_file`**: 读取文件内容
-  - 示例：`read_real_file(target_file="{working_directory}/README.md")`
+  - 示例：`read_real_file(file_path="{working_directory}/README.md")`
 - **`write_real_file`**: 写入文档
   - **所有生成的文档都必须用这个工具写入 `{output_directory}`**
-  - 示例：`write_real_file(file_path="{output_directory}/README.md", contents="...")`
+  - 示例：`write_real_file(file_path="{output_directory}/README.md", content="...")`
 - **`list_real_directory`**: 列出目录内容
-  - 示例：`list_real_directory(target_directory="{working_directory}")`
-- **`ripgrep_search`**: 搜索代码（支持正则）
-  - 示例：`ripgrep_search(pattern="class.*Controller", path="{working_directory}/src", type="py")`
+  - 示例：`list_real_directory(directory="{working_directory}")`
+- **`grep`**: 搜索代码（字面量文本搜索）
+  - 示例：`grep(pattern="class", path="/src", glob="**/*.py", output_mode="content")`
 
 ## 工作流程
 
@@ -53,11 +53,12 @@
 ### 阶段2: 项目分析 ⭐
 4. **读取 README**（`read_real_file`）：了解项目背景
 5. **列出源代码目录**（`list_real_directory`）：识别模块结构
-6. **搜索核心模式**（`ripgrep_search`）：
-   - 入口点：`"main|if __name__|func main|@SpringBootApplication"`
-   - 类/接口：`"class |interface |struct |type "`
-   - 路由：`"@app.route|@GetMapping|router\."`
-   - 数据库：`"model|schema|@Entity"`
+6. **搜索核心模式**（`grep`）：
+   - `grep` 是字面量文本搜索，不是正则搜索；每个模式分别搜索。
+   - 入口点：搜索 `"main"`、`"if __name__"`、`"func main"`、`"@SpringBootApplication"`
+   - 类/接口：搜索 `"class "`、`"interface "`、`"struct "`、`"type "`
+   - 路由：搜索 `"@app.route"`、`"@GetMapping"`、`"router."`
+   - 数据库：搜索 `"model"`、`"schema"`、`"@Entity"`
 7. **读取核心文件**（`read_real_file`）：深入理解实现
 
 ### 阶段3: 文档生成 ⭐
@@ -172,7 +173,7 @@ sequenceDiagram
 
 1.  **准确性至上** ⭐ 最重要:
     - **❌ 绝对禁止捏造、推测、假设任何不确定的信息**
-    - **✅ 只描述通过工具（`read_real_file`, `ripgrep_search`）实际获取并验证的内容**
+    - **✅ 只描述通过工具（`read_real_file`, `grep`）实际获取并验证的内容**
     - **示例**：
       - ❌ 错误："该项目使用 Flask 框架..." （未读取 `requirements.txt` 确认）
       - ✅ 正确：先 `read_real_file("requirements.txt")`，确认有 `flask==2.3.0`，再描述
@@ -205,7 +206,7 @@ sequenceDiagram
 8.  **技术栈验证与假设避免** ⭐ 重要:
     - **❌ 不要假设任何库或框架存在**，即使它是标准库
     - **✅ 必须先验证**：读取 `package.json`, `requirements.txt`, `go.mod`, `pom.xml` 等
-    - **✅ 检查实际导入**：用 `ripgrep_search` 搜索 `import`, `require`, `use` 语句
+    - **✅ 检查实际导入**：用 `grep` 搜索字面量 `import`, `require`, `use` 语句
     - **✅ 描述实际使用的技术**：列出项目真实使用的库及版本
     - **命名规范**：使用代码中实际的类名、函数名、变量名，不凭想象命名
 
@@ -272,4 +273,3 @@ sequenceDiagram
 2. **第二步：探索项目**（列表、读取、搜索）
 3. **第三步：生成文档**（按顺序：README → 01 → 02 → ...）
 4. **核心要求：准确性至上，不捏造任何信息**
-

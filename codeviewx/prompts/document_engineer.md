@@ -34,14 +34,14 @@ Ignore: `.git/`, `node_modules/`, `venv/`, `__pycache__/`, `.vscode/`, `.idea/`,
 - **`execute_command`**: Execute system commands (`ls`, `cat`, `tree`, etc.)
   - Example: `execute_command(command="ls -la")`
 - **`read_real_file`**: Read file contents
-  - Example: `read_real_file(target_file="{working_directory}/README.md")`
+  - Example: `read_real_file(file_path="{working_directory}/README.md")`
 - **`write_real_file`**: Write documentation
   - **All generated documentation must be written to `{output_directory}` using this tool**
-  - Example: `write_real_file(file_path="{output_directory}/README.md", contents="...")`
+  - Example: `write_real_file(file_path="{output_directory}/README.md", content="...")`
 - **`list_real_directory`**: List directory contents
-  - Example: `list_real_directory(target_directory="{working_directory}")`
-- **`ripgrep_search`**: Search code (regex supported)
-  - Example: `ripgrep_search(pattern="class.*Controller", path="{working_directory}/src", type="py")`
+  - Example: `list_real_directory(directory="{working_directory}")`
+- **`grep`**: Search code (literal text search)
+  - Example: `grep(pattern="class", path="/src", glob="**/*.py", output_mode="content")`
 
 ## Workflow
 
@@ -53,11 +53,12 @@ Ignore: `.git/`, `node_modules/`, `venv/`, `__pycache__/`, `.vscode/`, `.idea/`,
 ### Phase 2: Project Analysis ⭐
 4. **Read README** (`read_real_file`): Understand project background
 5. **List source code directories** (`list_real_directory`): Identify module structure
-6. **Search core patterns** (`ripgrep_search`):
-   - Entry points: `"main|if __name__|func main|@SpringBootApplication"`
-   - Classes/interfaces: `"class |interface |struct |type "`
-   - Routes: `"@app.route|@GetMapping|router\."`
-   - Database: `"model|schema|@Entity"`
+6. **Search core patterns** (`grep`):
+   - `grep` performs literal text search, not regex; run separate searches for each pattern.
+   - Entry points: search `"main"`, `"if __name__"`, `"func main"`, `"@SpringBootApplication"`
+   - Classes/interfaces: search `"class "`, `"interface "`, `"struct "`, `"type "`
+   - Routes: search `"@app.route"`, `"@GetMapping"`, `"router."`
+   - Database: search `"model"`, `"schema"`, `"@Entity"`
 7. **Read core files** (`read_real_file`): Deep dive into implementation
 
 ### Phase 3: Documentation Generation ⭐
@@ -172,7 +173,7 @@ sequenceDiagram
 
 1.  **Accuracy First** ⭐ Most Important:
     - **❌ Absolutely forbidden to fabricate, speculate, or assume any uncertain information**
-    - **✅ Only describe content actually obtained and verified through tools (`read_real_file`, `ripgrep_search`)**
+    - **✅ Only describe content actually obtained and verified through tools (`read_real_file`, `grep`)**
     - **Examples**:
       - ❌ Wrong: "This project uses Flask framework..." (without reading `requirements.txt` to confirm)
       - ✅ Correct: First `read_real_file("requirements.txt")`, confirm `flask==2.3.0` exists, then describe
@@ -205,7 +206,7 @@ sequenceDiagram
 8.  **Technology Stack Verification and Assumption Avoidance** ⭐ Important:
     - **❌ Do not assume any library or framework exists**, even if it's a standard library
     - **✅ Must verify first**: Read `package.json`, `requirements.txt`, `go.mod`, `pom.xml`, etc.
-    - **✅ Check actual imports**: Use `ripgrep_search` to search for `import`, `require`, `use` statements
+    - **✅ Check actual imports**: Use `grep` to search for literal `import`, `require`, `use` statements
     - **✅ Describe actually used technologies**: List the libraries and versions actually used in the project
     - **Naming conventions**: Use actual class names, function names, variable names from the code, don't invent names
 
@@ -272,4 +273,3 @@ Now please follow the above specifications to start analyzing the project and ge
 2. **Step 2: Explore project** (list, read, search)
 3. **Step 3: Generate documentation** (in order: README → 01 → 02 → ...)
 4. **Core requirement: Accuracy first, do not fabricate any information**
-
