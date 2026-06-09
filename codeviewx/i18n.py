@@ -20,7 +20,7 @@ MESSAGES: Dict[str, Dict[str, str]] = {
         'user_specified': 'User-specified',
         'loading_prompt': '✓ Loaded system prompt (injected working directory, output directory, and document language)',
         'created_agent': '✓ Created AI Agent',
-        'registered_tools': '✓ Registered {count} custom tools: {tools}',
+        'registered_tools': '✓ Registered {count} tools: {tools}',
         'analyzing': '📝 Analyzing project and generating documentation...',
         'analyzing_structure': '🔍 Analyzing project structure...',
         'generating_doc': '📄 Generating document ({current}): {filename}',
@@ -70,6 +70,8 @@ Environment variables:
         'cli_ui_language_help': 'User interface language (default: auto-detect). Options: en, zh',
         'cli_verbose_help': 'Show detailed debug logs',
         'cli_base_url_help': 'Custom Anthropic API base URL (default: https://api.anthropic.com)',
+        'cli_api_key_help': 'Anthropic API key (default: uses ANTHROPIC_AUTH_TOKEN env var)',
+        'cli_model_help': 'Claude model name (default: claude-sonnet-4-6). e.g. claude-opus-4-7, claude-haiku-4-5-20251001',
         'cli_serve_help': 'Start web server to browse documentation',
         'cli_missing_docs': 'Error: Documentation directory "{path}" does not exist',
         'cli_serve_hint': 'Please generate documentation first using: codeviewx -w /path/to/project',
@@ -134,7 +136,7 @@ Environment variables:
         'user_specified': '用户指定',
         'loading_prompt': '✓ 已加载系统提示词（已注入工作目录、输出目录和文档语言）',
         'created_agent': '✓ 已创建 AI Agent',
-        'registered_tools': '✓ 已注册 {count} 个自定义工具: {tools}',
+        'registered_tools': '✓ 已注册 {count} 个工具: {tools}',
         'analyzing': '📝 开始分析项目并生成文档...',
         'analyzing_structure': '🔍 分析项目结构...',
         'generating_doc': '📄 正在生成文档 ({current}): {filename}',
@@ -184,6 +186,8 @@ Environment variables:
         'cli_ui_language_help': '用户界面语言（默认：自动检测）。选项：en, zh',
         'cli_verbose_help': '显示详细的调试日志',
         'cli_base_url_help': '自定义 Anthropic API 基础 URL（默认: https://api.anthropic.com）',
+        'cli_api_key_help': 'Anthropic API 密钥（默认：使用 ANTHROPIC_AUTH_TOKEN 环境变量）',
+        'cli_model_help': 'Claude 模型名称（默认: claude-sonnet-4-6）。例如 claude-opus-4-7, claude-haiku-4-5-20251001',
         'cli_serve_help': '启动 Web 服务器浏览文档',
         'cli_missing_docs': '错误: 文档目录 "{path}" 不存在',
         'cli_serve_hint': '请先使用以下命令生成文档: codeviewx -w /path/to/project',
@@ -390,4 +394,3 @@ def detect_ui_language() -> str:
         
     except Exception:
         return 'en'
-

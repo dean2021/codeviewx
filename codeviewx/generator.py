@@ -7,12 +7,12 @@ import logging
 from datetime import datetime
 from typing import Optional
 
-from deepagents import create_deep_agent
 from langchain_anthropic import ChatAnthropic
+from deepagents.backends import FilesystemBackend
+from deepagents import create_deep_agent
 
 from .tools import (
     execute_command,
-    ripgrep_search,
     write_real_file,
     read_real_file,
     list_real_directory,
@@ -54,11 +54,13 @@ def generate_docs(
     ui_language: Optional[str] = None,
     recursion_limit: int = 1000,
     verbose: bool = False,
-    base_url: Optional[str] = None
+    base_url: Optional[str] = None,
+    model: Optional[str] = None,
+    api_key: Optional[str] = None,
 ) -> None:
     """
     Generate project documentation using AI
-    
+
     Args:
         working_directory: Project working directory (default: current directory)
         output_directory: Documentation output directory (default: docs)
@@ -68,20 +70,27 @@ def generate_docs(
         recursion_limit: Agent recursion limit (default: 1000)
         verbose: Show detailed logs (default: False)
         base_url: Custom Anthropic API base URL (default: None, uses https://api.anthropic.com)
-    
+        model: Claude model name (default: None, uses deepagents default)
+              e.g. "claude-sonnet-4-6", "claude-opus-4-7", "claude-haiku-4-5-20251001"
+        api_key: Anthropic API key (default: None, uses ANTHROPIC_AUTH_TOKEN env var)
+
     Examples:
         generate_docs()
-        
+
         generate_docs(
             working_directory="/path/to/project",
             output_directory="docs",
             doc_language="English",
             ui_language="en"
         )
-        
+
         generate_docs(doc_language="Chinese", ui_language="zh", verbose=True)
-        
+
         generate_docs(base_url="https://custom-api.example.com")
+
+        generate_docs(model="claude-opus-4-7")
+
+        generate_docs(api_key="sk-ant-...")
     """
     if ui_language is None:
         ui_language = detect_ui_language()
@@ -108,10 +117,12 @@ def generate_docs(
     if working_directory is None:
         working_directory = os.getcwd()
 
-    # Set custom base URL if provided
+    # Set custom base URL and API key if provided
     if base_url:
         os.environ['ANTHROPIC_BASE_URL'] = base_url
-    
+    if api_key:
+        os.environ['ANTHROPIC_AUTH_TOKEN'] = api_key
+
     # Get current base URL (from parameter or environment variable)
     current_base_url = os.getenv('ANTHROPIC_BASE_URL')
 
@@ -154,15 +165,28 @@ def generate_docs(
     
     tools = [
         execute_command,
-        ripgrep_search,
         write_real_file,
         read_real_file,
         list_real_directory,
     ]
     
-    agent = create_deep_agent(tools, prompt)
+    # If a custom base URL is set, always use ChatAnthropic explicitly
+    # so the model name isn't reinterpreted by langchain's auto-detection
+    # (e.g. "deepseek-*" → ChatDeepSeek, "gpt-*" → ChatOpenAI).
+    if model and (base_url or os.getenv('ANTHROPIC_BASE_URL')):
+        resolved_model = ChatAnthropic(model_name=model)
+    else:
+        resolved_model = model
+
+    agent = create_deep_agent(
+        tools=tools,
+        system_prompt=prompt,
+        model=resolved_model,
+        backend=FilesystemBackend(root_dir=working_directory, virtual_mode=True),
+    )
     print(t('created_agent'))
-    print(t('registered_tools', count=len(tools), tools=', '.join([tool.name for tool in tools])))
+    registered_tools = [tool.name for tool in tools] + ['ls', 'read_file', 'write_file', 'edit_file', 'glob', 'grep']
+    print(t('registered_tools', count=len(registered_tools), tools=', '.join(registered_tools)))
     print("=" * 80)
     
     print(f"\n{t('analyzing')}\n")
@@ -221,7 +245,7 @@ def generate_docs(
                                 preview += f" ... (+{len(items)-3})"
                             result_info = f"✓ {items_count} items | {preview}" if preview else f"✓ {items_count} items"
                         
-                        elif tool_name == 'ripgrep_search':
+                        elif tool_name == 'grep':
                             if content:
                                 lines = [x.strip() for x in content.split('\n') if x.strip()]
                                 matches_count = len(lines)
@@ -253,7 +277,7 @@ def generate_docs(
                         tool_display = {
                             'read_real_file': t('reading'),
                             'list_real_directory': t('listing'),
-                            'ripgrep_search': t('searching'),
+                            'grep': t('searching'),
                             'execute_command': t('executing'),
                         }
                         display_name = tool_display.get(tool_name, f'🔧 {tool_name}')
@@ -343,7 +367,7 @@ def generate_docs(
                         docs_generated += 1
                         print(t('generating_doc', current=docs_generated, filename=doc_file))
                         analysis_phase = False
-                    elif analysis_phase and any(t in ['list_real_directory', 'ripgrep_search'] for t in tool_names):
+                    elif analysis_phase and any(t in ['list_real_directory', 'grep'] for t in tool_names):
                         print(t('analyzing_structure'))
                         analysis_phase = False
             
@@ -372,4 +396,3 @@ def generate_docs(
         print(f"\n{t('generated_file_list')}:")
         for filename in chunk["files"].keys():
             print(f"   - {filename}")
-

@@ -71,11 +71,25 @@ def main():
     )
     
     parser.add_argument(
+        "--model",
+        dest="model",
+        default=None,
+        help=t('cli_model_help')
+    )
+
+    parser.add_argument(
         "--verbose",
         action="store_true",
         help=t('cli_verbose_help')
     )
     
+    parser.add_argument(
+        "--api-key",
+        dest="api_key",
+        default=None,
+        help=t('cli_api_key_help')
+    )
+
     parser.add_argument(
         "--base-url",
         dest="base_url",
@@ -122,7 +136,9 @@ def main():
                 ui_language=getattr(args, 'ui_language', None),
                 recursion_limit=args.recursion_limit,
                 verbose=args.verbose,
-                base_url=getattr(args, 'base_url', None)
+                base_url=getattr(args, 'base_url', None),
+                model=args.model,
+                api_key=args.api_key,
             )
         
     except KeyboardInterrupt:
