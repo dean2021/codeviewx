@@ -43,6 +43,12 @@ codeviewx
 # Specify project path and language
 codeviewx -w /path/to/project -l English -o docs
 
+# Use a custom model (e.g. Claude Opus 4.7)
+codeviewx --model claude-opus-4-7
+
+# Use a custom API endpoint and API key
+codeviewx --base-url https://custom-api.com --api-key sk-ant-xxx
+
 # Start documentation browser
 codeviewx --serve -o docs
 ```
@@ -61,6 +67,12 @@ generate_docs(
 
 # Start web server
 start_document_web_server("docs")
+
+# Use a custom model and API key
+generate_docs(
+    model="claude-opus-4-7",
+    api_key="sk-ant-xxx",
+)
 ```
 
 ## 📚 Documentation

@@ -43,6 +43,12 @@ codeviewx
 # 指定项目路径和语言
 codeviewx -w /path/to/project -l Chinese -o docs
 
+# 使用自定义模型（如 Claude Opus 4.7）
+codeviewx --model claude-opus-4-7
+
+# 使用自定义 API 端点和密钥
+codeviewx --base-url https://custom-api.com --api-key sk-ant-xxx
+
 # 启动文档浏览器
 codeviewx --serve -o docs
 ```
@@ -61,6 +67,12 @@ generate_docs(
 
 # 启动 Web 服务器
 start_document_web_server("docs")
+
+# 使用自定义模型和 API 密钥
+generate_docs(
+    model="claude-opus-4-7",
+    api_key="sk-ant-xxx",
+)
 ```
 
 ## 📚 文档
